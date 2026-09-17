@@ -103,44 +103,38 @@ registers its own connection automatically.
 
 ## Step 3 — Build the data tier
 
-Run the agent from the repository root and paste Prompt 1. It writes
+Run the agent from the repository root and paste Prompt 1. It is the authentic
+design beat: a short prompt, the agent designs the schema. It writes
 `working/notes_app.sql`, deploys a sandbox on port 3310, runs the schema, and reads
 the tables back, logging each step to `working/RUN_LOG.md`.
 
 ```text
-Work in this repository. Put every file you create in the working/ directory, and
-append a short record of each step (the command, and the key result) to
-working/RUN_LOG.md as you go. Complete every step in order.
+Work in this repository and complete every step in order. Put the files you create
+in the working/ directory, and append a short record of each step to
+working/RUN_LOG.md as you go.
 
-1. Design a MariaDB schema named notes_app for a note-taking application and
-   write it to working/notes_app.sql. A reference schema with the names to match
-   is in research/notes_app.sql. Use these tables and names exactly:
-   - account: a person, with email, display name and password hash.
-   - notebook: a folder of notes owned by an account, unique name per account,
-     one default per account.
-   - note: belongs to a notebook and an account, with a title, a Markdown body,
-     a status of active, archived or trashed, a pinned flag, and created and
-     updated timestamps.
-   - tag and note_tag: free-form labels owned by an account, many-to-many with
-     notes through the note_tag junction.
-   - attachment: a file pointer for a note (file name, mime type, byte size,
-     storage key, uploaded timestamp).
-   Make note titles and bodies full-text searchable. Give account and notebook
-   row history. Add a view of active notes with their notebook, owner and a
-   joined tag list. Use MariaDB idioms throughout.
+1. Create a MariaDB database schema named notes_app for a note-taking app and
+   store it in working/notes_app.sql.
 
-2. Deploy a MariaDB sandbox on port 3310 with root password demo-pw and its data
-   directory at working/sandbox, connect to it, and run working/notes_app.sql over
+2. Deploy a sandbox instance on port 3310 with root password demo-pw and its data
+   directory at working/sandbox, connect to it, and run working/notes_app.sql via
    the MCP server.
 
-3. List the tables you created and show the columns of the note table to confirm
-   the schema is in place. Record the table list in working/RUN_LOG.md.
+3. List the tables you created and show me the columns of the note table.
 ```
 
-**Check:** `working/notes_app.sql` opens with a session-settings block, primary
-keys are `UUID` with `UUID_v7()`, `account` and `notebook` are
-`WITH SYSTEM VERSIONING`, and `note` has a `FULLTEXT` index on `(title, body)`. The
-table list shows the six tables plus the `v_active_note` view.
+**Check against the reference.** Compare `working/notes_app.sql` with
+`research/notes_app.sql`, the canonical curated schema. The reference is the oracle,
+not an input to the prompt. Use it to confirm the run hit the MariaDB idioms:
+`CREATE OR REPLACE TABLE`, `utf8mb4`, system versioning on the owner and notebook
+tables, a `FULLTEXT` index on the note title and body, and `UUID`/`UUID_v7()`
+primary keys. Expect some drift on a free run, such as the owner table named `user`
+rather than `account`, or a missing `attachment` table. That is a finding for the
+check, not a failure of the skill.
+
+**Reproducible app track.** The REST tier and client are built for the canonical
+names. If the free design drifted, deploy `research/notes_app.sql` into the sandbox
+before Step 4 so the API and app run on the schema they were written for.
 
 ## Step 4 — Build the REST tier
 
