@@ -302,6 +302,7 @@ scaffolding (`README.md`, `bin/`, `docs/`, `research/`) in place.
 - [`docs/notes_app-prd.md`](docs/notes_app-prd.md) — the client design.
 - [`docs/demo-prompts.md`](docs/demo-prompts.md) — the three prompts on their own.
 - [`docs/stack-layering.md`](docs/stack-layering.md) — how the layers relate.
+- [`docs/decisions.md`](docs/decisions.md) — the choices behind the demo and why.
 - [`research/notes_app.sql`](research/notes_app.sql) — the canonical schema.
 - [`research/synthetic_data.sql`](research/synthetic_data.sql) — test data for it.
 - [`research/agent-security-note.md`](research/agent-security-note.md) — the blocked mass-delete talking point.
