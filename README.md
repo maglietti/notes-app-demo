@@ -71,13 +71,20 @@ In Claude Code:
 On first start the plugin downloads and extracts the `mariadb-shell` package. This
 takes about a minute and happens once.
 
-Confirm the skills loaded by asking for something only a skill knows. If the answer
-uses the native `UUID` type with `UUID_v7()` rather than `CHAR(36)`, the skills are
-in place:
+Confirm the skills loaded by asking for something only a skill knows:
 
 ```text
 Write a CREATE TABLE for a product catalogue, MariaDB style.
 ```
+
+The tell is not the primary key type. The skill chooses that by domain: an
+`INT UNSIGNED AUTO_INCREMENT` surrogate for a catalogue, or `UUID` with `UUID_v7()`
+where the id must not leak row counts, as the `notes_app.account` table does. The
+reliable signals are the MariaDB-only constructs that generic or MySQL SQL never
+emits: `CREATE OR REPLACE TABLE`, `utf8mb4` (never the `utf8` alias), and one or
+more of `WITH SYSTEM VERSIONING`, a `COMPRESSED` text column, a `PERSISTENT`
+generated column, an `INVISIBLE` column, a descending index, or `PAGE_COMPRESSED`.
+If the DDL carries those, the skill loaded.
 
 ## Step 2 — Configure the MCP server
 
