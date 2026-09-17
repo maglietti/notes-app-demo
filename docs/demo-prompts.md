@@ -21,16 +21,17 @@ The prompts name the artifact and number the steps, and say "in order" where the
 sequence is a hard constraint, because agents land the work better that way.
 
 Prompt 1 designs the schema from a short prompt, the way the talk shows it. The
-result is checked against `research/notes_app.sql`, the canonical curated schema;
-that file is an oracle, never an input to the prompt.
+result is checked against `research/notes_app.sql`, the canonical schema frozen from
+an earlier agent run; that file is an oracle, never an input to the prompt.
 
 Expect some drift on a free run: the skill may name the owner table `user` rather
 than `account`, or leave out the `attachment` table. The REST views in Prompt 2 and
 the client in Prompt 3 are built for the canonical names (`account`, `notebook`,
-`note`, `tag`, `note_tag`, `attachment`). To run the app track reproducibly, deploy
-`research/notes_app.sql` as the schema rather than a freshly designed one. Keep the
-free design for the talk beat; use the canonical schema when the app has to run on
-it.
+`note`, `tag`, `note_tag`, `attachment`). Keep the free design for the talk beat.
+When the app has to run on it, use the app track instead: deploy
+`research/notes_app.sql` and load the sample data from `research/synthetic_data.sql`
+(a direct load, not a prompt), so the API and client run on a known, populated
+schema. The README's Step 4 has the load command.
 
 ---
 

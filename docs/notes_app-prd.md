@@ -3,8 +3,8 @@
 **Version:** 1.0
 **Date:** 2026-09-17
 **Owner:** Michael Aglietti
-**Schema:** [`notes_app.sql`](notes_app.sql) (MariaDB 11.8 LTS)
-**ER:** [`notes_app-er.md`](notes_app-er.md)
+**Schema:** [`research/notes_app.sql`](../research/notes_app.sql) (MariaDB 11.8 LTS)
+**ER:** [`research/notes_app-er.md`](../research/notes_app-er.md)
 
 ## 1. Purpose and role in the talk
 
@@ -49,14 +49,21 @@ schema sample data). Multi-user is a schema capability, not a demo requirement.
 
 ## 4. Data model
 
-Six tables and one view, unchanged from [`notes_app.sql`](notes_app.sql):
+Six tables and one view, from the canonical schema in
+[`research/notes_app.sql`](../research/notes_app.sql), frozen from the agent's design
+run. Every table's primary key is a `uuid` column named `id` defaulting to
+`UUID_v7()`; native mode binds to these exact column names.
 
-- `account` — one seeded row. System-versioned.
-- `notebook` — folders, unique name per account, one `is_default`. System-versioned.
+- `account` — one seeded row (`id`, `email`, `display_name`, `created_at`; no
+  password field in this build). System-versioned.
+- `notebook` — folders, unique name per account, one `is_default`, enforced to at
+  most one per account by a generated `default_flag`. System-versioned.
 - `note` — `title`, Markdown `body`, `status` enum (`active` / `archived` /
   `trashed`), `is_pinned`, timestamps. `FULLTEXT(title, body)` drives search.
-- `tag`, `note_tag` — free-form labels, many-to-many with notes.
-- `attachment` — object-storage pointers. Read model only in this app.
+- `tag`, `note_tag` — free-form labels, many-to-many with notes; `note_tag` carries
+  an `added_at`.
+- `attachment` — object-storage pointers (`file_name`, `mime_type`, `size_bytes`,
+  `storage_key`). Read model only in this app.
 - `v_active_note` — active notes with notebook, owner and a comma-joined tag list.
   Backs the default list view.
 
