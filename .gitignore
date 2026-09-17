@@ -1,0 +1,26 @@
+# Working artifacts — the demo regenerates everything under working/
+# (schema, REST DDL, run log, and the sandbox data directory).
+working/
+
+# Secrets and local config
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments and tool caches
+.venv/
+venv/
+env/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# macOS
+.DS_Store
