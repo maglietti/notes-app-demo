@@ -53,11 +53,25 @@ the whole debate.
 
 ## REST tier
 
-- **Demo endpoints are created without `AUTHENTICATION REQUIRED`**, so the client
-  reads them without an auth app. Production would add an MRS auth app, a REST role
+- **The REST tier is the demo, not scaffolding for the app.** The talk is about the
+  agent building an API tier, so creating the endpoints is the payload, not setup.
+  They exist independent of any client. It is also the strongest evidence for the
+  skills thesis: REST Service DDL (the session-state rule, `@UNNEST`, the CRUD flags)
+  is the most niche, least-trained grammar in the run, the place a model is most
+  confidently wrong without a skill.
+- **The app does not consume the endpoints, and is not proof of the tier.** Native
+  mode talks straight to the tables. The app's original job was to validate the API
+  by consuming it; native mode removed that role, so the app is now a usable client
+  on the same schema, nothing more. What the router's absence orphaned is the
+  app-as-proof, not the REST creation.
+- **Demo endpoints are created without `AUTHENTICATION REQUIRED`**, so a client can
+  read them without an auth app. Production would add an MRS auth app, a REST role
   and a test user.
-- **The tier is verified through the metadata**, with `SHOW REST` and
-  `SHOW CREATE REST VIEW`, not by HTTP. The metadata is the API definition.
+- **The metadata is the proof, and it proves defined, not served.** `SHOW REST` and
+  `SHOW CREATE REST VIEW` confirm the agent produced correct REST grammar. They do
+  not prove an endpoint answers over HTTP, which needs the router. State this
+  precisely on stage ("the API definition is here; serving it is a router away")
+  rather than claiming the endpoints answer.
 
 ## Serving and the router
 
