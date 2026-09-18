@@ -1,4 +1,4 @@
-# Notes App demo for All Things Open
+# Notes App demo
 
 This repository holds the runbook for a live demo. One coding agent, handed the MariaDB skills and a live database over the Model Context Protocol, designs a note-taking schema, deploys a throwaway MariaDB server, runs the schema against it, and puts a REST API in front of it, all from a handful of prompts. A Textual client, built on the Python terminal-UI framework, then runs on the result, so the work the agent did is something you can open and use rather than just read.
 
@@ -10,15 +10,15 @@ The repository tracks the instructions, and nothing else. This is the committed 
 
 ```text
 .
-├── README.md            this runbook
+├── README.md                  this runbook
 ├── bin/
-│   └── notes-app        stable launcher for the generated app
-├── docs/                inputs the agent reads
-│   ├── notes_app-prd.md   the client design
-│   ├── demo-prompts.md    the three prompts on their own
-│   ├── stack-layering.md  how the pieces relate
-│   └── decisions.md       the choices behind the demo
-└── research/            inputs the agent reads
+│   └── notes-app              stable launcher for the generated app
+├── docs/                      inputs the agent reads
+│   ├── notes_app-prd.md       the client design
+│   ├── demo-prompts.md        the three prompts on their own
+│   ├── stack-layering.md      how the pieces relate
+│   └── decisions.md           the choices behind the demo
+└── research/                  inputs the agent reads
     ├── notes_app.sql          the canonical schema (frozen from an agent run)
     ├── synthetic_data.sql     test data for the canonical schema
     ├── agent-security-note.md the blocked mass-delete talking point
@@ -28,21 +28,21 @@ The repository tracks the instructions, and nothing else. This is the committed 
 Everything a run generates is gitignored, so `git clean -fdx` removes all of it:
 
 ```text
-notes_app/                              the Textual app package        (Prompt 3)
+notes_app/                                    the Textual app package        (Prompt 3)
 pyproject.toml, uv.lock, .env, .env.example   the app project and config (Prompt 3)
-working/                                schema, REST DDL, RUN_LOG, sandbox datadir (Prompts 1-2)
-.venv/                                  the app's virtual environment
+working/                                      schema, REST DDL, RUN_LOG, sandbox datadir (Prompts 1-2)
+.venv/                                        the app's virtual environment
 ```
 
 The repository is the project, not the output. It holds the instructions for generating the app, while the app itself and every prompt output stay ignored, so a run never dirties the tree and `git clean -fdx` returns it to a clean, re-runnable state. During a run the agent reads from `docs/` and `research/`, builds the `notes_app` package at the repository root, and writes its working files under `working/`.
 
 ## The stack, in three layers
 
-| Layer                    | What it is                                                                            | You install it? |
-| ------------------------ | ------------------------------------------------------------------------------------- | --------------- |
-| `ai-plugins`             | The harness plugin. Ships 82 MariaDB skills and wires the MCP server.                 | Yes             |
-| `mariadb-shell`          | The host runtime. Loads the plugins and exposes the MCP server.                       | Automatic       |
-| `mariadb-shell-plugins`  | The tool implementations the shell loads: `mcp_plugin`, `mrs_plugin`, `msm_plugin`.   | Automatic       |
+| Layer                   | What it is                                                                          | You install it? |
+| ----------------------- | ----------------------------------------------------------------------------------- | --------------- |
+| `ai-plugins`            | The harness plugin. Ships 82 MariaDB skills and wires the MCP server.               | Yes             |
+| `mariadb-shell`         | The host runtime. Loads the plugins and exposes the MCP server.                     | Automatic       |
+| `mariadb-shell-plugins` | The tool implementations the shell loads: `mcp_plugin`, `mrs_plugin`, `msm_plugin`. | Automatic       |
 
 You install only the top layer. Installing `ai-plugins` pulls down `mariadb-shell` and its bundled plugins the first time it runs, so the tools you call (`db.*`, `sandbox.*`, `msm.*`, and the REST grammar) all come from the bottom layer with no separate install. For how the three layers fit together, see [`docs/stack-layering.md`](docs/stack-layering.md).
 
@@ -249,13 +249,13 @@ Because the repository tracks only the instructions, `git clean -fdx` clears eve
 
 ## Troubleshooting
 
-| Symptom                                    | Cause                                                                        | Fix                                                                       |
-| ------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| A tool call hangs and never returns        | The repository root is not on the allowed-paths list.                        | Add it with `mariadb-shell -- mcp setup`.                                 |
-| Sandbox deploys but the connection refuses | The root password was blank.                                                | Redeploy with a non-blank password (`demo-pw`).                          |
-| REST DDL fails partway down                | It ran through `db.execute_sql_script`, which gives each statement a session. | Rerun through `db.execute_sql`, one statement at a time.                  |
-| Endpoints do not answer over HTTP          | No router is serving the service.                                            | Expected. Use native mode, or bootstrap a router for REST mode.          |
-| "Not a configured connection"             | The URI is not on the allow-list or asks for more than was configured.       | Rerun `mcp setup`, or drop the extra schema or option from the URI.      |
+| Symptom                                    | Cause                                                                         | Fix                                                                 |
+| ------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| A tool call hangs and never returns        | The repository root is not on the allowed-paths list.                         | Add it with `mariadb-shell -- mcp setup`.                           |
+| Sandbox deploys but the connection refuses | The root password was blank.                                                  | Redeploy with a non-blank password (`demo-pw`).                     |
+| REST DDL fails partway down                | It ran through `db.execute_sql_script`, which gives each statement a session. | Rerun through `db.execute_sql`, one statement at a time.            |
+| Endpoints do not answer over HTTP          | No router is serving the service.                                             | Expected. Use native mode, or bootstrap a router for REST mode.     |
+| "Not a configured connection"              | The URI is not on the allow-list or asks for more than was configured.        | Rerun `mcp setup`, or drop the extra schema or option from the URI. |
 
 ## Files
 
