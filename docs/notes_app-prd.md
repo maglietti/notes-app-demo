@@ -10,15 +10,15 @@
 
 The Notes App is a terminal client for the `notes_app` schema. It reads and writes notes through the MariaDB REST Service that the coding agent stands up in the All Things Open talk *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*.
 
-The talk's live demo is the scaffolding run, where one prompt builds the schema, deploys a sandbox, runs the DDL over MCP, and puts a REST service in front of the schema. This app is the capstone that makes the tier concrete, since the agent designed an API in about five minutes and this client runs on it with no server code written by hand. It shows the endpoints answering through a real application serving a user rather than through a read of the metadata.
+The talk's live demo is the scaffolding run, where one prompt builds the schema, deploys a sandbox, runs the DDL over MCP, and puts a REST service in front of the schema. The agent designs that API tier in about five minutes with no server code written by hand, and the proof that it is real is the metadata, since `SHOW REST` and `SHOW CREATE REST VIEW` show the endpoints the agent defined.
 
-The app is a payoff artifact and a clone-and-run repository, not the primary demo, so budget it as a short closing beat or a post-talk link.
+This app is a separate payoff artifact, a usable client on the same schema rather than proof of the tier. It defaults to native mode and reads and writes the tables directly, so it needs no REST Daemon to start and does not run on the `/notesApp` endpoints during the demo. It is a clone-and-run repository, not the primary demo, so budget it as a short closing beat or a post-talk link.
 
 ## 2. Stack decisions
 
 | Axis        | Choice               | Reason                                                                                                                                                                                                              |
 | ----------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Connection  | **REST**             | The app consumes the MariaDB REST Service (`/notesApp`), the exact artifact the talk produces. A native connector would bypass the API tier the talk is about.                                                      |
+| Connection  | **Native (default)** | The client defaults to a native connector, because serving REST over HTTP needs a router that is out of scope, and native keeps the demo running with no daemon. It can also consume the REST Service at `/notesApp` with `NOTES_APP_MODE=rest`, the artifact the talk produces.                                                      |
 | Interface   | **TUI**              | The whole demo lives in a terminal over MCP and SQL. A TUI keeps the payoff in the same register: no browser, no build step, instant start on a projector.                                                          |
 | Language    | **Python + Textual** | Charm is a Go framework and falls outside the Python/Node constraint. Textual is the Python equivalent, with tables, Markdown rendering, and CSS-like styling. Python matches the surrounding plugin tooling.       |
 | HTTP client | **httpx**            | Async client that fits Textual's asyncio loop; a blocking `requests` call would freeze the UI mid-render. Its API mirrors `requests`, so little familiarity is lost. `requests` would need a Textual thread worker. |
@@ -61,7 +61,7 @@ CREATE REST VIEW     /notebook AS notes_app.notebook { ... }
 CREATE REST VIEW     /tag      AS notes_app.tag      { ... }
 ```
 
-Endpoints the TUI calls, served by the REST Daemon under the service root:
+Endpoints the client calls in REST mode, served by the REST Daemon under the service root:
 
 | Method + path                         | Use                                                        |
 | ------------------------------------- | ---------------------------------------------------------- |
@@ -146,14 +146,14 @@ Key bindings are `n` for a new note, `e` to edit, `p` to pin, `a` to archive, `d
 
 ``` text
 Textual UI  ─▶  DataSource (interface)
-                   ├─ RestDataSource   (default, httpx → REST Daemon)
-                   └─ NativeDataSource  (fallback, mariadb Connector/Python)
+                   ├─ NativeDataSource  (default, mariadb Connector/Python)
+                   └─ RestDataSource    (optional, httpx → REST Daemon)
 ```
 
 A single `DataSource` interface backs two implementations, and the UI never knows which one it holds.
 
-- **`RestDataSource`** is the default and the on-thesis path, calling the `/notesApp` endpoints from section 5.
-- **`NativeDataSource`** runs the same queries through MariaDB Connector/Python against port 3310. It exists for one reason. If the REST Daemon misbehaves on stage, `NOTES_APP_MODE=native` swaps the data layer with no UI change and the demo still runs, a scoped contingency rather than speculative feature work.
+- **`NativeDataSource`** is the default. It runs the app's queries through MariaDB Connector/Python against port 3310, binding to the schema's actual columns, so the client starts with no REST Daemon.
+- **`RestDataSource`** is the on-thesis path, calling the `/notesApp` endpoints from section 5. It is selected with `NOTES_APP_MODE=rest` and needs a running REST Daemon, which is out of scope for the talk, so it stays available but off by default.
 
 The status line names the active mode, so the audience always knows which tier they are watching.
 
@@ -166,29 +166,28 @@ The status line names the active mode, so the audience always knows which tier t
 
 ## 11. Demo runbook and prerequisites
 
-1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw")`.
-2. Run [`research/notes_app.sql`](../research/notes_app.sql) against it with `db.execute_sql_script`.
-3. Run the REST DDL through `db.execute_sql` one statement at a time, because the REST grammar is session state and `db.execute_sql_script` breaks it. This is the break the talk shows and the agent recovers from.
-4. Publish the service with `ALTER REST SERVICE /notesApp PUBLISHED`.
-5. Start the REST Daemon so the endpoints answer over HTTP. This is the one piece the tutorials leave out, and it is a hard prerequisite for the REST data mode.
-6. Point the app at the service root and run it.
-7. Fall back to native if the daemon is not up: set `NOTES_APP_MODE=native` and the app talks to port 3310 directly.
-8. Clean up with `sandbox.stop` and then `sandbox.delete`, since the sandbox outlives the conversation and cleanup is manual, as the talk notes.
+1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw", sandbox_dir="working/sandbox")`.
+2. Deploy the canonical schema and load the fixture by running [`research/notes_app.sql`](../research/notes_app.sql) and then [`research/synthetic_data.sql`](../research/synthetic_data.sql) with `db.execute_sql_script`, which gives the app 34 notes across the active, archived, and trashed views.
+3. Build the REST tier by running the REST DDL through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` breaks it. This is the break the talk shows and the agent recovers from.
+4. Verify the tier from the metadata with `SHOW REST` and `SHOW CREATE REST VIEW`, then publish it with `ALTER REST SERVICE /notesApp PUBLISHED`.
+5. Run the client with `bin/notes-app`. It defaults to native mode, so it reads the sandbox on port 3310 directly and needs no daemon.
+6. REST mode is optional. Serving the endpoints over HTTP needs a router bootstrapped against the metadata, which is out of band, so switch to `NOTES_APP_MODE=rest` only once that router is running.
+7. Clean up with `sandbox.stop` and then `sandbox.delete`, since the sandbox outlives the conversation and cleanup is manual, as the talk notes.
 
 ## 12. Build order
 
-1. The `DataSource` interface and the six DTOs mapped to the endpoints.
+1. The `DataSource` interface and the DTOs the UI works with.
 2. `NativeDataSource` first, because it needs no daemon, so the UI can be built and tested against a plain sandbox.
 3. The Textual three-pane shell: the notebook list, the note list, the note view, and the status line.
 4. The read paths: list notebooks, list notes, and open a note with its tags.
 5. The write paths: create, edit, pin, archive, trash, and restore.
 6. Full-text search.
-7. `RestDataSource` against the running daemon, then make REST the default.
+7. `RestDataSource` as the optional REST-mode backend, selected by `NOTES_APP_MODE=rest` and left off by default, since it needs a router.
 8. A seed-data verification pass on a fresh sandbox for the projector.
 
 ## 13. Risks and open questions
 
-- **REST Daemon dependency.** The daemon is the least-documented moving part and the biggest live risk, so the native fallback is the mitigation and both are worth rehearsing.
+- **REST Daemon dependency.** The daemon is the least-documented moving part, and because the client runs in native mode by default, it sits off the critical path. It matters only if you choose to show REST mode live, so rehearse that path separately if you plan to.
 - **Writing tags through the `@UNNEST` view is unproven.** The note view flattens tags for reading, but the REST Service's support for writing nested related rows through a data mapping view is limited. Attaching or detaching a tag may need a separate `/noteTag` endpoint or a direct write, so resolve this before committing to the (Could) tag-write features.
-- **Search on the sandbox.** A `FULLTEXT` search needs enough sample rows to look real, and the three seeded notes are thin, so decide whether to seed more for the demo.
+- **Search on the sandbox.** A `FULLTEXT` search needs enough sample rows to look real, and the committed fixture `research/synthetic_data.sql` covers this with 34 notes, so load it (README Step 4) rather than relying on a bare seed.
 - **Auth on stage.** Endpoints without `AUTHENTICATION REQUIRED` are simplest but read as insecure to a DBA audience, so decide whether to show the auth path or name it as a follow-on.
