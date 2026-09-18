@@ -40,6 +40,7 @@ A running log of the choices behind this demo and why, so they do not have to be
 - **The title stays unchanged.** It is locked in the published agenda, and it is accurate regardless, since it claims the agent *builds* an API tier, which it does. The router only serves that tier, and serving was scoped out of the abstract from the start.
 - **Do not present the native-mode app as running on the REST tier.** Native mode talks straight to the tables and bypasses `/notesApp`, so claiming otherwise is the one dishonest move to avoid.
 - **State the router boundary as a one-sentence teaching beat.** The metadata proves the tier is real, the app is a client against the same schema, and serving over HTTP is a separate piece not stood up live. Naming that boundary models the talk's own thesis about knowing where the agent's competence stops.
+- **The public abstract stays as written; the spoken claim is corrected.** The locked abstract and session page say the run "queries the metadata to confirm the endpoints answer," which overstates it. The published copy is locked in the agenda and stays, but the talk track never says the endpoints answer. On stage the claim is that the metadata confirms the endpoints are defined, and serving them over HTTP is a router away.
 
 ## Supporting decisions
 
