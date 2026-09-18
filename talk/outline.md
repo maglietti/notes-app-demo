@@ -40,7 +40,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Build:** Side-by-side: what the model writes vs what current MariaDB wants. One or two lines each.
 - **Says:** The knowledge gap is real and it is specific, not hand-waving about hallucination.
 
-### Slide 5: Friction two, the infrastructure tax
+### Slide 5: Friction two, standing up the stack by hand
 
 - **On slide:** The time meant for the app goes to plumbing. Which version. Docker. Provisioning.
 - **Build:** A short list of the plumbing, struck through, to signal what the tooling removes.
