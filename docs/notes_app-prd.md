@@ -167,7 +167,7 @@ The status line names the active mode, so the audience always knows which tier t
 ## 11. Demo runbook and prerequisites
 
 1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw", sandbox_dir="working/sandbox")`.
-2. Deploy the canonical schema and load the fixture by running [`research/notes_app.sql`](../research/notes_app.sql) and then [`research/synthetic_data.sql`](../research/synthetic_data.sql) with `db.execute_sql_script`, which gives the app 34 notes across the active, archived, and trashed views.
+2. Deploy the canonical schema and load the fixture by running [`research/notes_app.sql`](../research/notes_app.sql) and then [`research/synthetic_data.sql`](../research/synthetic_data.sql) with `db.execute_sql_script`, which gives the app 61 notes across the active, archived, and trashed views.
 3. Build the REST tier by running the REST DDL through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` breaks it. This is the break the talk shows and the agent recovers from.
 4. Verify the tier from the metadata with `SHOW REST` and `SHOW CREATE REST VIEW`, then publish it with `ALTER REST SERVICE /notesApp PUBLISHED`.
 5. Run the client with `bin/notes-app`. It defaults to native mode, so it reads the sandbox on port 3310 directly and needs no daemon.
@@ -189,5 +189,5 @@ The status line names the active mode, so the audience always knows which tier t
 
 - **REST Daemon dependency.** The daemon is the least-documented moving part, and because the client runs in native mode by default, it sits off the critical path. It matters only if you choose to show REST mode live, so rehearse that path separately if you plan to.
 - **Writing tags through the `@UNNEST` view is unproven.** The note view flattens tags for reading, but the REST Service's support for writing nested related rows through a data mapping view is limited. Attaching or detaching a tag may need a separate `/noteTag` endpoint or a direct write, so resolve this before committing to the (Could) tag-write features.
-- **Search on the sandbox.** A `FULLTEXT` search needs enough sample rows to look real, and the committed fixture `research/synthetic_data.sql` covers this with 34 notes, so load it (README Step 4) rather than relying on a bare seed.
+- **Search on the sandbox.** A `FULLTEXT` search needs enough sample rows to look real, and the committed fixture `research/synthetic_data.sql` covers this with 61 notes, so load it (README Step 4) rather than relying on a bare seed.
 - **Auth on stage.** Endpoints without `AUTHENTICATION REQUIRED` are simplest but read as insecure to a DBA audience, so decide whether to show the auth path or name it as a follow-on.

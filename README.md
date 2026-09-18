@@ -115,7 +115,7 @@ qualified and self-contained, so db.execute_sql_script loads it in one call. Rep
 the row count of each notes_app table and record it in working/RUN_LOG.md.
 ```
 
-**Check.** The load gives you 34 notes, made up of 25 active with 4 pinned, 5 archived, and 4 trashed, alongside 6 notebooks and 12 tags. That is enough to exercise the archive and trash views, pinned sorting, tag filtering, full-text search, and pagination past the 25-per-page default. The fixture is idempotent and self-contained, so it runs safely more than once and works against a bare schema.
+**Check.** The load gives you 61 notes, made up of 48 active with 6 pinned, 7 archived, and 6 trashed, alongside 6 notebooks and 12 tags. That is enough to exercise the archive and trash views, pinned sorting, tag filtering, full-text search, and pagination past the 25-per-page default. The fixture is idempotent and self-contained, so it runs safely more than once and works against a bare schema.
 
 ## Step 5: Build the REST tier
 
