@@ -1,41 +1,24 @@
-# Notes App — demo prompts
+# Notes App demo prompts
 
-Three prompts, run in order, each pasted into the coding agent. Prompt 1 builds the
-data tier, Prompt 2 puts the REST tier in front of it, Prompt 3 builds the Textual
-client that runs on it.
+Three prompts, run in order, each pasted into the coding agent. Prompt 1 builds the data tier, Prompt 2 puts the REST tier in front of it, and Prompt 3 builds the Textual client that runs on the result.
 
-Run the agent from the repository root. The layout separates inputs from output:
+Run the agent from the repository root, where the layout keeps inputs apart from output:
 
-- `docs/` and `research/` are inputs the agent reads (the PRD, the reference schema).
-- The Textual app is generated at the repository root, as a `notes_app` package with
-  a `pyproject.toml`, the way a normal Python project is laid out.
-- `working/` holds the working artifacts: the schema SQL, the REST DDL, the sandbox
-  data directory, and a `working/RUN_LOG.md` recording each step's result.
+- `docs/` and `research/` are the inputs the agent reads, holding the design and the reference schema.
+- The Textual app is generated at the repository root as a `notes_app` package with a `pyproject.toml`, laid out like any normal Python project.
+- `working/` holds the working artifacts: the schema SQL, the REST DDL, the sandbox data directory, and a `working/RUN_LOG.md` that records each step.
 
-Add the repository root to the MCP allowed paths so the agent can read `docs/` and
-`research/`, write `working/`, and create the app at the root. The sandbox is
-deployed with its data directory under `working/sandbox`, so everything the demo
-generates stays inside the repository.
+Add the repository root to the MCP allowed paths so the agent can read `docs/` and `research/`, write `working/`, and create the app at the root. The sandbox is deployed with its data directory under `working/sandbox`, so everything the demo generates stays inside the repository.
 
-The prompts name the artifact and number the steps, and say "in order" where the
-sequence is a hard constraint, because agents land the work better that way.
+The prompts name the artifact they want, number the steps, and say "in order" wherever the sequence is a hard constraint, because an agent lands the work more reliably that way.
 
-Prompt 1 designs the schema from a short prompt, the way the talk shows it. The
-result is checked against `research/notes_app.sql`, the canonical schema frozen from
-an earlier agent run; that file is an oracle, never an input to the prompt.
+Prompt 1 designs the schema from a short prompt, the way the talk shows it, and the result is checked afterward against `research/notes_app.sql`, the canonical schema frozen from an earlier run. That file is an oracle, never an input to the prompt.
 
-Expect some drift on a free run: the skill may name the owner table `user` rather
-than `account`, or leave out the `attachment` table. The REST views in Prompt 2 and
-the client in Prompt 3 are built for the canonical names (`account`, `notebook`,
-`note`, `tag`, `note_tag`, `attachment`). Keep the free design for the talk beat.
-When the app has to run on it, use the app track instead: deploy
-`research/notes_app.sql` and load the sample data from `research/synthetic_data.sql`
-(a direct load, not a prompt), so the API and client run on a known, populated
-schema. The README's Step 4 has the load command.
+Expect some drift on a free run, since the skill may name the owner table `user` rather than `account`, or leave out the `attachment` table. The REST views in Prompt 2 and the client in Prompt 3 are built for the canonical names (`account`, `notebook`, `note`, `tag`, `note_tag`, and `attachment`), so keep the free design for the talk beat and switch to the app track when the app has to run on the schema. The app track deploys `research/notes_app.sql` and loads the sample data from `research/synthetic_data.sql` as a direct load rather than a prompt, so the API and the client run on a known, populated schema. The README's Step 4 has the load command.
 
 ---
 
-## Prompt 1 — Infrastructure (schema and sandbox)
+## Prompt 1: Infrastructure (schema and sandbox)
 
 ```text
 Work in this repository and complete every step in order. Put the files you create
@@ -52,17 +35,11 @@ working/RUN_LOG.md as you go.
 3. List the tables you created and show me the columns of the note table.
 ```
 
-Check against the reference: compare `working/notes_app.sql` with
-`research/notes_app.sql`. Use the reference to confirm the run hit the MariaDB
-idioms, not to demand an exact match. Expect `CREATE OR REPLACE TABLE`, `utf8mb4`,
-system versioning on the owner and notebook tables, a `FULLTEXT` index on the note
-title and body, and `UUID`/`UUID_v7()` primary keys, since here the ids should not
-leak row counts. Naming that drifts from the reference is a finding for the check,
-not a failure of the skill.
+Check against the reference. Compare `working/notes_app.sql` with `research/notes_app.sql`, using the reference to confirm the run reached the MariaDB idioms rather than to demand an exact match. Expect `CREATE OR REPLACE TABLE`, `utf8mb4`, system versioning on the owner and notebook tables, a `FULLTEXT` index over the note title and body, and `UUID` keys from `UUID_v7()`, since the ids here should not leak row counts. Naming that drifts from the reference is a finding for the check, not a failure of the skill.
 
 ---
 
-## Prompt 2 — REST API (the tier the talk is about)
+## Prompt 2: REST API (the tier the talk is about)
 
 ```text
 Continue in this repository, against the sandbox on port 3310. Write any files
@@ -99,13 +76,11 @@ In order:
    working/RUN_LOG.md.
 ```
 
-What to check: `SHOW REST VIEWS` lists `/note`, `/notebook` and `/tag` under
-`/notesApp`. The endpoints are defined even before a router serves them, because
-the metadata is the API definition.
+What to check. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. The endpoints are defined before any router serves them, because the metadata is the API definition.
 
 ---
 
-## Prompt 3 — Front end (the Textual client)
+## Prompt 3: Front end (the Textual client)
 
 ```text
 Read docs/notes_app-prd.md and build the Textual application it specifies. Build
@@ -139,21 +114,12 @@ confirm the seeded notes from the schema appear in the list, and record the run
 command and the result in working/RUN_LOG.md.
 ```
 
-What to check: the app starts, the left pane shows the `Inbox` and `DevRel`
-notebooks, and the middle pane shows the seeded notes with the pinned one first.
-The status line reads `native` and the sandbox address.
+What to check. The app starts, the left pane lists the six notebooks, and the middle pane shows the seeded notes with the pinned ones at the top. The status line reads `native` alongside the sandbox address.
 
 ---
 
 ## After the three prompts
 
-- **Where things land:** the app is a `notes_app` package at the repository root;
-  the schema, the REST DDL, the sandbox data and `RUN_LOG.md` are under `working/`;
-  the inputs it read stay in `docs/` and `research/`.
-- **REST mode needs a router.** Serving `/notesApp` over HTTP is a
-  MySQL-Router-family binary bootstrapped against the metadata. It is not a shell
-  or MCP command, and standing one up is out of band. Native mode is the reliable
-  demo path; switch to `NOTES_APP_MODE=rest` only once a router is running and
-  verified.
-- **The sandbox outlives the conversation.** Stop and delete it when done:
-  `sandbox.stop(port=3310, password="demo-pw")`, then `sandbox.delete(port=3310)`.
+- **Where things land.** The app is a `notes_app` package at the repository root, the schema and REST DDL and sandbox data and `RUN_LOG.md` sit under `working/`, and the inputs the agent read stay in `docs/` and `research/`.
+- **REST mode needs a router.** Serving `/notesApp` over HTTP is a MySQL-Router-family binary bootstrapped against the metadata, and it is neither a shell command nor an MCP tool, so standing one up is out of band. Native mode is the reliable demo path, so switch to `NOTES_APP_MODE=rest` only once a router is running and verified.
+- **The sandbox outlives the conversation.** Stop and delete it when done with `sandbox.stop(port=3310, password="demo-pw", sandbox_dir="working/sandbox")` and then `sandbox.delete(port=3310, sandbox_dir="working/sandbox")`.
