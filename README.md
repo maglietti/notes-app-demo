@@ -272,10 +272,37 @@ the REST metadata. It is not a shell or MCP command, and standing one up is out 
 band. Switch the client to `NOTES_APP_MODE=rest` and point it at the service root
 only once a router is running and verified. For the live demo, stay in native mode.
 
-## Clean up
+## Capturing a run for comparison
 
-The sandbox is a real server process that outlives the conversation. Stop and
-delete it when done:
+The repository ignores generated output, so by default a run leaves nothing behind,
+which is what you want for a clean demo. When you instead want to keep a generation,
+to evaluate it or to diff two runs of the plugins, snapshot it on a branch. This is
+the one place the ignored files are committed on purpose, so `git add` needs `-f`.
+
+```bash
+git switch -c run/2026-09-18
+git add -f notes_app pyproject.toml uv.lock working/notes_app.sql working/notes_app_rest.sql working/RUN_LOG.md
+git commit -m "run: <harness or model>, <what stood out>"
+git switch main
+```
+
+Keep the snapshot scoped to what you want to compare: the app source and the SQL the
+agent wrote. Leave out `.venv`, `.env` and the sandbox data directory, which are
+noise. Switching back to `main` removes those generated files from your working tree;
+they stay safe on the run branch. Compare two runs by diffing their branches:
+
+```bash
+git diff run/2026-09-17 run/2026-09-18 -- notes_app
+```
+
+Delete a snapshot you no longer need with `git branch -D run/2026-09-18`.
+
+## Clean up after a run
+
+Two things to tidy: the sandbox process and the generated files.
+
+First stop and delete the sandbox, a real server process that outlives the
+conversation:
 
 ```text
 Stop and delete the sandbox on port 3310.
@@ -283,15 +310,20 @@ Stop and delete the sandbox on port 3310.
 
 That runs `sandbox.stop(port=3310, password="demo-pw", sandbox_dir="working/sandbox")`
 then `sandbox.delete(port=3310, sandbox_dir="working/sandbox")`. `sandbox.delete`
-refuses a running instance, so the stop lands first. If a stop fails,
-`sandbox.kill` forces it down.
+refuses a running instance, so the stop lands first. If a stop fails, `sandbox.kill`
+forces it down.
 
-To reset for another run, stop and delete the sandbox first (it lives under
-`working/`), then run `git clean -fdx`. This repository tracks only the instructions,
-so that removes everything the prompts produced — the generated app at the root, the
-`working/` artifacts, the sandbox, `.venv` and `.env` — and leaves a pristine repo
-(`README.md`, `bin/`, `docs/`, `research/`). Re-run the prompts from Step 3 for a
-fresh build with no residue.
+Then remove the generated files. If you want to keep this generation, snapshot it
+first (see Capturing a run for comparison). To reset to a pristine repo:
+
+```bash
+git clean -fdx
+```
+
+Because the repository tracks only the instructions, that removes everything the
+prompts produced — the generated app, the `working/` artifacts, the sandbox, `.venv`
+and `.env` — and leaves `README.md`, `bin/`, `docs/` and `research/`. Re-run the
+prompts from Step 3 for a fresh build with no residue.
 
 ## Troubleshooting
 
