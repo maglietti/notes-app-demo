@@ -269,3 +269,7 @@ Because the repository tracks only the instructions, `git clean -fdx` clears eve
 - [`research/agent-security-note.md`](research/agent-security-note.md) is the blocked mass-delete talking point.
 - [`research/notes_app-er.md`](research/notes_app-er.md) is the schema ER diagram.
 - `working/` holds what the demo generates: the design-run schema, the REST DDL, and `RUN_LOG.md`.
+
+## License
+
+Apache License 2.0, in [`LICENSE`](LICENSE). The license covers the runbook, the prompts, the schema, and the launcher script alike. Copy the SQL, the prompts, or the launcher into your own work, with attribution and the notice preserved.
