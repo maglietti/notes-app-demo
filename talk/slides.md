@@ -394,23 +394,28 @@ Everything from here is that plugin, doing its job, in one conversation. Watch.
 
 <!-- _class: lead -->
 
-# Act one: from one sentence to a schema
+# Act one: from a prompt to a schema
 
-### **A short prompt. The design is the agent's own.**
+### **I gave it the task, not the schema.**
 
 ```
-Design a schema for a note-taking app. Deploy a sandbox on 3310,
-run the DDL, and show me the tables.
+Work in this repository and complete every step in order.
+
+1. Create a MariaDB schema named notes_app for a note-taking app
+   and store it in working/notes_app.sql.
+2. Deploy a sandbox on port 3310, connect to it, and run
+   working/notes_app.sql via the MCP server.
+3. List the tables you created and show me the columns of note.
 ```
 
 <!--
 SPEAKER NOTES:
 
-Act one. And I want to be honest about what is scripted, because that honesty is the whole talk.
+Act one, and I want to be straight about what is scripted, because that is the whole talk. This is the actual prompt I ran. It is on the slide, not cleaned up.
 
-The prompt is short. I am not feeding the agent a schema. I am asking it to design one, deploy a server, run the DDL, and read the tables back. What it designs is its own work, live.
+Notice what it does and does not say. It names the artifacts, it numbers the steps, and it says complete them in order. That is how you phrase a prompt so the work lands. But nowhere does it describe the schema. I am asking the agent to design one, deploy a server, run the DDL, and read the tables back. The design is its own work, live.
 
-This is the shape of the prompt. The full thing is numbered and lives in my notes. Watch what it reaches for.
+Watch what it reaches for.
 -->
 
 ---
@@ -481,8 +486,12 @@ Nothing changed about the model. The knowledge changed. A skill put the current 
 ### **Same conversation. The least-trained grammar in the run.**
 
 ```
-Now put a MariaDB REST Service in front of that schema,
-and verify it from the metadata.
+Put a MariaDB REST Service in front of notes_app. Run the REST DDL
+through db.execute_sql one statement at a time, because the grammar
+is session state.
+
+Create service /notesApp, a schema, and a view for each table.
+Verify with SHOW REST, then publish.
 ```
 
 <!--
@@ -570,19 +579,21 @@ That distinction is the entire thesis in one breath. The agent is genuinely good
 
 # Act three: an idea you can open
 
-### **The same context reads the product doc and builds the client.**
+### **Spec-driven development: I wrote the PRD, the agent builds to it.**
 
 ```
-Read the product doc and build the client it specifies.
-Run it against the sandbox.
+Read docs/notes_app-prd.md and build the Textual application it
+specifies. Implement the DataSource interface, the three-pane
+layout from section 7, and every Must feature from section 6.
+Then run it in native mode against the sandbox.
 ```
 
 <!--
 SPEAKER NOTES:
 
-Act three. Still the same conversation. Now I point the agent at a product requirements document already sitting in the repo, and I ask it to build the client that document describes, a terminal application, and run it.
+Act three, still the same conversation, and this is spec-driven development. Earlier I wrote a product requirements document, a real spec: the data model, the three-pane layout, the feature list, the architecture. It is sitting in the repo. Now I point the agent at it and ask it to build the client that spec describes, and run it.
 
-This is the part that got me the first time. The context that designed my tables turns around and reads my product doc and writes my front end. You do not hand the work from one tool to the next. You keep talking to one agent, and it keeps building.
+That is the shift worth naming. I am not describing the app in a chat prompt. I wrote the spec once, and the agent builds to it. The same context that designed my tables reads my spec and writes my front end. You keep talking to one agent, and it keeps building.
 -->
 
 ---
