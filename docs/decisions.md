@@ -23,15 +23,23 @@ the whole debate.
 
 ## Repository structure
 
-- **The app lives at the repository root** as a `notes_app` package, the Pythonic
-  layout. Working artifacts live in `working/`; inputs the agent reads live in
-  `docs/` and `research/`.
+- **The repository tracks the instructions, not the app.** It holds the runbook,
+  the prompts, the design, the canonical schema and the seed. Everything the prompts
+  or the agent produce is gitignored: the generated `notes_app` package,
+  `pyproject.toml`, `uv.lock`, `.env`, `.env.example`, the `.venv`, and everything
+  under `working/`. A run never dirties the repo, and `git clean -fdx` returns it to
+  a pristine, re-runnable state with no residue from a previous generation. This is
+  the point: the app is regenerated from the instructions in minutes, so it does not
+  belong in version control.
+- **The app is generated at the repository root** as a `notes_app` package, the
+  Pythonic layout, but it is ignored, not committed. Inputs the agent reads live in
+  `docs/` and `research/`; working artifacts land in `working/`.
 - **`bin/notes-app` is a committed launcher at the root.** It runs
-  `python -m notes_app` and survives a `working/` reset, so the stage command never
-  changes. `bin/` holds only the launcher, never the app source.
-- **The sandbox data directory is `working/sandbox`**, so everything the demo
-  generates stays inside the repository. `working/` is gitignored (a global ignore
-  already excludes it), so none of it is committed.
+  `python -m notes_app` against whatever the agent generates, and survives a reset,
+  so the stage command never changes. It is instructions and tooling, not app source,
+  which is why it is the one root-level runtime file that is tracked.
+- **The sandbox data directory is `working/sandbox`**, so it is covered by the
+  `working/` ignore and cleaned with everything else.
 
 ## Schema and data
 

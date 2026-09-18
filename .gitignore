@@ -1,12 +1,18 @@
-# Working artifacts — the demo regenerates everything under working/
-# (schema, REST DDL, run log, and the sandbox data directory).
+# This repository holds the INSTRUCTIONS for generating the app, not the app.
+# Everything the prompts, the agent, or a build produce is ignored, so the repo
+# stays clean and `git clean -fdx` returns it to a pristine, re-runnable state.
+
+# Prompt 3 output: the generated Textual app at the repository root
+/notes_app/
+/pyproject.toml
+/uv.lock
+/.env
+/.env.example
+
+# Prompt 1 and 2 output: schema, REST DDL, run log, and the sandbox data directory
 working/
 
-# Secrets and local config
-.env
-!.env.example
-
-# Python
+# Python build and bytecode
 __pycache__/
 *.py[cod]
 *.egg-info/
