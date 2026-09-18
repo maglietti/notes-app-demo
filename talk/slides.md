@@ -728,8 +728,9 @@ Here is the part for the maintainers in the room, and I think that is a lot of y
 </div>
 <div>
 
-4. **Guardrails are layered, so set all three.** The working-directory allow-list, the harness action classifier, and the database grants each get a veto. You do not have to trust the agent's judgment to keep it safe.
-5. **Start on greenfield.** The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, then take it into harder work.
+4. **For real work, write a spec.** A short PRD drives the agent better than a chat prompt, and unlike a prompt it is something you can review. That is spec-driven development.
+5. **Guardrails are layered, so set all three.** The working-directory allow-list, the harness action classifier, and the database grants each get a veto. You do not have to trust the agent's judgment to keep it safe.
+6. **Start on greenfield.** The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, then take it into harder work.
 
 </div>
 </div>
@@ -737,7 +738,7 @@ Here is the part for the maintainers in the room, and I think that is a lot of y
 <!--
 SPEAKER NOTES:
 
-Five things to carry out the door, whatever database you run.
+Six things to carry out the door, whatever database you run.
 
 One. Skills are the fix, not a cleverer prompt. When the model guesses past its training, no amount of prompting makes it know current MariaDB. A skill hands it that knowledge, and the plugin installs it in the harness you already use.
 
@@ -745,9 +746,11 @@ Two. Tools give the agent something real to run against. The MCP server opens a 
 
 Three. Name the artifact you want. Ask for the schema, the DDL file, the running app, not the outcome you are imagining, and number the steps when the sequence matters.
 
-Four. Guardrails are layered. The working-directory allow-list, the harness action classifier, and the database grants each get a veto. Set all three, and you do not have to trust the agent's judgment to stay safe.
+Four. For real work, write a spec. For anything past a one-liner, a short product doc drives the agent better than a chat prompt, and unlike a prompt it is something you and your team can review. That is spec-driven development, and it is how act three happened.
 
-Five. Start on greenfield. The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, and carry it into harder work from there.
+Five. Guardrails are layered. The working-directory allow-list, the harness action classifier, and the database grants each get a veto. Set all three, and you do not have to trust the agent's judgment to stay safe.
+
+Six. Start on greenfield. The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, and carry it into harder work from there.
 -->
 
 ---
