@@ -115,7 +115,7 @@ SPEAKER NOTES:
 
 Larry Page said that. Handing a coding agent, one that is confidently wrong about a database it never trained on, the job of building an API tier, is a crazy idea. That is the "anyway" in the title of this talk.
 
-So here is my deal with you. By the end, you will see the exact moment it stops being crazy, and the exact place it is still crazy. Let me start with the idea.
+So here is my deal with you. By the end, you will watch it stop being crazy, and see the one place it is still crazy. Let me start with the idea.
 -->
 
 ---
@@ -179,8 +179,9 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 ---
 
-# Perfect time to vibe code my idea into existence...
-### What usually happens: the agent lies to you, fluently
+### *Perfect time to vibe code my idea into existence...*
+
+# What usually happens: the agent lies to you, fluently
 
 <div class="columns">
 <div>
@@ -453,9 +454,9 @@ CREATE OR REPLACE TABLE notes_app.note (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 ```
 
-- `CREATE OR REPLACE TABLE` and `utf8mb4`: today's MariaDB, not a MySQL reflex
-- `uuid_v7()` keys, `WITH SYSTEM VERSIONING` on the owner tables, a generated `default_flag`
-- `FULLTEXT` search, built in
+- `CREATE OR REPLACE TABLE` with the `uca1400` collation, not MySQL's `utf8mb4_0900`
+- A `uuid_v7()` primary key and `FULLTEXT` search, both in the `note` table shown
+- Elsewhere in the schema: system versioning on the owners, a generated one-default rule
 
 <span class="accent">This is the grammar the model gets wrong from memory. It got it right because a skill was in the room.</span>
 
@@ -475,7 +476,7 @@ Nothing changed about the model. The knowledge changed. A skill put the current 
 
 <!-- _class: lead -->
 
-# Act two: the tier it should get wrong
+# Act two: from the schema to a REST API
 
 ### **Same conversation. The least-trained grammar in the run.**
 
@@ -489,36 +490,34 @@ SPEAKER NOTES:
 
 Act two, and I have not started a new chat. Same agent, same context. It just built my schema. Now I ask it to put a REST Service in front of it.
 
-This is the tier the talk is named for, and it is the real test, because the REST grammar is the most niche, least-documented syntax in the whole run. If the model is going to be confidently wrong anywhere, it is here. So do not look away. Watch it hit the wall.
+This is the tier the talk is named for, and the real test, because the REST grammar is the most niche syntax in the whole run. It is exactly where a skill earns its place. So do not look away, this is the best part. Watch the agent handle it.
 -->
 
 ---
 
-# It breaks. Then it fixes itself.
+# It works out the trickiest grammar on its own
 
 <div class="watch">
 
 **What is happening on screen**
 
-1. The REST grammar is **session state**, so it cannot run as one batch script
-2. Run as a script, it **breaks partway down**
-3. The agent **reads the error**, works out the rule, and reruns one statement per session
-4. It **recovers on its own**. I never touched the keyboard.
+1. The REST grammar runs **one statement per session**, a rule most models miss
+2. The agent **hits that rule**, reads what comes back, and adapts
+3. It **reruns it the right way**, and the endpoints land
+4. All **on its own**. I never touched the keyboard.
 
 </div>
 
-*The grammar it should get most wrong is the grammar the skill knows best.*
+*The trickiest grammar in the run, and the skill carries the agent through it.*
 
 <!--
 SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT TWO]
 
-Here is the low point of the story, and I left it in on purpose. The REST grammar is session state, which means it cannot run as one batch script the way ordinary SQL can. Run it that way and each statement lands in a fresh session and the whole thing falls apart halfway down. Watch it fail, right here.
+This is the trickiest part of the whole run, and the best part to watch. The REST grammar runs one statement per session, a rule most models have never seen. The agent hits it, reads what comes back, adapts, and reruns it the right way, with no help from me. The endpoints land.
 
-Now watch it come back. The agent reads the error, works out that it has to run one statement at a time, and reruns it correctly. I did not touch the keyboard. That is the loop again, on the hardest grammar in the run. Write, fail, read, fix.
-
-This is the moment that makes the case for me. The exact place a model should be most confidently wrong is the place the skill knows best, and the tool let the agent prove it. When the metadata comes up, I get precise.
+This is the moment that makes the case. The place a model would usually be most confidently wrong is the place the skill carries it through, and the tool let the agent prove it, live. When the metadata comes up, I get precise.
 
 [ADVANCE WHEN SHOW REST APPEARS]
 -->
