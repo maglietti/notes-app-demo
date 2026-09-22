@@ -98,34 +98,30 @@ working/RUN_LOG.md as you go.
 Paste:
 
 ```text
-Build the Textual application that docs/notes_app-prd.md specifies, in native mode
-only. Leave RestDataSource and NOTES_APP_MODE for later (PRD build order step 7).
-Build the app at the repository root, the way a normal Python project is laid out.
-Do not put the app under working/; that directory is only for the schema, the run
-log and the sandbox. Hold to these constraints:
+Build the Textual app that docs/notes_app-prd.md specifies, in native mode only.
+Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
 
-- Python 3.11 or newer. Textual for the UI, and the mariadb Connector/Python
-  against 127.0.0.1:3310 for data access, bound to the columns in
-  working/notes_app.sql.
-- Build the three-pane layout and status line from section 7, and every Must
-  feature from section 6: list notebooks with a per-notebook note count; list,
-  open, create and edit notes; pin and unpin; archive and restore; trash and
-  restore; and the status line naming the native data mode and the sandbox address.
-- Read configuration (sandbox host, port and password) from the environment or a
-  .env file, and ship a .env.example. Keep .env and .env.example at the repository
-  root with the app.
-- Make it runnable as `python -m notes_app` from the repository root: put the
-  source in a notes_app package with a __main__.py, and add a pyproject.toml with
-  the dependencies and a notes-app console script. A committed launcher at
-  bin/notes-app already runs `python -m notes_app` from the root, so satisfy that
-  contract rather than inventing another entry point.
+- Layout: a notes_app package with a __main__.py at the repository root, and a
+  pyproject.toml with the dependencies and a notes-app console script. The repo
+  gitignores notes_app/, so make sure the build backend still packages it. Keep
+  working/ for the schema, run log and sandbox only.
+- Stack: Python 3.11+, Textual, and mariadb Connector/Python against
+  127.0.0.1:3310, bound to the columns in working/notes_app.sql.
+- Features: the three-pane layout from section 7, with a status line naming
+  native mode and the sandbox address, and every Must in section 6: notebooks
+  with note counts; list, open, create and edit notes; pin and unpin; archive
+  and restore; trash and restore.
+- Config: host, port and password from the environment or .env. Write .env with
+  password demo-pw, plus .env.example, at the repository root.
 
-Then run it with bin/notes-app against the sandbox on port 3310, confirm the seeded
-notes appear in the list, and record the run command and the result in
-working/RUN_LOG.md.
+Verify both entry points against the sandbox, and record each command and its
+result in working/RUN_LOG.md:
+1. bin/notes-app (the committed launcher, which runs `python -m notes_app` from
+   the root) starts the app and the seeded notes appear in the list.
+2. The notes-app console script starts the app too.
 ```
 
-The build ships `.env.example`, not `.env`. For the native run to reach the seeded data, `.env` must exist at the repository root with the sandbox password `demo-pw`. If the build left only `.env.example`, copy it and set the password before launching.
+The build writes `.env` with the sandbox password `demo-pw`, which the native run needs to reach the seeded data. If `.env` is missing, copy `.env.example` and set the password before launching.
 
 If the build finishes but you want a clean launch on stage, run it yourself:
 
