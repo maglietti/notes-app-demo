@@ -28,9 +28,9 @@ working/RUN_LOG.md as you go.
 1. Create a MariaDB database schema named notes_app for a note-taking app and
    store it in working/notes_app.sql.
 
-2. Deploy a sandbox instance on port 3310 with root password demo-pw and its data
-   directory at working/sandbox, connect to it, and run working/notes_app.sql via
-   the MCP server.
+2. Deploy a MariaDB 11.8 sandbox instance on port 3310 with root password demo-pw
+   and its data directory at working/sandbox, connect to it, and run
+   working/notes_app.sql via the MCP server.
 
 3. List the tables you created and show me the columns of the note table.
 ```

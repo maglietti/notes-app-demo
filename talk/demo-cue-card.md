@@ -41,12 +41,11 @@ mariadb-shell -- mcp setup
 Pre-cache the sandbox server binary. The agent deploys the sandbox live in act one, and the first deploy on a machine with no local MariaDB server downloads the server package, a few hundred megabytes that takes a while. Do that download once, off stage, by deploying the sandbox exactly as act one will, confirming it, then tearing it down:
 
 ```text
-Deploy a sandbox on port 3310 with root password demo-pw and its data directory at
-working/sandbox, connect to it, and report the server version. Then stop the sandbox
-and delete it (sandbox.stop then sandbox.delete on port 3310).
+Deploy a MariaDB 11.8 sandbox on port 3310 with root password demo-pw and its data
+directory at working/sandbox, connect to it, and report the server version.
 ```
 
-The version-less deploy here matches act one exactly, so whatever version it resolves to is the version act one reuses, cached and offline. The cache lives outside the repository, so `git clean -fdx` removes the `working/sandbox` data directory but leaves the download in place. Confirm the reported version is the MariaDB 11.8 LTS series the schema and REST grammar target. If the default is older, pin `MariaDB 11.8` in this deploy and in act one's Prompt 1 step 2 so both use the same version.
+Both this deploy and act one's Prompt 1 step 2 pin MariaDB 11.8, the LTS series the schema and REST grammar target, so act one reuses this download, cached and offline. The pin is required: with no server on the PATH, a version-less deploy fails instead of downloading or reusing the cache. The cache lives outside the repository, so `git clean -fdx` removes the `working/sandbox` data directory but leaves the download in place. Confirm the reported version is 11.8.x.
 
 ## Act one: the data tier (Prompt 1)
 
@@ -64,9 +63,9 @@ working/RUN_LOG.md as you go.
    gives, since the app binds to them. Write the DDL yourself from the PRD; do not
    copy or read research/notes_app.sql. Store it in working/notes_app.sql.
 
-2. Deploy a sandbox instance on port 3310 with root password demo-pw and its data
-   directory at working/sandbox, connect to it, and run working/notes_app.sql via
-   the MCP server.
+2. Deploy a MariaDB 11.8 sandbox instance on port 3310 with root password demo-pw
+   and its data directory at working/sandbox, connect to it, and run
+   working/notes_app.sql via the MCP server.
 
 3. Seed the database by loading research/synthetic_data.sql with
    db.execute_sql_script. The fixture is fully qualified and self-contained, and it
