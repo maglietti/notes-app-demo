@@ -6,6 +6,20 @@ The operating sheet for the live run and for recording it. One agent context run
 
 Two prompts, two acts, one conversation: the data tier, then the app. Both acts start from the same product doc, `docs/notes_app-prd.md`, so the schema the agent designs is the schema the app is built on. Act one seeds the database, so the app has real data to show. An optional third act puts a REST Service in front of the schema and refactors the app to run in native or REST mode.
 
+## Running this card as an agent walkthrough
+
+To rehearse, open a fresh Claude Code session at the repository root and say: "Walk through talk/demo-cue-card.md as a rehearsal." Add "including act three" to run the optional act. The rest of the card is written for the presenter, and an agent follows these five rules instead:
+
+1. **Check the pre-flight, change nothing.**
+   - Confirm the MariaDB MCP tools (`sandbox.*`, `db.*`) and the MariaDB skills are available, then run the skills smoke test from One-time setup yourself and check the output for the tells it lists. If the tools or skills are missing, stop and report it, because installing the plugin and running `mariadb-shell -- mcp setup` are interactive steps only the presenter can do.
+   - If a sandbox is running on port 3310, ask before stopping and deleting it.
+   - If generated files exist (`notes_app/`, `pyproject.toml`, `uv.lock`, `.env`, `.env.example`, `.venv/`, or `working/`), list them and ask the presenter to run `git clean -fdx`, then wait. Do not run git yourself.
+   - Skip the presenter-only items: the terminal font, the recording, and the pre-cache step. Act one's pinned deploy downloads MariaDB 11.8 if it is not cached yet.
+2. **Run the acts in order, in this one session.** Treat each **Paste** block as the presenter's next message and follow it exactly. Log each act's start and end time (from `date`) in `working/RUN_LOG.md`, so the rehearsal can be compared with the act's target.
+3. **Check each act before starting the next.** Compare the result with the act's **Check** paragraph and **[CAPTURE]** notes, and record whether each item held: the idioms in the DDL, the 61 seeded notes, the three panes and the `native` status line. Skip the **Line to say** and the manual `./bin/notes-app` launch, because the act two prompt already verifies the launcher.
+4. **Run act three only when asked.** Otherwise stop after act two.
+5. **Report and stop.** Finish with a table of the acts: elapsed time against target, checks that passed or failed, and anything you had to fix along the way. Leave the sandbox and the generated files in place for inspection. Run the Cleanup section only when asked, and leave its `git clean -fdx` to the presenter.
+
 ## Pre-flight checklist (before doors, then again before you record)
 
 - [ ] `ai-plugins` installed and the skills confirmed loaded (smoke test below).
