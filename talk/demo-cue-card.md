@@ -60,12 +60,13 @@ working/RUN_LOG.md as you go.
 
 1. Read docs/notes_app-prd.md. Design the MariaDB database schema named notes_app
    that its data model in section 4 describes, keeping the column names the PRD
-   gives, since the app binds to them. Write the DDL yourself from the PRD; do not
-   copy or read research/notes_app.sql. Store it in working/notes_app.sql.
+   gives, since the app binds to them. Write the DDL yourself from the PRD and
+   store it in working/notes_app.sql. Only after it is written, compare it with the
+   reference schema research/notes_app.sql and report the differences.
 
-2. Deploy a MariaDB 11.8 sandbox instance on port 3310 with root password demo-pw
-   and its data directory at working/sandbox, connect to it, and run
-   working/notes_app.sql via the MCP server.
+2. Check whether a MariaDB 11.8 sandbox is running on port 3310 with its data
+   directory at working/sandbox. If it is not, deploy one there with root password
+   demo-pw. Connect to it and run working/notes_app.sql via the MCP server.
 
 3. Seed the database by loading research/synthetic_data.sql with
    db.execute_sql_script. The fixture is fully qualified and self-contained, and it
@@ -84,7 +85,7 @@ working/RUN_LOG.md as you go.
 - `FULLTEXT (title, body)` on `note`. Search without a second system.
 - `default_flag` generated column. One default notebook per account, enforced by the schema.
 
-**Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure. Compare against `research/notes_app.sql` off stage if you want the side-by-side.
+**Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure. The agent reports its differences from `research/notes_app.sql` at the end of step 1.
 
 **Line to say:** "No SQL by hand. I wrote down the idea, and the agent turned it into grammar this model was never trained on, because a skill handed it the current version. Then it proved the schema by loading real data into it."
 
