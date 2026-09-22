@@ -110,6 +110,8 @@ Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
   working/ for the schema, run log and sandbox only.
 - Stack: Python 3.11+, Textual, and mariadb Connector/Python against
   127.0.0.1:3310, bound to the columns in working/notes_app.sql.
+- Structure: put the queries behind the section 9 DataSource interface as
+  NativeDataSource.
 - Features: the three-pane layout from section 7, with a status line naming
   native mode and the sandbox address, and every Must in section 6: notebooks
   with note counts; list, open, create and edit notes; pin and unpin; archive
@@ -161,12 +163,12 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
 2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
    exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
    SHOW REST output.
-3. Put native data access behind the section 9 DataSource interface as
-   NativeDataSource, if it is not already, and add RestDataSource: httpx against
-   the /notesApp service root, the section 5 endpoints, and the paginated
-   items/hasMore list shape. NOTES_APP_MODE selects the backend and defaults to
-   native. Add the mode and service root URL to .env.example, and name the
-   active mode and its address on the status line.
+3. Add RestDataSource as the second section 9 DataSource backend beside
+   NativeDataSource: httpx against the /notesApp service root, the section 5
+   endpoints, and the paginated items/hasMore list shape. NOTES_APP_MODE
+   selects the backend and defaults to native. Add the mode and service root
+   URL to .env.example, and name the active mode and its address on the status
+   line.
 4. Run bin/notes-app in native mode to confirm nothing regressed, then with
    NOTES_APP_MODE=rest. No router is running, so the app must start, show the
    connection error on the status line, and stay up (PRD section 8). Log both
