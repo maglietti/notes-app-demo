@@ -140,14 +140,14 @@ Let me tell you what the idea was.
 
 ---
 
-# The idea: a notebook that lives in the terminal
+# The idea: a notebook that lives in my terminal
 
 <div class="columns">
 <div>
 
 ## The feel
 
-A fast, keyboard-first notebook you never have to leave the terminal for. Three panes: your notebooks, your notes, and the one you are reading, in Markdown.
+A fast, keyboard-first notebook you never have to leave the terminal for. Three panes: the notebooks, the notes, and the note you are reading, in Markdown.
 
 *The kind of tool you keep open all day.*
 
@@ -168,7 +168,7 @@ A fast, keyboard-first notebook you never have to leave the terminal for. Three 
 <!--
 SPEAKER NOTES:
 
-Here is the idea, and I want you to picture it, because the whole point is that it is a real app, not a toy.
+Here is the idea, and I want you to picture it, because the whole point is that in my head it is already real app.
 
 A notebook that lives in the terminal. No browser, no tab to lose, no mouse. Three panes. On the left, your notebooks. In the middle, the notes inside the one you picked. On the right, the note you are reading, rendered from Markdown.
 
@@ -181,7 +181,7 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 ### *Perfect time to vibe code my idea into existence...*
 
-# What usually happens: the agent lies to you, fluently
+# What usually happens: the LLM lies to you, fluently
 
 <div class="columns">
 <div>
@@ -199,7 +199,7 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 The SQL parses, and it usually runs. Then you exercise the app and CRUD breaks: a create rejected, an update touching the wrong rows, a read in the wrong shape. You catch it in testing, and every pass is time you wanted for the app.
 
-<span class="accent">Confidently wrong is not a syntax error. It is code that looks right and behaves wrong when you use it.</span>
+<span class="accent">Confidently wrong _hallucinations_ are not syntax errors. It is code that looks right and behaves wrong when you use it.</span>
 
 </div>
 </div>

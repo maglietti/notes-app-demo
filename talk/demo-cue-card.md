@@ -9,12 +9,13 @@ Three prompts, three acts, one conversation: the data tier, the API tier, the ap
 ## Pre-flight checklist (before doors, then again before you record)
 
 - [ ] Recording loaded on the laptop and cued to the four capture moments. Never streamed.
-- [ ] Sandbox reachable on port 3310, or ready to deploy fresh in act one.
+- [ ] Sandbox server binary already downloaded (one-time setup), so the act-one deploy runs offline and instant with no mid-talk download.
+- [ ] Port 3310 is free, with no leftover sandbox process from a prior run holding it. Delete any leftover before doors (`sandbox.delete` on port 3310).
 - [ ] MCP allowed-paths include the repository root (`mariadb-shell -- mcp setup`).
 - [ ] `ai-plugins` installed and the skills confirmed loaded (smoke test below).
 - [ ] Terminal font sized for the projector. Test from the back row.
 - [ ] Tree is clean and re-runnable: `git clean -fdx` has been run, `docs/` and `research/` intact.
-- [ ] `.env` present at the repository root with the sandbox password set to `demo-pw`.
+- [ ] Password is `demo-pw` throughout: the act-one deploy sets it, and the app's `.env` (generated in act three) must carry the same value, so the native client connects. `.env` is generated output, so a clean tree will not have it until act three builds the app.
 
 ## One-time setup (done before the talk, not on stage)
 
@@ -36,6 +37,16 @@ Point the MCP server at the repository root so it can read `docs/` and `research
 ```bash
 mariadb-shell -- mcp setup
 ```
+
+Pre-cache the sandbox server binary. The agent deploys the sandbox live in act one, and the first deploy on a machine with no local MariaDB server downloads the server package, a few hundred megabytes that takes a while. Do that download once, off stage, by deploying the sandbox exactly as act one will, confirming it, then tearing it down:
+
+```text
+Deploy a sandbox on port 3310 with root password demo-pw and its data directory at
+working/sandbox, connect to it, and report the server version. Then stop the sandbox
+and delete it (sandbox.stop then sandbox.delete on port 3310).
+```
+
+The version-less deploy here matches act one exactly, so whatever version it resolves to is the version act one reuses, cached and offline. The cache lives outside the repository, so `git clean -fdx` removes the `working/sandbox` data directory but leaves the download in place. Confirm the reported version is the MariaDB 11.8 LTS series the schema and REST grammar target. If the default is older, pin `MariaDB 11.8` in this deploy and in act one's Prompt 1 step 2 so both use the same version.
 
 ## Act one: the data tier (Prompt 1)
 
@@ -173,6 +184,8 @@ Then run it in native mode with bin/notes-app against the sandbox on port 3310,
 confirm the seeded notes from the schema appear in the list, and record the run
 command and the result in working/RUN_LOG.md.
 ```
+
+The build ships `.env.example`, not `.env`. For the native run to reach the seeded data, `.env` must exist at the repository root with the sandbox password `demo-pw`. If the build left only `.env.example`, copy it and set the password before launching.
 
 If the build finishes but you want a clean launch on stage, run it yourself:
 
