@@ -37,86 +37,88 @@ The demo runs as one seeded account (`michael.aglietti@mariadb.com`, from the sc
 
 ## 4. Data model
 
-Six tables and one view, from the canonical schema in [`research/notes_app.sql`](../research/notes_app.sql), frozen from the agent's design run. Native mode binds to these exact names, so this section is the specification: a schema generated from it should match the reference column for column, including types, defaults, keys, and index names.
+Six tables and one view, from the canonical schema in [`research/notes_app.sql`](../research/notes_app.sql), frozen from the agent's design run. Native mode binds to these exact names, so this section is the specification: a schema generated from it should match the reference in its names, types, defaults, keys, and index names.
+
+It deliberately leaves the MariaDB grammar to the agent and its skills. Each entry says what a column or table must do, not the syntax that does it, so the idioms in a generated schema are the agent's own work rather than a copy of this document.
 
 ### 4.1 Conventions
 
 These apply to every object unless a table below says otherwise.
 
-- **Target and schema.** MariaDB 11.8 LTS. Create the schema with `CREATE SCHEMA IF NOT EXISTS notes_app CHARACTER SET = 'utf8mb4' COLLATE = 'uca1400_ai_ci'`.
-- **Tables.** Use `CREATE OR REPLACE TABLE` with `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci`.
-- **Primary keys.** Every entity table is keyed on `id uuid NOT NULL DEFAULT uuid_v7()`. The join table `note_tag` is the only exception: its key is `(note_id, tag_id)`, and it has no `id` column.
-- **Timestamps.** Use plain `timestamp` (second precision, not `timestamp(6)`) with `DEFAULT current_timestamp()`. Every table has `created_at`, except `note_tag`, which has `added_at` instead. Only `note` has `updated_at`.
-- **Flags.** Use `tinyint(1) NOT NULL DEFAULT 0`.
-- **Foreign keys.** Every foreign key is `ON DELETE CASCADE ON UPDATE CASCADE` and is named `fk_<table>_<parent>`.
+- **Target and schema.** MariaDB 11.8 LTS. A `notes_app` schema in `utf8mb4` with the server's current default Unicode collation, and the same for every table.
+- **Rerunnable.** Running the file again replaces each table rather than failing because it already exists.
+- **Primary keys.** Every entity table has an `id` primary key: a UUID the server generates, in the database's native UUID type, in time order so new rows sort last and ids do not leak row counts. The join table `note_tag` is the only exception: its key is `(note_id, tag_id)`, and it has no `id` column. Foreign key columns use the same type as the key they reference.
+- **Timestamps.** Second precision, defaulting to the time the row is written. Every table has `created_at`, except `note_tag`, which has `added_at` instead. Only `note` has `updated_at`, and the server advances it on every update.
+- **Flags.** Required booleans that default to false.
+- **Foreign keys.** Every foreign key cascades both deletes and updates, and is named `fk_<table>_<parent>`.
 - **Script shape.** Fully qualify every object as `notes_app.<name>`, and order the tables parent-first: `account`, `notebook`, `tag`, `note`, `note_tag`, `attachment`. Rely on no session state: no `USE`, and no `SET` block that saves and restores session variables. This lets `db.execute_sql_script` load the file statement by statement. The file is pure DDL with no `INSERT`s, because data comes from [`research/synthetic_data.sql`](../research/synthetic_data.sql).
 
 ### 4.2 Tables
 
-**`account`** holds the one seeded owner, with no password field in this build. It is `WITH SYSTEM VERSIONING`.
+**`account`** holds the one seeded owner, with no password field in this build. It keeps its full row history in the table itself, with no separate history table and no triggers.
 
 - `id`
-- `email varchar(320) NOT NULL`, unique as `uq_account_email`
-- `display_name varchar(120) NOT NULL`
+- `email varchar(320)`, required, unique as `uq_account_email`
+- `display_name varchar(120)`, required
 - `created_at`
 
-**`notebook`** holds folders. It is `WITH SYSTEM VERSIONING`.
+**`notebook`** holds folders. Like `account`, it keeps its full row history in the table itself.
 
 - `id`
-- `account_id uuid NOT NULL`, foreign key `fk_notebook_account` to `account`
-- `name varchar(120) NOT NULL`
+- `account_id`, required, foreign key `fk_notebook_account` to `account`
+- `name varchar(120)`, required
 - `is_default` flag
 - `created_at`
-- `default_flag tinyint(1) GENERATED ALWAYS AS (if(is_default,1,NULL)) STORED`
-- Keys: `uq_notebook_account_name (account_id, name)` and `uq_notebook_one_default (account_id, default_flag)`. The second key allows at most one default notebook per account, because it ignores the `NULL` flags on non-default rows.
+- `default_flag`, a stored column the server computes from `is_default`: 1 for the default notebook and `NULL` for every other row
+- Keys: `uq_notebook_account_name (account_id, name)` and `uq_notebook_one_default (account_id, default_flag)`. The second key allows at most one default notebook per account, because a unique key ignores the `NULL` flags on non-default rows.
 
 **`tag`** holds free-form labels scoped to one account.
 
 - `id`
-- `account_id uuid NOT NULL`, foreign key `fk_tag_account` to `account`
-- `name varchar(64) NOT NULL`
+- `account_id`, required, foreign key `fk_tag_account` to `account`
+- `name varchar(64)`, required
 - `created_at`
 - Key: `uq_tag_account_name (account_id, name)`
 
-**`note`** holds the notes. It is not system-versioned (see section 10).
+**`note`** holds the notes. It does not keep row history (see section 10).
 
 - `id`
-- `notebook_id uuid NOT NULL`, foreign key `fk_note_notebook` to `notebook`
-- `account_id uuid NOT NULL`, foreign key `fk_note_account` to `account`. This denormalized owner lets a per-account query skip the join to `notebook`.
-- `title varchar(255) NOT NULL DEFAULT ''`
-- `body longtext NOT NULL DEFAULT ''`, the Markdown source
-- `status enum('active','archived','trashed') NOT NULL DEFAULT 'active'`
+- `notebook_id`, required, foreign key `fk_note_notebook` to `notebook`
+- `account_id`, required, foreign key `fk_note_account` to `account`. This denormalized owner lets a per-account query skip the join to `notebook`.
+- `title varchar(255)`, required, default empty
+- `body longtext`, required, default empty, the Markdown source
+- `status`, one of `active`, `archived`, or `trashed`, required, default `active`
 - `is_pinned` flag
 - `created_at`
-- `updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()`
-- Indexes: `ix_note_notebook_updated (notebook_id, status, is_pinned DESC, updated_at DESC)`, `ix_note_account_status (account_id, status, updated_at DESC)`, and `FULLTEXT ft_note_title_body (title, body)` for search.
+- `updated_at`
+- Indexes: `ix_note_notebook_updated` on `notebook_id`, `status`, `is_pinned`, and `updated_at`, with the last two descending to match the pinned-first, newest-first list order; `ix_note_account_status` on `account_id`, `status`, and `updated_at` descending; and a full-text index `ft_note_title_body` on `title` and `body` for search.
 
 **`note_tag`** is the many-to-many join between notes and tags.
 
-- `note_id uuid NOT NULL`, foreign key `fk_note_tag_note` to `note`
-- `tag_id uuid NOT NULL`, foreign key `fk_note_tag_tag` to `tag`
-- `added_at timestamp NOT NULL DEFAULT current_timestamp()`
-- Keys: `PRIMARY KEY (note_id, tag_id)`, plus `ix_note_tag_tag (tag_id)` for the reverse lookup of every note carrying one tag.
+- `note_id`, required, foreign key `fk_note_tag_note` to `note`
+- `tag_id`, required, foreign key `fk_note_tag_tag` to `tag`
+- `added_at`
+- Keys: primary key `(note_id, tag_id)`, plus `ix_note_tag_tag (tag_id)` for the reverse lookup of every note carrying one tag.
 
 **`attachment`** holds object-storage pointers. This app treats it as a read model only.
 
 - `id`
-- `note_id uuid NOT NULL`, foreign key `fk_attachment_note` to `note`
-- `file_name varchar(255) NOT NULL`
-- `mime_type varchar(127) NOT NULL DEFAULT 'application/octet-stream'`
-- `size_bytes bigint unsigned NOT NULL DEFAULT 0`
-- `storage_key varchar(512) NOT NULL`, an object-storage path such as an S3 key. It has no unique key.
+- `note_id`, required, foreign key `fk_attachment_note` to `note`
+- `file_name varchar(255)`, required
+- `mime_type varchar(127)`, required, default `application/octet-stream`
+- `size_bytes`, an unsigned 64-bit integer, required, default 0
+- `storage_key varchar(512)`, required, an object-storage path such as an S3 key. It has no unique key.
 - `created_at`
 - Index: `ix_attachment_note (note_id)`
 
 ### 4.3 View
 
-**`v_active_note`** backs the default list view. It selects from `note`, inner-joins `notebook` and `account`, left-joins `note_tag` and `tag`, filters on `status = 'active'`, and groups by `n.id`. Its columns, in order:
+**`v_active_note`** backs the default list view. It lists active notes only, with one row per note, and keeps notes that have no tags. Its columns, in order:
 
 - `note_id`, `title`, `body`, `is_pinned`, `created_at`, `updated_at`
 - `notebook_id`, `notebook_name`
 - `account_id`, `account_email`
-- `tags`, computed as `GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',')`
+- `tags`, the note's distinct tag names in alphabetical order, joined with commas
 
 The `status` enum maps directly to the three app views for the active list, the archive, and the trash, and `is_pinned` sorts pinned notes to the top of the active list.
 
@@ -234,13 +236,13 @@ The status line names the active mode, so the audience always knows which tier t
 - **Account sign-up and password login.** The demo uses the seeded account.
 - **Attachments.** The schema stores object-storage pointers, but the demo has no object store, so attachments are not read or written.
 - **REST authentication.** The demo creates endpoints without `AUTHENTICATION REQUIRED`. Production would add an MRS auth app, a REST role scoped to read or write per endpoint, a seeded test user, and a login screen in the TUI that stores the session token, all of which the `mariadb-rest-service-authorization` skill covers.
-- **Note history.** The `note` table is not system-versioned in the shipped schema, only `account` and `notebook` are. A history view would first need `ALTER TABLE note ... WITH SYSTEM VERSIONING`, which is a good live push-back demo but a stretch feature here.
+- **Note history.** The `note` table does not keep row history in the shipped schema, only `account` and `notebook` do. A history view would first need an `ALTER TABLE` that adds history to `note`, which is a good live push-back demo but a stretch feature here.
 
 ## 11. Demo runbook and prerequisites
 
 1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw", sandbox_dir="working/sandbox")`.
 2. Deploy the canonical schema and load the fixture by running [`research/notes_app.sql`](../research/notes_app.sql) and then [`research/synthetic_data.sql`](../research/synthetic_data.sql) with `db.execute_sql_script`, which gives the app 61 notes across the active, archived, and trashed views.
-3. Build the REST tier by running the REST DDL through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` breaks it. This is the break the talk shows and the agent recovers from.
+3. Build the REST tier by running the REST DDL through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` breaks it.
 4. Verify the tier from the metadata with `SHOW REST` and `SHOW CREATE REST VIEW`, then publish it with `ALTER REST SERVICE /notesApp PUBLISHED`.
 5. Run the client with `bin/notes-app`. It defaults to native mode, so it reads the sandbox on port 3310 directly and needs no daemon.
 6. REST mode is optional. Serving the endpoints over HTTP needs a router bootstrapped against the metadata, which is out of band, so switch to `NOTES_APP_MODE=rest` only once that router is running.

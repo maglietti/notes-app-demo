@@ -269,7 +269,7 @@ Both of them, and here is the part that stings. While you fight them, you never 
 
 ## What this app could lean on
 
-- **Row history** on notes and notebooks, from system versioning
+- **Row history** on accounts and notebooks, from system versioning
 - **Time-ordered keys**, so the note list sorts itself (`UUID_v7()`)
 - **Full-text search** over title and body, no second system
 - **One default notebook**, enforced by the schema, not app code
@@ -291,7 +291,7 @@ SPEAKER NOTES:
 
 This is the part I will not lose in a talk about agents, because it is the reason any of this matters.
 
-MariaDB is good on its own, and this app leans on it. System versioning keeps row history on notes and notebooks, so I do not write audit triggers or shadow tables. UUID version 7 gives me keys that sort by time, so the note list comes back in order without extra work. FULLTEXT searches title and body, so I do not stand up a separate search system. And a generated column enforces one default notebook per account, so my app code never has to.
+MariaDB is good on its own, and this app leans on it. System versioning keeps row history on accounts and notebooks, so I do not write audit triggers or shadow tables. UUID version 7 gives me keys that sort by time, so the note list comes back in order without extra work. FULLTEXT searches title and body, so I do not stand up a separate search system. And a generated column enforces one default notebook per account, so my app code never has to.
 
 All of that is in the server today. But left to its own knowledge, the model does not use any of it. It hands me the plain version, and I rebuild the rest by hand: triggers for history, app logic for the default rule, search bolted on the side. More code, to get less than the server already does.
 
@@ -465,7 +465,7 @@ CREATE OR REPLACE TABLE notes_app.note (
 - A `uuid_v7()` primary key and `FULLTEXT` search, both in the `note` table shown
 - Then the fixture loaded: 61 notes, 6 notebooks, 12 tags
 
-<span class="accent">The spec said what to build. The server and the data confirmed the agent built it right.</span>
+<span class="accent">My spec says what each column does, never the syntax. The MariaDB grammar is the agent's own work.</span>
 
 <!--
 SPEAKER NOTES:
@@ -474,7 +474,7 @@ Now look at what it actually wrote, because this is the payoff of act one.
 
 CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys defaulting to uuid_v7. System versioning on the owner tables. A generated column that enforces one default notebook per account. A FULLTEXT index for search.
 
-Remember the MySQL habits from a few minutes ago, the BINARY 16 keys and the collation that does not exist on MariaDB? None of them are here. And I will be straight with you, because that is the talk: my spec asks for these idioms by name. What a spec cannot do is make the server accept the DDL, or make sixty-one notes load into it. The agent did both, against a live server, and checked the counts itself.
+Remember the MySQL habits from a few minutes ago, the BINARY 16 keys and the collation that does not exist on MariaDB? None of them are here. And check me on this, because the spec is in the repo: it never says uuid_v7, uca1400, or system versioning. It says a time-ordered UUID key, row history kept in the table itself, one default notebook per account. The agent picked the current MariaDB grammar for each of those, with a skill in the room. Then it proved the result: the server accepted the DDL, and sixty-one notes loaded into it.
 
 So the schema is real, and it is exactly the schema the app will bind to. Now we build on it.
 -->
@@ -564,13 +564,13 @@ This is the tier the talk is named for, and the real test, because the REST gram
 
 ---
 
-# It works out the trickiest grammar on its own
+# It writes the least-trained grammar in the run
 
 <div class="watch">
 
 **What is happening on screen**
 
-1. The REST grammar runs **one statement per session**, a rule most models miss
+1. The REST grammar runs **one statement per session**, and the agent follows that rule
 2. It builds the **service, a schema, and a view per table**, and `SHOW REST` confirms them
 3. It **refactors the app**: a REST data source beside the native one, picked by one variable
 4. In REST mode the **status line reports the missing router**, and the app stays up
@@ -584,7 +584,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT THREE]
 
-This is the trickiest part of the whole run. The REST grammar runs one statement per session, a rule most models have never seen. [IF THE RECORDING SHOWS THE BREAK: The agent hits it, reads what comes back, adapts, and reruns it the right way, with no help from me.] The service, the schema, and a view per table land, and SHOW REST confirms them.
+This is the trickiest grammar in the whole run. It runs one statement per session, a rule most models have never seen, and I named that rule in the prompt, because saying what you already know is how you phrase a prompt. The prompt also names what I want from each view: a key, sort columns, nested tags, and create, update and delete. Writing those into valid REST Service DDL is the grammar a model is most likely to get wrong from memory. The service, the schema, and a view per table land, and SHOW REST confirms them.
 
 Then it goes back to the app it built in act two, adds a REST data source beside the native one, and picks between them with one environment variable. In REST mode the status line says plainly that nothing is serving the endpoints yet, and the app stays up. When the metadata comes up, I get precise.
 

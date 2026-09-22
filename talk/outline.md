@@ -88,7 +88,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 - **On slide:** `CREATE OR REPLACE TABLE`. `utf8mb4` with `uca1400`. `WITH SYSTEM VERSIONING`. `uuid_v7()`. `FULLTEXT`. Generated `default_flag`. Then 61 notes, 6 notebooks, 12 tags loaded.
 - **Build:** The idioms as callouts over a trimmed DDL snippet, with the fixture counts beneath.
-- **Says:** The spec said what to build. The server accepted it and the fixture loaded, so the agent built it right.
+- **Says:** The spec describes behaviour, not syntax. The agent chose the current grammar, and the server and the fixture proved it.
 
 ---
 
@@ -127,7 +127,7 @@ Run this act, or cut to its recording, only when the clock allows. The skip path
 ### Slide 16: The recording (the API tier and the two modes)
 
 - **On slide:** The recording fills the frame. Caption: the REST grammar is session state, then the app flips between native and REST mode.
-- **Build:** Cut to the act three recording. **[CAPTURE] break and recover (if the run shows one), `SHOW REST`, and the two modes.**
+- **Build:** Cut to the act three recording. **[CAPTURE] the REST DDL landing, `SHOW REST`, and the two modes.**
 - **Says:** The grammar the model is most confidently wrong about is the grammar the skill knows best.
 
 ### Slide 17: Defined, not served

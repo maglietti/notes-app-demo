@@ -80,7 +80,7 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 
 **Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure. The agent reports its differences from `research/notes_app.sql` at the end of step 1.
 
-**Line to say:** "No SQL by hand. I wrote the data model down once, in a spec, and the agent turned it into DDL a live server accepts. Then it proved the schema by loading real data into it."
+**Line to say:** "No SQL by hand. My spec says what each column does, never the syntax. The agent turned it into current MariaDB grammar, with a skill in the room, then proved the schema by loading real data into it."
 
 ## Act two: the application (Prompt 2)
 
@@ -161,9 +161,9 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
    runs.
 ```
 
-**[CAPTURE] the break and recover.** The REST grammar is session state, and the prompt names the one-statement-per-session rule up front to save the round trip, so a clean run may not break at all. If the agent still runs part of it as a script, each statement lands in a fresh session and the grammar breaks partway down, and a capable agent recovers after the first failure. When that happens, let the failure and recovery play. It is the point.
+**[CAPTURE] the REST DDL landing.** The prompt names the one-statement-per-session rule, so the DDL runs one statement at a time. Call out what the agent wrote: `@KEY`, `@SORTABLE`, `@UNNEST` through `note_tag`, and the CRUD flags, the least-trained grammar in the run.
 
-**Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best. If it trips on the session rule, watch it read the error and fix itself."
+**Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best."
 
 **[CAPTURE] the metadata.** `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. State the boundary in one sentence and move on:
 
@@ -189,8 +189,8 @@ git clean -fdx
 
 ## Recording notes
 
-- Capture the core moments in order: schema landing, app opening. For the optional act, add break and recover, `SHOW REST`, and the two modes.
-- Trim the waits between tool calls, but keep any fixture-driven schema fix and the break-and-recover intact. The failure is the evidence.
+- Capture the core moments in order: schema landing, app opening. For the optional act, add the REST DDL landing, `SHOW REST`, and the two modes.
+- Trim the waits between tool calls, but keep any fixture-driven schema fix intact. A failure the agent fixes is evidence.
 - The core run is about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, and a separate optional-act cut inside 4:00, so the whole talk lands near 20 and stays under 25 with or without it.
 - Record at the projector font size, not your desk size.
 - Keep the file local. Have `working/RUN_LOG.md`, an app screenshot, and, for the optional act, the `SHOW REST` output exported as static slides in case the recording will not play.

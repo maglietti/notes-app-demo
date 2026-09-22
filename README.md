@@ -148,7 +148,7 @@ Configuration comes from a `.env` file at the repository root, which the client 
 
 ## Step 6 (optional): Add the API tier and REST mode
 
-Give the agent Prompt 3 when you want the REST tier the talk is named for. It puts a MariaDB REST Service in front of the schema, then refactors the client so `NOTES_APP_MODE` selects native or REST mode. The REST DDL has to run through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` hands each statement a fresh session. A capable agent works that out after the first failure, and the prompt says so up front to save the round trip.
+Give the agent Prompt 3 when you want the REST tier the talk is named for. It puts a MariaDB REST Service in front of the schema, then refactors the client so `NOTES_APP_MODE` selects native or REST mode. The REST DDL has to run through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` hands each statement a fresh session. The prompt says so up front.
 
 ```text
 Continue against the sandbox on port 3310. Keep database files in working/, and
