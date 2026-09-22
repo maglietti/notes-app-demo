@@ -8,14 +8,14 @@ Two prompts, two acts, one conversation: the data tier, then the app. Both acts 
 
 ## Pre-flight checklist (before doors, then again before you record)
 
-- [ ] Recording loaded on the laptop and cued to the capture moments. Never streamed.
-- [ ] Sandbox server binary already downloaded (one-time setup), so the act-one deploy runs offline and instant with no mid-talk download.
-- [ ] Port 3310 is free, with no leftover sandbox process from a prior run holding it. Delete any leftover before doors (`sandbox.delete` on port 3310).
-- [ ] MCP allowed-paths include the repository root (`mariadb-shell -- mcp setup`).
 - [ ] `ai-plugins` installed and the skills confirmed loaded (smoke test below).
+- [ ] MCP allowed-paths include the repository root (`mariadb-shell -- mcp setup`).
+- [ ] MariaDB 11.8 server already downloaded (one-time setup), so the act-one deploy runs offline with no mid-talk download.
+- [ ] No sandbox on port 3310. Stop and delete any leftover from a rehearsal (`sandbox.stop`, then `sandbox.delete`), so step 2 of Prompt 1 finds nothing and deploys fresh on stage.
+- [ ] Tree is clean: `git clean -fdx` has been run after the sandbox was deleted, and `docs/` and `research/` are intact.
+- [ ] Password is `demo-pw` throughout. The act-one deploy sets it, and the `.env` that act two needs must carry the same value. A clean tree has no `.env` until act two builds the app.
 - [ ] Terminal font sized for the projector. Test from the back row.
-- [ ] Tree is clean and re-runnable: `git clean -fdx` has been run, `docs/` and `research/` intact.
-- [ ] Password is `demo-pw` throughout: the act-one deploy sets it, and the app's `.env` (generated in act two) must carry the same value, so the native client connects. `.env` is generated output, so a clean tree will not have it until act two builds the app.
+- [ ] Recording loaded on the laptop and cued to the capture moments. Never streamed.
 
 ## One-time setup (done before the talk, not on stage)
 
@@ -42,14 +42,15 @@ Pre-cache the sandbox server binary. The agent deploys the sandbox live in act o
 
 ```text
 Deploy a MariaDB 11.8 sandbox on port 3310 with root password demo-pw and its data
-directory at working/sandbox, connect to it, and report the server version.
+directory at working/sandbox, connect to it, and report the server version. Then stop
+the sandbox and delete it (sandbox.stop then sandbox.delete on port 3310).
 ```
 
 Both this deploy and act one's Prompt 1 step 2 pin MariaDB 11.8, the LTS series the schema and REST grammar target, so act one reuses this download, cached and offline. The pin is required: with no server on the PATH, a version-less deploy fails instead of downloading or reusing the cache. The cache lives outside the repository, so `git clean -fdx` removes the `working/sandbox` data directory but leaves the download in place. Confirm the reported version is 11.8.x.
 
 ## Act one: the data tier (Prompt 1)
 
-**Target 4:00.** The design beat. The agent reads the product doc, turns its data model into current MariaDB DDL, deploys it, and seeds it.
+**Target 4:00.** The design beat. The agent reads the product doc, turns its data model into current MariaDB DDL, compares it with the reference schema, deploys it to a fresh sandbox, and seeds it.
 
 Paste:
 
@@ -62,7 +63,8 @@ working/RUN_LOG.md as you go.
    that its data model in section 4 describes, keeping the column names the PRD
    gives, since the app binds to them. Write the DDL yourself from the PRD and
    store it in working/notes_app.sql. Only after it is written, compare it with the
-   reference schema research/notes_app.sql and report the differences.
+   reference schema research/notes_app.sql and report the differences, without
+   changing your schema to match it.
 
 2. Check whether a MariaDB 11.8 sandbox is running on port 3310 with its data
    directory at working/sandbox. If it is not, deploy one there with root password
@@ -98,10 +100,9 @@ Paste:
 ```text
 Build the Textual application that docs/notes_app-prd.md specifies, in native mode
 only. Leave RestDataSource and NOTES_APP_MODE for later (PRD build order step 7).
-Build the app at the repository root as a notes_app package with a pyproject.toml,
-the way a normal Python project is laid out. Do not put the app under working/;
-that directory is only for the schema, the run log and the sandbox. Hold to these
-constraints:
+Build the app at the repository root, the way a normal Python project is laid out.
+Do not put the app under working/; that directory is only for the schema, the run
+log and the sandbox. Hold to these constraints:
 
 - Python 3.11 or newer. Textual for the UI, and the mariadb Connector/Python
   against 127.0.0.1:3310 for data access, bound to the columns in
@@ -215,7 +216,7 @@ Stop and delete the sandbox on port 3310.
 git clean -fdx
 ```
 
-`git clean -fdx` clears the generated app, `working/`, the sandbox, the `.venv`, and the `.env`, and leaves the committed `README.md`, `bin/`, `docs/`, and `research/`.
+`git clean -fdx` clears the generated app, `working/` with the sandbox data directory, the `.venv`, and the `.env`, and leaves the committed `README.md`, `bin/`, `docs/`, and `research/`.
 
 ## Recording notes
 
