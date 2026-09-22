@@ -2,7 +2,7 @@
 
 The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md). Twenty-one slides plus one appendix, across nine beats. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
 
-Recording note: the three acts play from the recorded run, in three separate cuts, one per act. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The deck carries the frame; the recording carries the work.
+Recording note: the acts play from the recorded run. Acts one and two share one trimmed cut, cued at the start of each act, and the optional act three has its own cut. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The deck carries the frame; the recording carries the work.
 
 Prompt slides show the trimmed shape of the prompt, not the full text. The full prompt lives in the speaker notes and on the cue card.
 
@@ -70,69 +70,71 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ---
 
-## Beat 4: Act one, the data tier (slides 9-11, ~3:30)
+## Beat 4: Act one, the data tier (slides 9-11, ~4:00)
 
 ### Slide 9: Act one divider, Prompt 1
 
-- **On slide:** Act 1: The data tier. The shape of Prompt 1: design the schema, deploy a sandbox, run the DDL, read it back.
+- **On slide:** Act 1: From a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, compare with the reference, deploy a sandbox, seed it, report the counts.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** A short prompt is all the agent gets. The schema is its own work.
+- **Says:** I wrote the data model once, in a spec. The agent writes the DDL and proves it.
 
 ### Slide 10: The recording (schema landing)
 
-- **On slide:** Minimal chrome, the recording fills the frame. Caption: designing the schema, deploying the sandbox, running the DDL.
+- **On slide:** Minimal chrome, the recording fills the frame. Caption: writing the DDL, deploying the sandbox, running it, loading the fixture.
 - **Build:** Cut to act one of the recorded run. **[CAPTURE] schema landing.**
-- **Says:** No SQL by hand. Watch the loop close against a live database.
+- **Says:** No SQL by hand. Watch the loop close against a live database, with real data as the contract.
 
 ### Slide 11: What just landed
 
-- **On slide:** `CREATE OR REPLACE TABLE`. `utf8mb4`. `WITH SYSTEM VERSIONING`. `uuid_v7()`. `FULLTEXT`. Generated `default_flag`.
-- **Build:** The idioms as callouts over a trimmed DDL snippet. This is current MariaDB, labeled.
-- **Says:** A skill handed the model the current version, so the agent reached for grammar it was never trained on.
+- **On slide:** `CREATE OR REPLACE TABLE`. `utf8mb4` with `uca1400`. `WITH SYSTEM VERSIONING`. `uuid_v7()`. `FULLTEXT`. Generated `default_flag`. Then 61 notes, 6 notebooks, 12 tags loaded.
+- **Build:** The idioms as callouts over a trimmed DDL snippet, with the fixture counts beneath.
+- **Says:** The spec said what to build. The server accepted it and the fixture loaded, so the agent built it right.
 
 ---
 
-## Beat 5: Act two, the API tier (slides 12-14, ~2:30)
+## Beat 5: Act two, the application (slides 12-14, ~2:30)
 
 ### Slide 12: Act two divider, Prompt 2
 
-- **On slide:** Act 2: The API tier. The shape of Prompt 2: put a REST Service in front of the schema, one statement per session, verify the metadata.
+- **On slide:** Act 2: An idea you can open. The shape of Prompt 2: build the Textual app the PRD specifies, in native mode, and verify both entry points.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** The same context now puts a REST Service in front of the schema.
+- **Says:** Spec-driven development. The same product doc that gave act one its data model drives the client.
 
-### Slide 13: The recording (break and recover)
+### Slide 13: The recording (the app opens)
 
-- **On slide:** The recording fills the frame. Caption: the REST grammar is session state, so it breaks, then the agent fixes itself.
-- **Build:** Cut to act two of the recorded run. **[CAPTURE] break and recover, then [CAPTURE] `SHOW REST`.**
-- **Says:** The grammar the model is most confidently wrong about is the grammar the skill knows best.
+- **On slide:** The recording fills the frame, then hold on the running three-pane app.
+- **Build:** Cut to act two of the recorded run. **[CAPTURE] app opening.** Land on notebooks, pinned notes, the status line reading `native`.
+- **Says:** From an empty directory to this, in one conversation, on the data act one loaded.
 
-### Slide 14: Defined, not served
+### Slide 14: A working client, and the line
 
-- **On slide:** `SHOW REST VIEWS` lists `/note`, `/notebook`, `/tag`. Serving them over HTTP is a router, and that router is a separate job.
-- **Build:** The metadata output, with the boundary line beneath it in the accent color.
-- **Says:** The endpoints are real in the metadata. Knowing where the agent's work stops is the point.
+- **On slide:** Native mode, straight to the tables. A working client on the schema the agent built. Not proof of a REST tier.
+- **Build:** App screenshot with the status line circled. The boundary in the accent color.
+- **Says:** Draw the line at the emotional peak. This is the honesty the title promises.
 
 ---
 
-## Beat 6: Act three, the application (slides 15-17, ~2:30)
+## Beat 6 (optional): Act three, the API tier (slides 15-17, ~4:00, or ~0:30 on the skip path)
+
+Run this act, or cut to its recording, only when the clock allows. The skip path jumps from slide 14 straight to slide 17 and shows the recorded `SHOW REST VIEWS` output with the boundary line, about 30 seconds, because the title promises an API tier.
 
 ### Slide 15: Act three divider, Prompt 3
 
-- **On slide:** Act 3: The application. The shape of Prompt 3: read the product doc, build the Textual client, run it.
+- **On slide:** Act 3: From the schema to a REST API. The shape of Prompt 3: build the REST Service from PRD section 5 one statement per session, verify with `SHOW REST`, publish, then add REST mode to the app.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** The same context reads the product doc and builds the client.
+- **Says:** The same context now puts a REST Service in front of the schema, and teaches the app to use it.
 
-### Slide 16: The recording (the app opens)
+### Slide 16: The recording (the API tier and the two modes)
 
-- **On slide:** The recording fills the frame, then hold on the running three-pane app.
-- **Build:** Cut to act three of the recorded run. **[CAPTURE] app opening.** Land on notebooks, pinned notes, the status line reading `native`.
-- **Says:** From an empty directory to this, in one conversation.
+- **On slide:** The recording fills the frame. Caption: the REST grammar is session state, then the app flips between native and REST mode.
+- **Build:** Cut to the act three recording. **[CAPTURE] break and recover (if the run shows one), `SHOW REST`, and the two modes.**
+- **Says:** The grammar the model is most confidently wrong about is the grammar the skill knows best.
 
-### Slide 17: A working client, and the line
+### Slide 17: Defined, not served
 
-- **On slide:** Native mode, straight to the tables. A working client on the schema the agent designed. Not proof of the REST tier.
-- **Build:** App screenshot with the status line circled. The boundary in the accent color.
-- **Says:** Draw the line at the emotional peak. This is the honesty the title promises.
+- **On slide:** `SHOW REST VIEWS` lists `/note`, `/notebook`, `/tag`. Serving them over HTTP is a router, and that router is a separate job.
+- **Build:** The metadata output, with the boundary line beneath it in the accent color. The skip path lands here.
+- **Says:** The endpoints are real in the metadata. Knowing where the agent's work stops is the point.
 
 ---
 
@@ -185,7 +187,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 ## Decisions folded in
 
 - **Prompt slides:** trimmed shape on the wall, full text in notes and on the cue card.
-- **Recording:** three cuts, one per act, so control holds when AV is cold and the single-conversation story still narrates across them.
+- **Recording:** one trimmed cut for acts one and two, cued per act, and a separate cut for the optional act three, so control holds when AV is cold, the act can be dropped cleanly, and the single-conversation story still narrates across them.
 - **Three layers:** moved to the appendix (slide A1) so beat 3 stays a glance. Promote it into the main flow only if the architecture question is expected to lead.
 
 ## Still open

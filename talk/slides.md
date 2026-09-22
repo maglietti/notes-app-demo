@@ -96,7 +96,7 @@ SPEAKER NOTES:
 
 Good morning. You just sat through two keynotes about how agents are going to change everything. I want to do the opposite for twenty minutes. I want to get specific.
 
-I gave a coding agent one job: build the data and API tier for an app, against a real MariaDB server. I knew before I started that a model is confidently wrong about a database it never trained on. I handed it the job anyway. And it worked, because of one change I made to the setup.
+I gave a coding agent one job: build an app against a real MariaDB server, from the data tier up, API tier included. I knew before I started that a model is confidently wrong about a database it never trained on. I handed it the job anyway. And it worked, because of one change I made to the setup.
 
 But start with why I would even try that.
 -->
@@ -394,42 +394,44 @@ Everything from here is that plugin, doing its job, in one conversation. Watch.
 
 <!-- _class: lead -->
 
-# Act one: from a prompt to a schema
+# Act one: from a spec to a schema
 
-### **I gave it the task, not the schema.**
+### **I wrote the data model. The agent writes the DDL.**
 
 ```
 Work in this repository and complete every step in order.
 
-1. Create a MariaDB schema named notes_app for a note-taking app
-   and store it in working/notes_app.sql.
-2. Deploy a sandbox on port 3310, connect to it, and run
-   working/notes_app.sql via the MCP server.
-3. List the tables you created and show me the columns of note.
+1. Turn the data model in section 4 of docs/notes_app-prd.md
+   into MariaDB DDL in working/notes_app.sql, then compare it
+   with research/notes_app.sql.
+2. Deploy a MariaDB 11.8 sandbox on port 3310 and run the DDL.
+3. Seed it with research/synthetic_data.sql. If the fixture
+   fails, fix the schema. Never edit the fixture.
+4. List the tables and report each table's row count.
 ```
 
 <!--
 SPEAKER NOTES:
 
-Act one, and I want to be straight about what is scripted, because that is the whole talk. This is the actual prompt I ran. It is on the slide, not cleaned up.
+Act one, and I want to be straight about what is scripted, because that is the whole talk. This is the prompt I ran, trimmed to fit the slide. The full text is in the repo.
 
-Notice what it does and does not say. It names the artifacts, it numbers the steps, and it says complete them in order. That is how you phrase a prompt so the work lands. But nowhere does it describe the schema. I am asking the agent to design one, deploy a server, run the DDL, and read the tables back. The design is its own work, live.
+Notice what it does and does not say. It names the artifacts, it numbers the steps, and it says complete them in order. That is how you phrase a prompt so the work lands. And it points at a spec. Section 4 of my product doc lays out the data model: the tables, the columns, the keys. I wrote that once. The agent's job is to turn it into DDL, deploy a server, run it, and then prove it by loading real data. The fixture is the contract. If the data does not fit, the schema changes, never the data.
 
-Watch what it reaches for.
+Watch what it does with it.
 -->
 
 ---
 
-# Watch it design, deploy, run, and check itself
+# Watch it write, deploy, run, and prove itself
 
 <div class="watch">
 
 **What is happening on screen**
 
-1. It **designs** a `notes_app` schema from that one line
+1. It **reads** the data model in the spec and **writes** the DDL
 2. It **deploys** a MariaDB sandbox on port 3310, with no Docker and no root
 3. It **runs** the DDL over MCP against that live server
-4. It **reads the tables back** and confirms its own work
+4. It **loads 61 real notes** as the data contract, and confirms its own work
 
 </div>
 
@@ -440,16 +442,16 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT ONE]
 
-Four things are happening here. It designs the schema from that one sentence. It deploys a MariaDB sandbox on port 3310, and notice, there was no Docker step, no container, nothing I set up beforehand. It runs the DDL over the connection against that live server. And then it reads the tables back to check what it did.
+Four things are happening here. It reads the data model out of my spec and writes the DDL. It deploys a MariaDB sandbox on port 3310, and notice, there was no Docker step, no container, nothing I set up beforehand. It runs the DDL over the connection against that live server. And then it loads sixty-one real notes into it, the fixture that the app depends on, and reads the counts back.
 
-That last step is the difference between a demo and a result. An agent that just prints code hands you a review task. This one ran its own code against a real database and confirmed it. It closed the loop by itself.
+That last step is the difference between a demo and a result. An agent that just prints code hands you a review task. This one ran its own code against a real database, and then made real data prove it. It closed the loop by itself.
 
 [LET THE SCHEMA LAND, THEN ADVANCE]
 -->
 
 ---
 
-# It knew the current grammar
+# It wrote current MariaDB, and the data proved it
 
 ```sql
 CREATE OR REPLACE TABLE notes_app.note (
@@ -461,45 +463,103 @@ CREATE OR REPLACE TABLE notes_app.note (
 
 - `CREATE OR REPLACE TABLE` with the `uca1400` collation, not MySQL's `utf8mb4_0900`
 - A `uuid_v7()` primary key and `FULLTEXT` search, both in the `note` table shown
-- Elsewhere in the schema: system versioning on the owners, a generated one-default rule
+- Then the fixture loaded: 61 notes, 6 notebooks, 12 tags
 
-<span class="accent">This is the grammar the model gets wrong from memory. It got it right because a skill was in the room.</span>
+<span class="accent">The spec said what to build. The server and the data confirmed the agent built it right.</span>
 
 <!--
 SPEAKER NOTES:
 
 Now look at what it actually wrote, because this is the payoff of act one.
 
-CREATE OR REPLACE TABLE. That is the MariaDB idiom, not the MySQL pattern a model defaults to. utf8mb4 with a current collation. UUID keys defaulting to uuid_v7. System versioning on the owner tables. A generated column that enforces one default notebook per account. A FULLTEXT index for search.
+CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys defaulting to uuid_v7. System versioning on the owner tables. A generated column that enforces one default notebook per account. A FULLTEXT index for search.
 
-None of that is what a model writes from memory. Remember the two snags from a few minutes ago, the UUID keys and the collation that does not exist in MySQL land? Here they are, correct. uuid_v7 defaults, and utf8mb4 with uca1400. Same model. It wrote the opposite of the guess, because this time the knowledge was in the room.
+Remember the MySQL habits from a few minutes ago, the BINARY 16 keys and the collation that does not exist on MariaDB? None of them are here. And I will be straight with you, because that is the talk: my spec asks for these idioms by name. What a spec cannot do is make the server accept the DDL, or make sixty-one notes load into it. The agent did both, against a live server, and checked the counts itself.
 
-Nothing changed about the model. The knowledge changed. A skill put the current grammar in the room, and the agent reached for syntax it was never trained on. That is a skill doing one job, closing the knowledge gap. Now for the hard part.
+So the schema is real, and it is exactly the schema the app will bind to. Now we build on it.
 -->
 
 ---
 
 <!-- _class: lead -->
 
-# Act two: from the schema to a REST API
+# Act two: an idea you can open
 
-### **Same conversation. The least-trained grammar in the run.**
+### **Spec-driven development: I wrote the PRD, the agent builds to it.**
 
 ```
-Put a MariaDB REST Service in front of notes_app. Run the REST DDL
-through db.execute_sql one statement at a time, because the grammar
-is session state.
+Build the Textual app that docs/notes_app-prd.md specifies,
+in native mode only: the three-pane layout from section 7
+and every Must feature from section 6.
 
-Create service /notesApp, a schema, and a view for each table.
-Verify with SHOW REST, then publish.
+Verify both entry points against the sandbox: bin/notes-app
+and the notes-app console script.
 ```
 
 <!--
 SPEAKER NOTES:
 
-Act two, and I have not started a new chat. Same agent, same context. It just built my schema. Now I ask it to put a REST Service in front of it.
+Act two, still the same conversation, and this is spec-driven development. The same product requirements document that gave act one its data model also describes the app: the three-pane layout, the feature list, the architecture. Now I point the agent at it and ask it to build the client that spec describes, and run it.
 
-This is the tier the talk is named for, and the real test, because the REST grammar is the most niche syntax in the whole run. It is exactly where a skill earns its place. So do not look away, this is the best part. Watch the agent handle it.
+That is the shift worth naming. I am not describing the app in a chat prompt. I wrote the spec once, and the agent builds to it. The same context that built my tables reads my spec and writes my front end. You keep talking to one agent, and it keeps building.
+-->
+
+---
+
+# From an empty directory to a running app
+
+<div class="watch">
+
+**What is happening on screen**
+
+1. It **reads the product doc** and builds a real Python package, not a snippet
+2. It **runs** the app against the sandbox, from the launcher and the installed command
+3. Three panes: **notebooks**, **notes** with pinned ones on top, the **note view**
+4. The status line reads `native`, next to the sandbox address
+
+</div>
+
+*One conversation carried an idea from nothing to something you can use.*
+
+<!--
+SPEAKER NOTES:
+
+[CUT TO RECORDING, ACT TWO]
+
+It reads the product doc and builds a real Python package. Not a snippet in a chat window. A project, with an entry point and dependencies. Then it runs it, both from the launcher and from the command it installed, because a package that installs with no code in it is a classic way to fool yourself.
+
+And there it is. Three panes. On the left, the notebooks from act one. In the middle, the notes, with the pinned ones sorted to the top, exactly the way the schema's index intended. On the right, a note rendered from Markdown. Along the bottom, a status line that reads native, so it talks straight to the tables on the sandbox. That is the data act one loaded, on screen.
+
+From an empty directory to a working app, in one conversation.
+
+[IF THE CLOCK ALLOWS, ADVANCE TO ACT THREE. OTHERWISE SKIP TO "REAL IN THE METADATA" FOR THE 30-SECOND BOUNDARY BEAT.]
+-->
+
+---
+
+<!-- _class: lead -->
+
+# Act three: from the schema to a REST API
+
+### **Same conversation. The least-trained grammar in the run.**
+
+```
+Build the REST Service from PRD section 5. Run the DDL through
+db.execute_sql one statement at a time, because the grammar is
+session state. Verify with SHOW REST, then publish.
+
+Add RestDataSource, select it with NOTES_APP_MODE, and run the
+app in both modes.
+```
+
+<!--
+SPEAKER NOTES:
+
+[OPTIONAL ACT. RUN IT, OR CUT TO ITS RECORDING, ONLY WHEN THE CLOCK ALLOWS.]
+
+Act three, and I have not started a new chat. Same agent, same context. It built my schema and my app. Now I ask it to put a REST Service in front of the schema, and to teach the app to use it.
+
+This is the tier the talk is named for, and the real test, because the REST grammar is the most niche syntax in the whole run. It is exactly where a skill earns its place. So do not look away. Watch the agent handle it.
 -->
 
 ---
@@ -511,9 +571,9 @@ This is the tier the talk is named for, and the real test, because the REST gram
 **What is happening on screen**
 
 1. The REST grammar runs **one statement per session**, a rule most models miss
-2. The agent **hits that rule**, reads what comes back, and adapts
-3. It **reruns it the right way**, and the endpoints land
-4. All **on its own**. I never touched the keyboard.
+2. It builds the **service, a schema, and a view per table**, and `SHOW REST` confirms them
+3. It **refactors the app**: a REST data source beside the native one, picked by one variable
+4. In REST mode the **status line reports the missing router**, and the app stays up
 
 </div>
 
@@ -522,11 +582,11 @@ This is the tier the talk is named for, and the real test, because the REST gram
 <!--
 SPEAKER NOTES:
 
-[CUT TO RECORDING, ACT TWO]
+[CUT TO RECORDING, ACT THREE]
 
-This is the trickiest part of the whole run, and the best part to watch. The REST grammar runs one statement per session, a rule most models have never seen. The agent hits it, reads what comes back, adapts, and reruns it the right way, with no help from me. The endpoints land.
+This is the trickiest part of the whole run. The REST grammar runs one statement per session, a rule most models have never seen. [IF THE RECORDING SHOWS THE BREAK: The agent hits it, reads what comes back, adapts, and reruns it the right way, with no help from me.] The service, the schema, and a view per table land, and SHOW REST confirms them.
 
-This is the moment that makes the case. The place a model would usually be most confidently wrong is the place the skill carries it through, and the tool let the agent prove it, live. When the metadata comes up, I get precise.
+Then it goes back to the app it built in act two, adds a REST data source beside the native one, and picks between them with one environment variable. In REST mode the status line says plainly that nothing is serving the endpoints yet, and the app stays up. When the metadata comes up, I get precise.
 
 [ADVANCE WHEN SHOW REST APPEARS]
 -->
@@ -566,65 +626,15 @@ I am not going to tell you these endpoints answer a web request, because that is
 <!--
 SPEAKER NOTES:
 
+[THE SKIP PATH LANDS HERE. IF ACT THREE DID NOT RUN, SAY: "The same agent also put a REST Service in front of this schema. Here is the metadata from that run." THEN CONTINUE.]
+
 So how do I know the tier is real. Not because I called it over HTTP. Because I can read it. SHOW REST VIEWS lists the endpoints the agent defined, note, notebook, tag, under the notesApp service. They are genuinely there, in the metadata.
 
 And here is the line I promised you in the first minute. The agent built the API definition. Serving that definition over HTTP is the job of a router, a separate piece I chose not to stand up for this talk. So I am not going to tell you these endpoints answer a web request, because that is not what I built. They are defined. Serving them is a router away.
 
-That distinction is the entire thesis in one breath. The agent is genuinely good, right up to a boundary, and the honest move is to name the boundary instead of smudging it. Which is exactly the tension in the title of this talk. And it sets up the finale.
--->
+That distinction is the entire thesis in one breath. The agent is genuinely good, right up to a boundary, and the honest move is to name the boundary instead of smudging it. Which is exactly the tension in the title of this talk. Now, something happened during cleanup that I did not plan.
 
----
-
-<!-- _class: lead -->
-
-# Act three: an idea you can open
-
-### **Spec-driven development: I wrote the PRD, the agent builds to it.**
-
-```
-Read docs/notes_app-prd.md and build the Textual application it
-specifies. Implement the DataSource interface, the three-pane
-layout from section 7, and every Must feature from section 6.
-Then run it in native mode against the sandbox.
-```
-
-<!--
-SPEAKER NOTES:
-
-Act three, still the same conversation, and this is spec-driven development. Earlier I wrote a product requirements document, a real spec: the data model, the three-pane layout, the feature list, the architecture. It is sitting in the repo. Now I point the agent at it and ask it to build the client that spec describes, and run it.
-
-That is the shift worth naming. I am not describing the app in a chat prompt. I wrote the spec once, and the agent builds to it. The same context that designed my tables reads my spec and writes my front end. You keep talking to one agent, and it keeps building.
--->
-
----
-
-# From an empty directory to a running app
-
-<div class="watch">
-
-**What is happening on screen**
-
-1. It **reads the product doc** and builds a real Python package, not a snippet
-2. It **runs** the app against the sandbox
-3. Three panes: **notebooks**, **notes** with pinned ones on top, the **note view**
-4. The status line reads `native`, next to the sandbox address
-
-</div>
-
-*One conversation carried an idea from nothing to something you can use.*
-
-<!--
-SPEAKER NOTES:
-
-[CUT TO RECORDING, ACT THREE]
-
-It reads the product doc and builds a real Python package. Not a snippet in a chat window. A project, with an entry point and dependencies. Then it runs it.
-
-And there it is. Three panes. On the left, the notebooks it designed. In the middle, the notes, with the pinned ones sorted to the top, exactly the way the schema's index intended. On the right, a note rendered from Markdown. Along the bottom, a status line that reads native, so it talks straight to the tables on the sandbox. I can go deeper on native versus REST in questions.
-
-From an empty directory to a working app, in one conversation. Now, something happened after this, during cleanup, that I did not plan.
-
-[HOLD ON THE RUNNING APP, THEN ADVANCE]
+[ADVANCE]
 -->
 
 ---
@@ -746,7 +756,7 @@ Two. Tools give the agent something real to run against. The MCP server opens a 
 
 Three. Name the artifact you want. Ask for the schema, the DDL file, the running app, not the outcome you are imagining, and number the steps when the sequence matters.
 
-Four. For real work, write a spec. For anything past a one-liner, a short product doc drives the agent better than a chat prompt, and unlike a prompt it is something you and your team can review. That is spec-driven development, and it is how act three happened.
+Four. For real work, write a spec. For anything past a one-liner, a short product doc drives the agent better than a chat prompt, and unlike a prompt it is something you and your team can review. That is spec-driven development, and it is how acts one and two happened.
 
 Five. Guardrails are layered. The working-directory allow-list, the harness action classifier, and the database grants each get a veto. Set all three, and you do not have to trust the agent's judgment to stay safe.
 
@@ -773,7 +783,7 @@ Six. Start on greenfield. The loop is fast and there is no existing code to put 
 <!--
 SPEAKER NOTES:
 
-Good ideas are crazy until they're not. That was Larry Page, at the start. You just watched one stop being crazy: a confidently wrong agent built a real data tier and a real API tier, because it had the knowledge and the reach. And I showed you the one place it is still crazy, the router I did not stand up.
+Good ideas are crazy until they're not. That was Larry Page, at the start. You just watched one stop being crazy: a confidently wrong agent built a real data tier, a working app on top of it, and an API tier you can read in the metadata, because it had the knowledge and the reach. And I showed you the one place it is still crazy, the router I did not stand up.
 
 That is the story. One idea, one conversation, from an empty directory to a running app, with the boundary named out loud along the way.
 
@@ -842,7 +852,7 @@ If someone asks how the pieces fit. You install one thing, the ai-plugins. On fi
 
 ## Why it is not proof of REST
 
-<span class="boundary">It never calls the `/notesApp` endpoints. Those were defined in Act two, and serving them needs a router. The app takes the native path to the same tables.</span>
+<span class="boundary">In native mode it never calls the `/notesApp` endpoints. Those were defined in Act three, and serving them needs a router, so REST mode has nothing to answer it. The app takes the native path to the same tables.</span>
 
 </div>
 </div>
@@ -854,5 +864,5 @@ SPEAKER NOTES:
 
 [Q&A backup, if someone asks whether the app runs on the REST API]
 
-The app connects with the native MariaDB connector, straight to the tables on the sandbox. It never calls the slash notesApp endpoints. Those were defined in Act two, and serving them over HTTP needs a router I did not stand up. So the app shows the schema is real and usable. Whether the REST tier serves was answered earlier, in the metadata. Two different claims, kept separate.
+The app connects with the native MariaDB connector, straight to the tables on the sandbox. In native mode it never calls the slash notesApp endpoints, and in REST mode it reports that nothing is serving them. Those were defined in Act three, and serving them over HTTP needs a router I did not stand up. So the app shows the schema is real and usable. Whether the REST tier serves was answered earlier, in the metadata. Two different claims, kept separate.
 -->

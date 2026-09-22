@@ -1,6 +1,6 @@
 # Demo cue card: Confidently Wrong
 
-The operating sheet for the live run and for recording it. One agent context runs every act, so open one Claude Code session at the repository root and stay in it from the schema to the app. The prompts below lead the README for now: prove the run here, then sync the README to match. The capture moments are marked **[CAPTURE]**.
+The operating sheet for the live run and for recording it. One agent context runs every act, so open one Claude Code session at the repository root and stay in it from the schema to the app. The prompts below are the source of truth: change them here first, prove the run, then copy them into the README, `docs/demo-prompts.md`, and the act slides. The capture moments are marked **[CAPTURE]**.
 
 ## What the audience watches
 
@@ -41,42 +41,33 @@ mariadb-shell -- mcp setup
 Pre-cache the sandbox server binary. The agent deploys the sandbox live in act one, and the first deploy on a machine with no local MariaDB server downloads the server package, a few hundred megabytes that takes a while. Do that download once, off stage, by deploying the sandbox exactly as act one will, confirming it, then tearing it down:
 
 ```text
-Deploy a MariaDB 11.8 sandbox on port 3310 with root password demo-pw and its data
-directory at working/sandbox, connect to it, and report the server version. Then stop
-the sandbox and delete it (sandbox.stop then sandbox.delete on port 3310).
+Deploy a MariaDB 11.8 sandbox on port 3310 with root password demo-pw and data
+directory working/sandbox, and report its server version. Then stop and delete it.
 ```
 
 Both this deploy and act one's Prompt 1 step 2 pin MariaDB 11.8, the LTS series the schema and REST grammar target, so act one reuses this download, cached and offline. The pin is required: with no server on the PATH, a version-less deploy fails instead of downloading or reusing the cache. The cache lives outside the repository, so `git clean -fdx` removes the `working/sandbox` data directory but leaves the download in place. Confirm the reported version is 11.8.x.
 
 ## Act one: the data tier (Prompt 1)
 
-**Target 4:00.** The design beat. The agent reads the product doc, turns its data model into current MariaDB DDL, compares it with the reference schema, deploys it to a fresh sandbox, and seeds it.
+**Target 4:00.** The spec beat. The agent reads the product doc, turns its data model into current MariaDB DDL, compares it with the reference schema, deploys it to a fresh sandbox, and seeds it.
 
 Paste:
 
 ```text
-Work in this repository and complete every step in order. Put the files you create
-in the working/ directory, and append a short record of each step to
-working/RUN_LOG.md as you go.
+Work in this repository and complete every step in order. Write your files to
+working/, and append a short record of each step to working/RUN_LOG.md.
 
-1. Read docs/notes_app-prd.md. Design the MariaDB database schema named notes_app
-   that its data model in section 4 describes, keeping the column names the PRD
-   gives, since the app binds to them. Write the DDL yourself from the PRD and
-   store it in working/notes_app.sql. Only after it is written, compare it with the
-   reference schema research/notes_app.sql and report the differences, without
-   changing your schema to match it.
-
-2. Check whether a MariaDB 11.8 sandbox is running on port 3310 with its data
-   directory at working/sandbox. If it is not, deploy one there with root password
-   demo-pw. Connect to it and run working/notes_app.sql via the MCP server.
-
-3. Seed the database by loading research/synthetic_data.sql with
-   db.execute_sql_script. The fixture is fully qualified and self-contained, and it
-   is the data contract: if it fails to load, fix working/notes_app.sql and redeploy
-   it. Never edit the fixture.
-
-4. List the tables you created, show me the columns of the note table, and report
-   the row count of each notes_app table.
+1. Turn the data model in section 4 of docs/notes_app-prd.md into MariaDB DDL
+   for the notes_app schema, saved as working/notes_app.sql. Only then compare
+   it with research/notes_app.sql and report the differences, without changing
+   your schema to match.
+2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
+   root password demo-pw and data directory working/sandbox. Run
+   working/notes_app.sql on it via the MCP server.
+3. Seed it by loading research/synthetic_data.sql with db.execute_sql_script.
+   The fixture is the data contract: if it fails, fix working/notes_app.sql and
+   redeploy. Never edit the fixture.
+4. List the tables, show the columns of note, and report each table's row count.
 ```
 
 **[CAPTURE] the schema landing.** As the DDL scrolls, call out the current-MariaDB idioms and what they mean:
@@ -89,11 +80,11 @@ working/RUN_LOG.md as you go.
 
 **Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure. The agent reports its differences from `research/notes_app.sql` at the end of step 1.
 
-**Line to say:** "No SQL by hand. I wrote down the idea, and the agent turned it into grammar this model was never trained on, because a skill handed it the current version. Then it proved the schema by loading real data into it."
+**Line to say:** "No SQL by hand. I wrote the data model down once, in a spec, and the agent turned it into DDL a live server accepts. Then it proved the schema by loading real data into it."
 
 ## Act two: the application (Prompt 2)
 
-**Target 2:30.** The finale. The same context reads the same product doc, builds the client in native mode, and runs it on the data it just seeded.
+**Target 2:30.** The finale of the core run. The same context reads the same product doc, builds the client in native mode, and runs it on the data it just seeded.
 
 Paste:
 
@@ -135,62 +126,44 @@ If the build finishes but you want a clean launch on stage, run it yourself:
 
 ## Optional act three: the API tier and REST mode (Prompt 3)
 
-**Target 4:00.** Run it only when the clock allows, or cut to the recording. The agent puts a MariaDB REST Service in front of the schema, then refactors the working app to run in native or REST mode.
+**Target 4:00.** Run it only when the clock allows, or cut to the recording. The agent puts a MariaDB REST Service in front of the schema, then refactors the working app to run in native or REST mode. If you skip the act, still show the recorded `SHOW REST VIEWS` output and say the boundary line below, about 30 seconds, because the title promises an API tier.
 
 Paste:
 
 ```text
-Continue in this repository, against the sandbox on port 3310. Write any
-database files you create into working/, and keep appending each step's result to
-working/RUN_LOG.md.
+Continue against the sandbox on port 3310. Keep database files in working/, and
+append each step's result to working/RUN_LOG.md. Complete the steps in order.
 
-Put a MariaDB REST Service in front of the notes_app schema, as PRD section 5
-describes. Save the REST DDL you run to working/notes_app_rest.sql as a record,
-but run it through db.execute_sql one statement at a time, not
-db.execute_sql_script, because the REST grammar is session state and each script
-statement runs in a fresh session.
-
-In order:
-
-1. Configure the REST metadata for the server.
-
-2. Create a REST service with request path /notesApp, then a REST schema /notes
-   that maps the notes_app database schema into it.
-
-3. Add a REST data mapping view for each table:
-   - /note, from notes_app.note. Mark the id column @KEY. Make title,
-     created_at and updated_at @SORTABLE. Flatten the note's tags into the
-     document with @UNNEST through note_tag so one request returns a note with
-     its tag names. Allow create, read, update and delete with @INSERT @UPDATE
-     @DELETE.
-   - /notebook, from notes_app.notebook, with @INSERT @UPDATE for create and
-     update.
-   - /tag, from notes_app.tag, read-only.
-   Do not add AUTHENTICATION REQUIRED to any view. This is a local demo and the
-   client reads the endpoints without a router auth app.
-
-4. Verify with the SHOW REST commands (SHOW REST SERVICES, SCHEMAS, VIEWS) that
-   /notesApp exists with an endpoint for every table, then publish the service
-   with ALTER REST SERVICE /notesApp PUBLISHED. Record the SHOW REST output in
-   working/RUN_LOG.md.
-
-5. Refactor the notes_app package to the architecture in PRD section 9: move the
-   native data access behind the DataSource interface as NativeDataSource, and add
-   RestDataSource (httpx against the /notesApp service root) for the endpoints in
-   section 5, handling the paginated items/hasMore list shape. Select the backend
-   with the NOTES_APP_MODE environment variable, default to native, and add the
-   mode and service root URL to .env.example. The status line names the active
-   mode and the service root.
-
-6. Run bin/notes-app in native mode and confirm nothing regressed. Then run it
-   with NOTES_APP_MODE=rest. No REST router is running, so confirm the app starts,
-   shows the connection error on the status line, and does not crash, as PRD
-   section 8 requires. Record both runs in working/RUN_LOG.md.
+1. Build the REST Service from PRD section 5. Save the REST DDL to
+   working/notes_app_rest.sql, but run it with db.execute_sql one statement at a
+   time: the REST grammar is session state, and db.execute_sql_script gives each
+   statement a fresh session.
+   - Configure the REST metadata, then create service /notesApp and schema
+     /notes mapping notes_app.
+   - /note from notes_app.note: id @KEY; title, created_at and updated_at
+     @SORTABLE; tag names flattened through note_tag with @UNNEST; @INSERT
+     @UPDATE @DELETE.
+   - /notebook from notes_app.notebook, with @INSERT @UPDATE.
+   - /tag from notes_app.tag, read-only.
+   - No AUTHENTICATION REQUIRED on any view. This is a local demo.
+2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
+   exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
+   SHOW REST output.
+3. Put native data access behind the section 9 DataSource interface as
+   NativeDataSource, if it is not already, and add RestDataSource: httpx against
+   the /notesApp service root, the section 5 endpoints, and the paginated
+   items/hasMore list shape. NOTES_APP_MODE selects the backend and defaults to
+   native. Add the mode and service root URL to .env.example, and name the
+   active mode and its address on the status line.
+4. Run bin/notes-app in native mode to confirm nothing regressed, then with
+   NOTES_APP_MODE=rest. No router is running, so the app must start, show the
+   connection error on the status line, and stay up (PRD section 8). Log both
+   runs.
 ```
 
-**[CAPTURE] the break and recover.** The REST grammar is session state. If any part runs as a script, each statement lands in a fresh session and the grammar breaks partway down. A capable agent works this out after the first failure and reruns one statement per session. Let that failure and recovery play. It is the point.
+**[CAPTURE] the break and recover.** The REST grammar is session state, and the prompt names the one-statement-per-session rule up front to save the round trip, so a clean run may not break at all. If the agent still runs part of it as a script, each statement lands in a fresh session and the grammar breaks partway down, and a capable agent recovers after the first failure. When that happens, let the failure and recovery play. It is the point.
 
-**Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best. Watch it fail once, read the error, and fix itself."
+**Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best. If it trips on the session rule, watch it read the error and fix itself."
 
 **[CAPTURE] the metadata.** `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. State the boundary in one sentence and move on:
 
