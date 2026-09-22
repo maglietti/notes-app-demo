@@ -37,14 +37,86 @@ The demo runs as one seeded account (`michael.aglietti@mariadb.com`, from the sc
 
 ## 4. Data model
 
-Six tables and one view, from the canonical schema in [`research/notes_app.sql`](../research/notes_app.sql), frozen from the agent's design run. Every table's primary key is a `uuid` column named `id` defaulting to `UUID_v7()`, and native mode binds to these exact column names.
+Six tables and one view, from the canonical schema in [`research/notes_app.sql`](../research/notes_app.sql), frozen from the agent's design run. Native mode binds to these exact names, so this section is the specification: a schema generated from it should match the reference column for column, including types, defaults, keys, and index names.
 
-- `account` holds one seeded row (`id`, `email`, `display_name`, `created_at`, with no password field in this build), and it is system-versioned.
-- `notebook` holds folders with a unique name per account and one `is_default`, held to at most one per account by a generated `default_flag`, and it is system-versioned.
-- `note` carries a `title`, a Markdown `body`, a `status` enum (`active`, `archived`, `trashed`), an `is_pinned` flag, and created and updated timestamps, with a `FULLTEXT(title, body)` index driving search.
-- `tag` and `note_tag` provide free-form labels in a many-to-many with notes, and `note_tag` carries an `added_at`.
-- `attachment` holds object-storage pointers (`file_name`, `mime_type`, `size_bytes`, `storage_key`), and this app treats it as a read model only.
-- `v_active_note` lists active notes with their notebook, owner, and a comma-joined tag list, and backs the default list view.
+### 4.1 Conventions
+
+These apply to every object unless a table below says otherwise.
+
+- **Target and schema.** MariaDB 11.8 LTS. Create the schema with `CREATE SCHEMA IF NOT EXISTS notes_app CHARACTER SET = 'utf8mb4' COLLATE = 'uca1400_ai_ci'`.
+- **Tables.** Use `CREATE OR REPLACE TABLE` with `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci`.
+- **Primary keys.** Every entity table is keyed on `id uuid NOT NULL DEFAULT uuid_v7()`. The join table `note_tag` is the only exception: its key is `(note_id, tag_id)`, and it has no `id` column.
+- **Timestamps.** Use plain `timestamp` (second precision, not `timestamp(6)`) with `DEFAULT current_timestamp()`. Every table has `created_at`, except `note_tag`, which has `added_at` instead. Only `note` has `updated_at`.
+- **Flags.** Use `tinyint(1) NOT NULL DEFAULT 0`.
+- **Foreign keys.** Every foreign key is `ON DELETE CASCADE ON UPDATE CASCADE` and is named `fk_<table>_<parent>`.
+- **Script shape.** Fully qualify every object as `notes_app.<name>`, and order the tables parent-first: `account`, `notebook`, `tag`, `note`, `note_tag`, `attachment`. Rely on no session state: no `USE`, and no `SET` block that saves and restores session variables. This lets `db.execute_sql_script` load the file statement by statement. The file is pure DDL with no `INSERT`s, because data comes from [`research/synthetic_data.sql`](../research/synthetic_data.sql).
+
+### 4.2 Tables
+
+**`account`** holds the one seeded owner, with no password field in this build. It is `WITH SYSTEM VERSIONING`.
+
+- `id`
+- `email varchar(320) NOT NULL`, unique as `uq_account_email`
+- `display_name varchar(120) NOT NULL`
+- `created_at`
+
+**`notebook`** holds folders. It is `WITH SYSTEM VERSIONING`.
+
+- `id`
+- `account_id uuid NOT NULL`, foreign key `fk_notebook_account` to `account`
+- `name varchar(120) NOT NULL`
+- `is_default` flag
+- `created_at`
+- `default_flag tinyint(1) GENERATED ALWAYS AS (if(is_default,1,NULL)) STORED`
+- Keys: `uq_notebook_account_name (account_id, name)` and `uq_notebook_one_default (account_id, default_flag)`. The second key allows at most one default notebook per account, because it ignores the `NULL` flags on non-default rows.
+
+**`tag`** holds free-form labels scoped to one account.
+
+- `id`
+- `account_id uuid NOT NULL`, foreign key `fk_tag_account` to `account`
+- `name varchar(64) NOT NULL`
+- `created_at`
+- Key: `uq_tag_account_name (account_id, name)`
+
+**`note`** holds the notes. It is not system-versioned (see section 10).
+
+- `id`
+- `notebook_id uuid NOT NULL`, foreign key `fk_note_notebook` to `notebook`
+- `account_id uuid NOT NULL`, foreign key `fk_note_account` to `account`. This denormalized owner lets a per-account query skip the join to `notebook`.
+- `title varchar(255) NOT NULL DEFAULT ''`
+- `body longtext NOT NULL DEFAULT ''`, the Markdown source
+- `status enum('active','archived','trashed') NOT NULL DEFAULT 'active'`
+- `is_pinned` flag
+- `created_at`
+- `updated_at timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()`
+- Indexes: `ix_note_notebook_updated (notebook_id, status, is_pinned DESC, updated_at DESC)`, `ix_note_account_status (account_id, status, updated_at DESC)`, and `FULLTEXT ft_note_title_body (title, body)` for search.
+
+**`note_tag`** is the many-to-many join between notes and tags.
+
+- `note_id uuid NOT NULL`, foreign key `fk_note_tag_note` to `note`
+- `tag_id uuid NOT NULL`, foreign key `fk_note_tag_tag` to `tag`
+- `added_at timestamp NOT NULL DEFAULT current_timestamp()`
+- Keys: `PRIMARY KEY (note_id, tag_id)`, plus `ix_note_tag_tag (tag_id)` for the reverse lookup of every note carrying one tag.
+
+**`attachment`** holds object-storage pointers. This app treats it as a read model only.
+
+- `id`
+- `note_id uuid NOT NULL`, foreign key `fk_attachment_note` to `note`
+- `file_name varchar(255) NOT NULL`
+- `mime_type varchar(127) NOT NULL DEFAULT 'application/octet-stream'`
+- `size_bytes bigint unsigned NOT NULL DEFAULT 0`
+- `storage_key varchar(512) NOT NULL`, an object-storage path such as an S3 key. It has no unique key.
+- `created_at`
+- Index: `ix_attachment_note (note_id)`
+
+### 4.3 View
+
+**`v_active_note`** backs the default list view. It selects from `note`, inner-joins `notebook` and `account`, left-joins `note_tag` and `tag`, filters on `status = 'active'`, and groups by `n.id`. Its columns, in order:
+
+- `note_id`, `title`, `body`, `is_pinned`, `created_at`, `updated_at`
+- `notebook_id`, `notebook_name`
+- `account_id`, `account_email`
+- `tags`, computed as `GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ',')`
 
 The `status` enum maps directly to the three app views for the active list, the archive, and the trash, and `is_pinned` sorts pinned notes to the top of the active list.
 
