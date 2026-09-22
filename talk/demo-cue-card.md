@@ -72,9 +72,7 @@ Work in this repository and complete every step in order. Write your files to
 working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Turn the data model in section 4 of docs/notes_app-prd.md into MariaDB DDL
-   for the notes_app schema, saved as working/notes_app.sql. Only then compare
-   it with research/notes_app.sql and report the differences, without changing
-   your schema to match.
+   for the notes_app schema, saved as working/notes_app.sql.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
