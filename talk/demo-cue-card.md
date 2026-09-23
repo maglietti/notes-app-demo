@@ -4,7 +4,7 @@ The operating sheet for the live run and for recording it. One agent context run
 
 ## What the audience watches
 
-Two prompts, two acts, one conversation: the data tier, then the app. Both acts start from the same product doc, `docs/notes_app-prd.md`, so the schema the agent designs is the schema the app is built on. Act one seeds the database, so the app has real data to show. An optional third act puts a REST Service in front of the schema and refactors the app to run in native or REST mode.
+Two prompts, two acts, one conversation: the data tier, then the app. Both acts start from the same product doc, `docs/notes_app-prd.md`, so the schema the agent designs is the schema the app is built on. Act one seeds the database, so the app has real data to show. An optional third act puts a REST Service in front of the schema and adds a REST backend beside the native one, so the app runs in native or REST mode.
 
 ## Running this card as an agent walkthrough
 
@@ -16,7 +16,7 @@ To rehearse, open a fresh Claude Code session at the repository root and say: "W
    - If generated files exist (`notes_app/`, `pyproject.toml`, `uv.lock`, `.env`, `.env.example`, `.venv/`, or `working/`), list them and ask the presenter to run `git clean -fdx`, then wait. Do not run git yourself.
    - Skip the presenter-only items: the terminal font, the recording, and the pre-cache step. Act one's pinned deploy downloads MariaDB 11.8 if it is not cached yet.
 2. **Run the acts in order, in this one session.** Treat each **Paste** block as the presenter's next message and follow it exactly. Log each act's start and end time (from `date`) in `working/RUN_LOG.md`, so the rehearsal can be compared with the act's target.
-3. **Check each act before starting the next.** Check only what the act's **Check** paragraph and **[CAPTURE]** notes name, from output the act already produced: the idioms in the DDL, the 61 seeded notes from the step 4 counts, and the three panes and `native` status line from the launch the act two prompt verifies. Record whether each item held. Do not drive the app's features or write to the seeded data, because testing beyond the prompt's own verification inflates the act's time and changes the fixture. Skip the **Line to say** and the manual `./bin/notes-app` launch.
+3. **Check each act before starting the next.** Check only what the act's **Check** paragraph and **[CAPTURE]** notes name, from output the act already produced: the idioms in the DDL, the 61 seeded notes from the step 4 counts, the three panes and `native` status line from the launch the act two prompt verifies, and, in act three, the `SHOW REST` output, the `/note` read-back report, and the two mode runs. Record whether each item held. Do not drive the app's features or write to the seeded data, because testing beyond the prompt's own verification inflates the act's time and changes the fixture. Skip the **Line to say** and the manual `./bin/notes-app` launch.
 4. **Run act three only when asked.** Otherwise stop after act two.
 5. **Report and stop.** Finish with a table of the acts: elapsed time against target, checks that passed or failed, and anything you had to fix along the way. Leave the sandbox and the generated files in place for inspection. Run the Cleanup section only when asked, and leave its `git clean -fdx` to the presenter.
 
@@ -63,7 +63,7 @@ Both this deploy and act one's Prompt 1 step 2 pin MariaDB 11.8, the LTS series 
 
 ## Act one: the data tier (Prompt 1)
 
-**Target 4:00.** The spec beat. The agent reads the product doc, turns its data model into current MariaDB DDL, compares it with the reference schema, deploys it to a fresh sandbox, and seeds it.
+**Target 4:00.** The spec beat. The agent reads the product doc, turns its data model into current MariaDB DDL, deploys it to a fresh sandbox, and seeds it.
 
 Paste:
 
@@ -140,7 +140,7 @@ If the build finishes but you want a clean launch on stage, run it yourself:
 
 ## Optional act three: the API tier and REST mode (Prompt 3)
 
-**Target 4:00.** Run it only when the clock allows, or cut to the recording. The agent puts a MariaDB REST Service in front of the schema, then refactors the working app to run in native or REST mode. If you skip the act, still show the recorded `SHOW REST VIEWS` output and say the boundary line below, about 30 seconds, because the title promises an API tier.
+**Target 4:00.** Run it only when the clock allows, or cut to the recording. The agent puts a MariaDB REST Service in front of the schema, reads the `/note` view back, then adds a REST backend beside the native one, so the working app runs in native or REST mode. If you skip the act, still show the recorded `SHOW REST VIEWS` output and say the boundary line below, about 30 seconds, because the title promises an API tier.
 
 Paste:
 

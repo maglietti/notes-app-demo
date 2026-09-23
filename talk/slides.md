@@ -402,8 +402,7 @@ Everything from here is that plugin, doing its job, in one conversation. Watch.
 Work in this repository and complete every step in order.
 
 1. Turn the data model in section 4 of docs/notes_app-prd.md
-   into MariaDB DDL in working/notes_app.sql, then compare it
-   with research/notes_app.sql.
+   into MariaDB DDL in working/notes_app.sql.
 2. Deploy a MariaDB 11.8 sandbox on port 3310 and run the DDL.
 3. Seed it with research/synthetic_data.sql. If the fixture
    fails, fix the schema. Never edit the fixture.
@@ -489,8 +488,9 @@ So the schema is real, and it is exactly the schema the app will bind to. Now we
 
 ```
 Build the Textual app that docs/notes_app-prd.md specifies,
-in native mode only: the three-pane layout from section 7
-and every Must feature from section 6.
+in native mode only: the three-pane layout from section 7,
+every Must feature from section 6, and the queries behind the
+section 9 DataSource interface.
 
 Verify both entry points against the sandbox: bin/notes-app
 and the notes-app console script.
@@ -574,7 +574,7 @@ This is the tier the talk is named for, and the real test, because the REST gram
 1. The REST grammar runs **one statement per session**, and the agent follows that rule
 2. It builds the **service, a schema, and a view per table**, and `SHOW REST` confirms them
 3. Reading `/note` back shows the **tool dropped the read-only tag flags**, and the agent reports it
-4. It **refactors the app**: a REST data source beside the native one, picked by one variable
+4. It **extends the app**: a REST data source beside the native one, picked by one variable
 5. In REST mode the **status line reports the missing router**, and the app stays up
 
 </div>

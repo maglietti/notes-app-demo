@@ -74,7 +74,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 9: Act one divider, Prompt 1
 
-- **On slide:** Act 1: From a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, compare with the reference, deploy a sandbox, seed it, report the counts.
+- **On slide:** Act 1: From a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, deploy a sandbox, seed it, report the counts.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
 - **Says:** I wrote the data model once, in a spec. The agent writes the DDL and proves it.
 
@@ -96,7 +96,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 12: Act two divider, Prompt 2
 
-- **On slide:** Act 2: An idea you can open. The shape of Prompt 2: build the Textual app the PRD specifies, in native mode, and verify both entry points.
+- **On slide:** Act 2: An idea you can open. The shape of Prompt 2: build the Textual app the PRD specifies, in native mode with its queries behind the DataSource interface, and verify both entry points.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
 - **Says:** Spec-driven development. The same product doc that gave act one its data model drives the client.
 
@@ -120,7 +120,7 @@ Run this act, or cut to its recording, only when the clock allows. The skip path
 
 ### Slide 15: Act three divider, Prompt 3
 
-- **On slide:** Act 3: From the schema to a REST API. The shape of Prompt 3: build the REST Service from PRD section 5 one statement per session, verify with `SHOW REST`, publish, then add REST mode to the app.
+- **On slide:** Act 3: From the schema to a REST API. The shape of Prompt 3: build the REST Service from PRD section 5 one statement per session, verify with `SHOW REST`, read `/note` back, publish, then add REST mode to the app.
 - **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
 - **Says:** The same context now puts a REST Service in front of the schema, and teaches the app to use it.
 

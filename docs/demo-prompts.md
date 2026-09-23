@@ -1,10 +1,10 @@
 # Notes App demo prompts
 
-Three prompts, run in order in one agent session, each pasted into the coding agent. Prompt 1 builds and seeds the data tier, and Prompt 2 builds the Textual client that runs on it. Prompt 3 is optional: it puts a REST Service in front of the schema and refactors the client to run in native or REST mode. The cue card, [`talk/demo-cue-card.md`](../talk/demo-cue-card.md), is the source of truth for these prompts, and this file and the README carry copies of them.
+Three prompts, run in order in one agent session, each pasted into the coding agent. Prompt 1 builds and seeds the data tier, and Prompt 2 builds the Textual client that runs on it. Prompt 3 is optional: it puts a REST Service in front of the schema and adds a REST backend beside the native one, so the client runs in native or REST mode. The cue card, [`talk/demo-cue-card.md`](../talk/demo-cue-card.md), is the source of truth for these prompts, and this file and the README carry copies of them.
 
 Run the agent from the repository root, where the layout keeps inputs apart from output:
 
-- `docs/` and `research/` are the inputs the agent reads. They hold the product doc, the reference schema, and the seed fixture.
+- `docs/` and `research/` are the inputs the agent reads. They hold the product doc and the seed fixture, plus the reference schema that the app and fixture were frozen from, which the prompts do not read.
 - The Textual app is generated at the repository root as a `notes_app` package with a `pyproject.toml`, laid out like any normal Python project.
 - `working/` holds the working artifacts: the schema SQL, the REST DDL, the sandbox data directory, and a `working/RUN_LOG.md` that records each step.
 
@@ -21,9 +21,7 @@ Work in this repository and complete every step in order. Write your files to
 working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Turn the data model in section 4 of docs/notes_app-prd.md into MariaDB DDL
-   for the notes_app schema, saved as working/notes_app.sql. Only then compare
-   it with research/notes_app.sql and report the differences, without changing
-   your schema to match.
+   for the notes_app schema, saved as working/notes_app.sql.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
@@ -33,7 +31,7 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 4. List the tables, show the columns of note, and report each table's row count.
 ```
 
-What to check. The tables match the six tables and one view in PRD section 4, and the seed reports 61 notes (48 active with 6 pinned, 7 archived, and 6 trashed), 6 notebooks, and 12 tags. The agent writes its schema before it reads `research/notes_app.sql`, so the difference report at the end of step 1 measures how closely the spec pins the design. Any drift it reports is a finding, and if the fixture forces a schema fix, that is the contract working as intended.
+What to check. The tables match the six tables and one view in PRD section 4, and the seed reports 61 notes (48 active with 6 pinned, 7 archived, and 6 trashed), 6 notebooks, and 12 tags. If the fixture forces a schema fix, that is a finding, not a failure: the contract working as intended.
 
 ---
 
@@ -49,6 +47,8 @@ Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
   working/ for the schema, run log and sandbox only.
 - Stack: Python 3.11+, Textual, and mariadb Connector/Python against
   127.0.0.1:3310, bound to the columns in working/notes_app.sql.
+- Structure: put the queries behind the section 9 DataSource interface as
+  NativeDataSource.
 - Features: the three-pane layout from section 7, with a status line naming
   native mode and the sandbox address, and every Must in section 6: notebooks
   with note counts; list, open, create and edit notes; pin and unpin; archive
