@@ -90,7 +90,7 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 - `FULLTEXT (title, body)` on `note`. Search without a second system.
 - `default_flag` generated column. One default notebook per account, enforced by the schema.
 
-**Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure. The agent reports its differences from `research/notes_app.sql` at the end of step 1.
+**Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure.
 
 **Line to say:** "No SQL by hand. My spec says what each column does, never the syntax. The agent turned it into current MariaDB grammar, with a skill in the room, then proved the schema by loading real data into it."
 
@@ -159,7 +159,7 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
      @UPDATE @DELETE.
    - /notebook from notes_app.notebook, with @INSERT @UPDATE.
    - /tag from notes_app.tag, read-only.
-   - No AUTHENTICATION REQUIRED on any view. This is a local demo.
+   - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
 2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
    exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
    SHOW REST output.

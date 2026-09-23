@@ -10,7 +10,7 @@
 
 The Notes App is a terminal client for the `notes_app` schema. It reads and writes notes through the MariaDB REST Service that the coding agent stands up in the All Things Open talk *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*.
 
-The talk's live demo is the scaffolding run, where one prompt builds the schema, deploys a sandbox, runs the DDL over MCP, and puts a REST service in front of the schema. The agent designs that API tier in about five minutes with no server code written by hand, and the proof that it is real is the metadata, since `SHOW REST` and `SHOW CREATE REST VIEW` show the endpoints the agent defined.
+The talk's live demo is the scaffolding run, where the first prompt builds the schema, deploys a sandbox, and runs the DDL over MCP, and an optional third prompt puts a REST service in front of the schema. The agent designs that API tier in about five minutes with no server code written by hand, and the proof that it is real is the metadata, since `SHOW REST` and `SHOW CREATE REST VIEW` show the endpoints the agent defined.
 
 This app is a separate payoff artifact, a usable client on the same schema rather than proof of the tier. It defaults to native mode and reads and writes the tables directly, so it needs no REST Daemon to start and does not run on the `/notesApp` endpoints during the demo. It is a clone-and-run repository, not the primary demo, so budget it as a short closing beat or a post-talk link.
 
@@ -154,7 +154,7 @@ Two response shapes the client must handle:
 - **List responses are paginated.** The REST Service wraps a collection in an `items` array alongside `limit`, `offset`, `count`, `hasMore`, and `links`, so even with a handful of notes the client reads `items` and honours `hasMore` rather than assuming a bare array.
 - **Create carries the owning keys.** `note.notebook_id` and `note.account_id` are `NOT NULL` foreign keys, so a `POST /note` must include the current notebook id and the seeded account id, and the UI supplies both from context.
 
-**The demo build creates endpoints without `AUTHENTICATION REQUIRED`** to keep the live path short, and section 10 covers what production would add.
+**The demo build marks every endpoint `AUTHENTICATION NOT REQUIRED`** to keep the live path short, and section 10 covers what production would add. The clause must be explicit, because a view created without it defaults to `AUTHENTICATION REQUIRED`.
 
 ## 6. Functional requirements
 
@@ -235,7 +235,7 @@ The status line names the active mode, so the audience always knows which tier t
 
 - **Account sign-up and password login.** The demo uses the seeded account.
 - **Attachments.** The schema stores object-storage pointers, but the demo has no object store, so attachments are not read or written.
-- **REST authentication.** The demo creates endpoints without `AUTHENTICATION REQUIRED`. Production would add an MRS auth app, a REST role scoped to read or write per endpoint, a seeded test user, and a login screen in the TUI that stores the session token, all of which the `mariadb-rest-service-authorization` skill covers.
+- **REST authentication.** The demo creates endpoints with `AUTHENTICATION NOT REQUIRED`. Production would add an MRS auth app, a REST role scoped to read or write per endpoint, a seeded test user, and a login screen in the TUI that stores the session token, all of which the `mariadb-rest-service-authorization` skill covers.
 - **Note history.** The `note` table does not keep row history in the shipped schema, only `account` and `notebook` do. A history view would first need an `ALTER TABLE` that adds history to `note`, which is a good live push-back demo but a stretch feature here.
 
 ## 11. Demo runbook and prerequisites
@@ -264,4 +264,4 @@ The status line names the active mode, so the audience always knows which tier t
 - **REST Daemon dependency.** The daemon is the least-documented moving part, and because the client runs in native mode by default, it sits off the critical path. It matters only if you choose to show REST mode live, so rehearse that path separately if you plan to.
 - **Writing tags through the `@UNNEST` view is unproven.** The note view flattens tags for reading, but the REST Service's support for writing nested related rows through a data mapping view is limited. Attaching or detaching a tag may need a separate `/noteTag` endpoint or a direct write, so resolve this before committing to the (Could) tag-write features.
 - **Search on the sandbox.** A `FULLTEXT` search needs enough sample rows to look real, and the committed fixture `research/synthetic_data.sql` covers this with 61 notes, so load it (README Step 4) rather than relying on a bare seed.
-- **Auth on stage.** Endpoints without `AUTHENTICATION REQUIRED` are simplest but read as insecure to a DBA audience, so decide whether to show the auth path or name it as a follow-on.
+- **Auth on stage.** Endpoints marked `AUTHENTICATION NOT REQUIRED` are simplest but read as insecure to a DBA audience, so decide whether to show the auth path or name it as a follow-on.

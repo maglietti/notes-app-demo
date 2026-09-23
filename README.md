@@ -165,7 +165,7 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
      @UPDATE @DELETE.
    - /notebook from notes_app.notebook, with @INSERT @UPDATE.
    - /tag from notes_app.tag, read-only.
-   - No AUTHENTICATION REQUIRED on any view. This is a local demo.
+   - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
 2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
    exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
    SHOW REST output.
