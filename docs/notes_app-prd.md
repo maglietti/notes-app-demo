@@ -3,7 +3,7 @@
 **Version:** 1.0
 **Date:** 2026-09-17
 **Owner:** Michael Aglietti
-**Schema:** [`research/notes_app.sql`](../research/notes_app.sql) (MariaDB 11.8 LTS)
+**Reference schema:** [`research/notes_app.sql`](../research/notes_app.sql) (MariaDB 11.8 LTS), for setup by hand. The demo agent writes its own schema from section 4.
 **ER:** [`research/notes_app-er.md`](../research/notes_app-er.md)
 
 ## 1. Purpose and role in the talk
@@ -243,8 +243,8 @@ The status line names the active mode, so the audience always knows which tier t
 
 ## 11. Demo runbook and prerequisites
 
-1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw", sandbox_dir="working/sandbox")`.
-2. Deploy the canonical schema and load the fixture by running [`research/notes_app.sql`](../research/notes_app.sql) and then [`research/synthetic_data.sql`](../research/synthetic_data.sql) with `db.execute_sql_script`, which gives the app 61 notes across the active, archived, and trashed views.
+1. Deploy the sandbox with `sandbox.deploy(port=3310, password="demo-pw", sandbox_dir="working/sandbox", server_version="11.8")`. The version pin is required, because with no server on the `PATH` a version-less deploy fails.
+2. Write the schema from section 4 to `working/notes_app.sql`, run it, then load the fixture by running [`research/synthetic_data.sql`](../research/synthetic_data.sql), both with `db.execute_sql_script`. That gives the app 61 notes across the active, archived, and trashed views. In the demo, the agent writes this DDL itself from section 4 and does not read the reference schema. Only when you set up the tier by hand, with no agent, run [`research/notes_app.sql`](../research/notes_app.sql) in place of `working/notes_app.sql`.
 3. Build the REST tier by running the REST DDL through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` breaks it.
 4. Verify the tier from the metadata with `SHOW REST` and `SHOW CREATE REST VIEW`, then publish it with `ALTER REST SERVICE /notesApp PUBLISHED`.
 5. Run the client with `bin/notes-app`. It defaults to native mode, so it reads the sandbox on port 3310 directly and needs no daemon.
