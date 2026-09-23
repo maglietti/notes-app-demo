@@ -127,7 +127,7 @@ Run this act, or cut to its recording, only when the clock allows. The skip path
 ### Slide 16: The recording (the API tier and the two modes)
 
 - **On slide:** The recording fills the frame. Caption: the REST grammar is session state, then the app flips between native and REST mode.
-- **Build:** Cut to the act three recording. **[CAPTURE] the REST DDL landing, `SHOW REST`, and the two modes.**
+- **Build:** Cut to the act three recording. **[CAPTURE] the REST DDL landing, the `SHOW CREATE REST VIEW /note` read-back, `SHOW REST`, and the two modes.** On mariadb-shell 26.9.3 the read-back shows the nested tag objects writable despite the DDL's read-only flags, a tool bug the agent reports and does not patch.
 - **Says:** The grammar the model is most confidently wrong about is the grammar the skill knows best.
 
 ### Slide 17: Defined, not served

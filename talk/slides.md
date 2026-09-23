@@ -546,7 +546,8 @@ From an empty directory to a working app, in one conversation.
 ```
 Build the REST Service from PRD section 5. Run the DDL through
 db.execute_sql one statement at a time, because the grammar is
-session state. Verify with SHOW REST, then publish.
+session state. Verify with SHOW REST, read /note back, then
+publish.
 
 Add RestDataSource, select it with NOTES_APP_MODE, and run the
 app in both modes.
@@ -572,8 +573,9 @@ This is the tier the talk is named for, and the real test, because the REST gram
 
 1. The REST grammar runs **one statement per session**, and the agent follows that rule
 2. It builds the **service, a schema, and a view per table**, and `SHOW REST` confirms them
-3. It **refactors the app**: a REST data source beside the native one, picked by one variable
-4. In REST mode the **status line reports the missing router**, and the app stays up
+3. Reading `/note` back shows the **tool dropped the read-only tag flags**, and the agent reports it
+4. It **refactors the app**: a REST data source beside the native one, picked by one variable
+5. In REST mode the **status line reports the missing router**, and the app stays up
 
 </div>
 
@@ -584,7 +586,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT THREE]
 
-This is the trickiest grammar in the whole run. It runs one statement per session, a rule most models have never seen, and I named that rule in the prompt, because saying what you already know is how you phrase a prompt. The prompt also names what I want from each view: a key, sort columns, nested tags, and create, update and delete. Writing those into valid REST Service DDL is the grammar a model is most likely to get wrong from memory. The service, the schema, and a view per table land, and SHOW REST confirms them.
+This is the trickiest grammar in the whole run. It runs one statement per session, a rule most models have never seen, and I named that rule in the prompt, because saying what you already know is how you phrase a prompt. The prompt also names what I want from each view: a key, sort columns, nested tags, and create, update and delete. Writing those into valid REST Service DDL is the grammar a model is most likely to get wrong from memory. The service, the schema, and a view per table land, and SHOW REST confirms them. Then it reads the note view back, and here is a surprise that is not the model's fault. It wrote the read-only flags on the nested tags correctly, and the tool dropped them on the way into the metadata. The agent only catches that because I told it to read the metadata back. Check the source of truth, not the summary.
 
 Then it goes back to the app it built in act two, adds a REST data source beside the native one, and picks between them with one environment variable. In REST mode the status line says plainly that nothing is serving the endpoints yet, and the app stays up. When the metadata comes up, I get precise.
 

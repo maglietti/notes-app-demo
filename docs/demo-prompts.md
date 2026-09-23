@@ -80,27 +80,29 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
    - Configure the REST metadata, then create service /notesApp and schema
      /notes mapping notes_app.
    - /note from notes_app.note: id @KEY; title, created_at and updated_at
-     @SORTABLE; tag names flattened through note_tag with @UNNEST; @INSERT
-     @UPDATE @DELETE.
+     @SORTABLE; tag names flattened through note_tag with @UNNEST and
+     read-only; @INSERT @UPDATE @DELETE.
    - /notebook from notes_app.notebook, with @INSERT @UPDATE.
    - /tag from notes_app.tag, read-only.
    - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
 2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
-   exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
-   SHOW REST output.
-3. Put native data access behind the section 9 DataSource interface as
-   NativeDataSource, if it is not already, and add RestDataSource: httpx against
-   the /notesApp service root, the section 5 endpoints, and the paginated
-   items/hasMore list shape. NOTES_APP_MODE selects the backend and defaults to
-   native. Add the mode and service root URL to .env.example, and name the
-   active mode and its address on the status line.
+   exists. Run SHOW CREATE REST VIEW /note and report whether the nested tag
+   objects came back read-only. If they did not, log it and move on: do not
+   patch the REST metadata. Publish with ALTER REST SERVICE /notesApp
+   PUBLISHED, and log the SHOW REST output.
+3. Add RestDataSource as the second section 9 DataSource backend beside
+   NativeDataSource: httpx against the /notesApp service root, the section 5
+   endpoints, and the paginated items/hasMore list shape. NOTES_APP_MODE
+   selects the backend and defaults to native. Add the mode and service root
+   URL to .env.example, and name the active mode and its address on the status
+   line.
 4. Run bin/notes-app in native mode to confirm nothing regressed, then with
    NOTES_APP_MODE=rest. No router is running, so the app must start, show the
    connection error on the status line, and stay up (PRD section 8). Log both
    runs.
 ```
 
-What to check. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. The endpoints are defined before any router serves them, because the metadata is the API definition. In REST mode the status line names `rest` and the service root, shows a connection error, and the app stays up.
+What to check. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. On mariadb-shell 26.9.3, expect the agent to report that `SHOW CREATE REST VIEW /note` shows the nested tag objects as writable: the shell stores them with the parent view's operations whatever the DDL says (PRD section 13). The endpoints are defined before any router serves them, because the metadata is the API definition. In REST mode the status line names `rest` and the service root, shows a connection error, and the app stays up.
 
 ---
 

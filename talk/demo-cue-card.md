@@ -155,14 +155,16 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
    - Configure the REST metadata, then create service /notesApp and schema
      /notes mapping notes_app.
    - /note from notes_app.note: id @KEY; title, created_at and updated_at
-     @SORTABLE; tag names flattened through note_tag with @UNNEST; @INSERT
-     @UPDATE @DELETE.
+     @SORTABLE; tag names flattened through note_tag with @UNNEST and
+     read-only; @INSERT @UPDATE @DELETE.
    - /notebook from notes_app.notebook, with @INSERT @UPDATE.
    - /tag from notes_app.tag, read-only.
    - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
 2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
-   exists, publish with ALTER REST SERVICE /notesApp PUBLISHED, and log the
-   SHOW REST output.
+   exists. Run SHOW CREATE REST VIEW /note and report whether the nested tag
+   objects came back read-only. If they did not, log it and move on: do not
+   patch the REST metadata. Publish with ALTER REST SERVICE /notesApp
+   PUBLISHED, and log the SHOW REST output.
 3. Add RestDataSource as the second section 9 DataSource backend beside
    NativeDataSource: httpx against the /notesApp service root, the section 5
    endpoints, and the paginated items/hasMore list shape. NOTES_APP_MODE
@@ -178,6 +180,10 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
 **[CAPTURE] the REST DDL landing.** The prompt names the one-statement-per-session rule, so the DDL runs one statement at a time. Call out what the agent wrote: `@KEY`, `@SORTABLE`, `@UNNEST` through `note_tag`, and the CRUD flags, the least-trained grammar in the run.
 
 **Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best."
+
+**[CAPTURE] the read-back.** On mariadb-shell 26.9.3, `SHOW CREATE REST VIEW /note` shows the nested `noteTag` and `tag` objects with `@INSERT @UPDATE @DELETE`, even though the DDL says `@NOINSERT @NOUPDATE @NODELETE`. The grammar accepts the flags, but the shell stores each nested object with the parent view's operations (`plugins/mrs_plugin/lib/db_objects.py:762`), so no DDL can make them read-only. The prompt asks for a report, not a fix, so the act stays inside its target. Expect this until a fixed shell ships, and re-rehearse the beat on any newer shell.
+
+**Line to say:** "The agent wrote the flags right, and the tool dropped them on the way into the metadata. The agent only caught it because the prompt made it read the metadata back. Check the source of truth, not the summary."
 
 **[CAPTURE] the metadata.** `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. State the boundary in one sentence and move on:
 
@@ -203,7 +209,7 @@ git clean -fdx
 
 ## Recording notes
 
-- Capture the core moments in order: schema landing, app opening. For the optional act, add the REST DDL landing, `SHOW REST`, and the two modes.
+- Capture the core moments in order: schema landing, app opening. For the optional act, add the REST DDL landing, the `SHOW CREATE REST VIEW /note` read-back, `SHOW REST`, and the two modes.
 - Trim the waits between tool calls, but keep any fixture-driven schema fix intact. A failure the agent fixes is evidence.
 - The core run is about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, and a separate optional-act cut inside 4:00, so the whole talk lands near 20 and stays under 25 with or without it.
 - Record at the projector font size, not your desk size.
