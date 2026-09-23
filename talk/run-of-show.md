@@ -17,7 +17,7 @@ MariaDB stays the point. The database does real work in this demo: system versio
 
 ## The runbook is the spine, told in two acts and an optional third
 
-The prompts on the cue card are the acts, and one agent context runs them all. Act one turns the product doc's data model into a schema and seeds it, and act two reads the same product doc and builds the client on that data, so the audience watches a single conversation carry an idea from an empty directory to a running app. That continuity is the story: you do not hand the work between tools, you keep talking to one agent and it keeps closing its own loop.
+The prompts on the cue card are the acts, and one agent context runs them all. Act one turns the product doc's data model into a schema and seeds it, and act two reads the same product doc and builds the client on that data, so the audience watches a single conversation carry an idea from a spec, with no app code, to a running app. That continuity is the story: you do not hand the work between tools, you keep talking to one agent and it keeps closing its own loop.
 
 The REST tier was aspirational in the locked abstract. The agent builds it as metadata, and a router to serve it over HTTP is out of scope, so REST rides in an optional third act: the sharpest evidence for the skills thesis, run when the clock allows. When it is skipped, a 30-second skip path still shows the recorded `SHOW REST` metadata and states the boundary, because the title promises an API tier. The finale of the core run is the app.
 

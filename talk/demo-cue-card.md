@@ -136,7 +136,7 @@ If the build finishes but you want a clean launch on stage, run it yourself:
 
 **[CAPTURE] the app opening.** Left pane lists the six notebooks. Middle pane shows the notes with the pinned ones on top. Status line reads `native` next to the sandbox address. Open a note so the Markdown renders in the right pane.
 
-**Line to say:** "Same conversation, same product doc, from an empty directory to this. The app talks straight to the tables the agent designed, and the data on screen is the data act one loaded."
+**Line to say:** "Same conversation, same product doc, from no app code to this. The app talks straight to the tables the agent designed, and the data on screen is the data act one loaded."
 
 ## Optional act three: the API tier and REST mode (Prompt 3)
 

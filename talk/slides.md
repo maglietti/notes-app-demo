@@ -168,7 +168,7 @@ A fast, keyboard-first notebook you never have to leave the terminal for. Three 
 <!--
 SPEAKER NOTES:
 
-Here is the idea, and I want you to picture it, because the whole point is that in my head it is already real app.
+Here is the idea, and I want you to picture it, because the whole point is that in my head it is already a real app.
 
 A notebook that lives in the terminal. No browser, no tab to lose, no mouse. Three panes. On the left, your notebooks. In the middle, the notes inside the one you picked. On the right, the note you are reading, rendered from Markdown.
 
@@ -181,7 +181,7 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 ### *Perfect time to vibe code my idea into existence...*
 
-# What usually happens: the LLM lies to you, fluently
+# What usually happens: the LLM is wrong, fluently
 
 <div class="columns">
 <div>
@@ -199,7 +199,7 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 The SQL parses, and it usually runs. Then you exercise the app and CRUD breaks: a create rejected, an update touching the wrong rows, a read in the wrong shape. You catch it in testing, and every pass is time you wanted for the app.
 
-<span class="accent">Confidently wrong _hallucinations_ are not syntax errors. It is code that looks right and behaves wrong when you use it.</span>
+<span class="accent">Confidently wrong is not a syntax error. It is code that looks right and behaves wrong when you use it.</span>
 
 </div>
 </div>
@@ -227,8 +227,8 @@ That is what I mean by confidently wrong. It is not a syntax error you can see. 
 
 The model reaches for MySQL habits that do not fit this schema.
 
-- **Keys:** `BINARY(16)` + `UUID()`, missing MariaDB's `UUID` type and `UUID_v7()`
-- **Collation:** MySQL's `utf8mb4_0900_ai_ci`, which MariaDB does not have
+- **Keys:** `BINARY(16) DEFAULT (UUID_TO_BIN(UUID(), 1))`, a MySQL 8 function MariaDB does not have, missing its `UUID` type and `UUID_v7()`
+- **Character set:** plain `utf8`, which MariaDB still reads as 3-byte `utf8mb3`, so the first emoji in a note is rejected
 - **New row back:** `LAST_INSERT_ID()`, useless for UUID keys, not `INSERT ... RETURNING`
 
 *The first things that bite when you move a schema across, not edge cases.*
@@ -253,7 +253,7 @@ SPEAKER NOTES:
 
 Two things stall you here, and together they kill the momentum that makes prototyping worth doing.
 
-The first is knowledge. The model blends MariaDB and MySQL, because they share a family tree, and it reaches for the MySQL habit that does not fit. Three of them show up building this exact app. Our tables are keyed on UUIDs, and MariaDB has a native UUID type and UUID_v7 for keys that sort by time. MySQL has neither, so the model reaches for a BINARY 16 column and the old UUID function, and now your keys are a different type and they do not sort. Every table has a collation, and current MariaDB uses the uca1400 family. The model writes MySQL 8's utf8mb4_0900_ai_ci, which MariaDB does not have, so the CREATE TABLE just fails. And when the app creates a note, it needs the new id back. With a UUID key, MySQL's LAST_INSERT_ID gives you nothing, because that is an auto-increment idea. MariaDB has INSERT RETURNING, and the model does not reach for it. None of these are obscure. They are the first things that bite when you move between the two.
+The first is knowledge. The model blends MariaDB and MySQL, because they share a family tree, and it reaches for the MySQL habit that does not fit. Three of them show up building this exact app. Our tables are keyed on UUIDs, and MariaDB has a native UUID type and UUID_v7 for keys that sort by time. MySQL has neither, so the model reaches for MySQL 8's recipe: a BINARY 16 column filled by UUID_TO_BIN. MariaDB has no UUID_TO_BIN, so that CREATE TABLE fails on the spot. Then the character set. The model writes plain utf8, and on MariaDB that still means the old three-byte form. Everything works until someone puts an emoji in a note, and the insert is rejected. And when the app creates a note, it needs the new id back. With a UUID key, MySQL's LAST_INSERT_ID gives you nothing, because that is an auto-increment idea. MariaDB has INSERT RETURNING, and the model does not reach for it. None of these are obscure. They are the first things that bite when you move between the two.
 
 The second is infrastructure. Before you write a single line of the actual app, you are picking a version, fighting Docker, opening ports, wiring credentials, and remembering to tear it down. That is an hour of setup standing between you and the idea.
 
@@ -270,7 +270,7 @@ Both of them, and here is the part that stings. While you fight them, you never 
 ## What this app could lean on
 
 - **Row history** on accounts and notebooks, from system versioning
-- **Time-ordered keys**, so the note list sorts itself (`UUID_v7()`)
+- **Time-ordered keys** that sort by creation and leak no row counts (`UUID_v7()`)
 - **Full-text search** over title and body, no second system
 - **One default notebook**, enforced by the schema, not app code
 
@@ -291,7 +291,7 @@ SPEAKER NOTES:
 
 This is the part I will not lose in a talk about agents, because it is the reason any of this matters.
 
-MariaDB is good on its own, and this app leans on it. System versioning keeps row history on accounts and notebooks, so I do not write audit triggers or shadow tables. UUID version 7 gives me keys that sort by time, so the note list comes back in order without extra work. FULLTEXT searches title and body, so I do not stand up a separate search system. And a generated column enforces one default notebook per account, so my app code never has to.
+MariaDB is good on its own, and this app leans on it. System versioning keeps row history on accounts and notebooks, so I do not write audit triggers or shadow tables. UUID version 7 gives me keys that sort by creation time and do not leak how many rows I have. FULLTEXT searches title and body, so I do not stand up a separate search system. And a generated column enforces one default notebook per account, so my app code never has to.
 
 All of that is in the server today. But left to its own knowledge, the model does not use any of it. It hands me the plain version, and I rebuild the rest by hand: triggers for history, app logic for the default rule, search bolted on the side. More code, to get less than the server already does.
 
@@ -385,7 +385,7 @@ This is the one thing I installed, and it is the star of the show. The MariaDB a
 
 Two lines to install. Add the marketplace, install the plugin. It runs in Claude Code, Codex, OpenCode, and Pi, so bring whatever harness you like.
 
-Three things to expect, because I promised you specifics. The skills work the instant you install them, offline, no database needed, because they are just knowledge. The MCP server takes one setup step, where you tell it what it is allowed to touch. And when you have nothing, the sandbox deploys a real MariaDB server for you, with no Docker and no root. That last one is why the demo you are about to watch starts from an empty directory.
+Three things to expect, because I promised you specifics. The skills work the instant you install them, offline, no database needed, because they are just knowledge. The MCP server takes one setup step, where you tell it what it is allowed to touch. And when you have nothing, the sandbox deploys a real MariaDB server for you, with no Docker and no root. That last one is why the demo you are about to watch starts with no database and no app code.
 
 Everything from here is that plugin, doing its job, in one conversation. Watch.
 -->
@@ -441,7 +441,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT ONE]
 
-Four things are happening here. It reads the data model out of my spec and writes the DDL. It deploys a MariaDB sandbox on port 3310, and notice, there was no Docker step, no container, nothing I set up beforehand. It runs the DDL over the connection against that live server. And then it loads sixty-one real notes into it, the fixture that the app depends on, and reads the counts back.
+Four things are happening here. It reads the data model out of my spec and writes the DDL. It deploys a MariaDB sandbox on port 3310, and notice, there was no Docker step and no container. I cached the server download ahead of time so you are not watching a progress bar, but the server itself did not exist until the agent deployed it. It runs the DDL over the connection against that live server. And then it loads sixty-one real notes into it, the fixture that the app depends on, and reads the counts back.
 
 That last step is the difference between a demo and a result. An agent that just prints code hands you a review task. This one ran its own code against a real database, and then made real data prove it. It closed the loop by itself.
 
@@ -460,7 +460,7 @@ CREATE OR REPLACE TABLE notes_app.note (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 ```
 
-- `CREATE OR REPLACE TABLE` with the `uca1400` collation, not MySQL's `utf8mb4_0900`
+- `CREATE OR REPLACE TABLE` with `utf8mb4` and the current `uca1400` collation
 - A `uuid_v7()` primary key and `FULLTEXT` search, both in the `note` table shown
 - Then the fixture loaded: 61 notes, 6 notebooks, 12 tags
 
@@ -473,7 +473,7 @@ Now look at what it actually wrote, because this is the payoff of act one.
 
 CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys defaulting to uuid_v7. System versioning on the owner tables. A generated column that enforces one default notebook per account. A FULLTEXT index for search.
 
-Remember the MySQL habits from a few minutes ago, the BINARY 16 keys and the collation that does not exist on MariaDB? None of them are here. And check me on this, because the spec is in the repo: it never says uuid_v7, uca1400, or system versioning. It says a time-ordered UUID key, row history kept in the table itself, one default notebook per account. The agent picked the current MariaDB grammar for each of those, with a skill in the room. Then it proved the result: the server accepted the DDL, and sixty-one notes loaded into it.
+Remember the MySQL habits from a few minutes ago, the UUID_TO_BIN keys and the utf8 that rejects an emoji? None of them are here. And check me on this, because the spec is in the repo: its data model never says uuid_v7, uca1400, or system versioning. It links a reference schema, and the prompt never sends the agent there. The run log shows what it read. It says a time-ordered UUID key, row history kept in the table itself, one default notebook per account. The agent picked the current MariaDB grammar for each of those, with a skill in the room. Then it proved the result: the server accepted the DDL, and sixty-one notes loaded into it.
 
 So the schema is real, and it is exactly the schema the app will bind to. Now we build on it.
 -->
@@ -506,7 +506,7 @@ That is the shift worth naming. I am not describing the app in a chat prompt. I 
 
 ---
 
-# From an empty directory to a running app
+# From a spec to a running app
 
 <div class="watch">
 
@@ -519,7 +519,7 @@ That is the shift worth naming. I am not describing the app in a chat prompt. I 
 
 </div>
 
-*One conversation carried an idea from nothing to something you can use.*
+*One conversation carried an idea from a spec to something you can use.*
 
 <!--
 SPEAKER NOTES:
@@ -528,9 +528,9 @@ SPEAKER NOTES:
 
 It reads the product doc and builds a real Python package. Not a snippet in a chat window. A project, with an entry point and dependencies. Then it runs it, both from the launcher and from the command it installed, because a package that installs with no code in it is a classic way to fool yourself.
 
-And there it is. Three panes. On the left, the notebooks from act one. In the middle, the notes, with the pinned ones sorted to the top, exactly the way the schema's index intended. On the right, a note rendered from Markdown. Along the bottom, a status line that reads native, so it talks straight to the tables on the sandbox. That is the data act one loaded, on screen.
+And there it is. Three panes. On the left, the notebooks from act one. In the middle, the notes, with the pinned ones sorted to the top, exactly the way the schema's index intended. On the right, a note rendered from Markdown. Along the bottom, a status line that reads native, so it talks straight to the tables on the sandbox. That is the data act one loaded, on screen. Search and tag filters are Shoulds in the spec, not Musts, so this prompt leaves them for the next one.
 
-From an empty directory to a working app, in one conversation.
+From no app code to a working app, in one conversation.
 
 [IF THE CLOCK ALLOWS, ADVANCE TO ACT THREE. OTHERWISE SKIP TO "REAL IN THE METADATA" FOR THE 30-SECOND BOUNDARY BEAT.]
 -->
@@ -572,7 +572,7 @@ This is the tier the talk is named for, and the real test, because the REST gram
 **What is happening on screen**
 
 1. The REST grammar runs **one statement per session**, and the agent follows that rule
-2. It builds the **service, a schema, and a view per table**, and `SHOW REST` confirms them
+2. It builds the **service, a schema, and three views**: note, notebook, tag. `SHOW REST` confirms them
 3. Reading `/note` back shows the **tool dropped the read-only tag flags**, and the agent reports it
 4. It **extends the app**: a REST data source beside the native one, picked by one variable
 5. In REST mode the **status line reports the missing router**, and the app stays up
@@ -586,7 +586,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT THREE]
 
-This is the trickiest grammar in the whole run. It runs one statement per session, a rule most models have never seen, and I named that rule in the prompt, because saying what you already know is how you phrase a prompt. The prompt also names what I want from each view: a key, sort columns, nested tags, and create, update and delete. Writing those into valid REST Service DDL is the grammar a model is most likely to get wrong from memory. The service, the schema, and a view per table land, and SHOW REST confirms them. Then it reads the note view back, and here is a surprise that is not the model's fault. It wrote the read-only flags on the nested tags correctly, and the tool dropped them on the way into the metadata. The agent only catches that because I told it to read the metadata back. Check the source of truth, not the summary.
+This is the trickiest grammar in the whole run. It runs one statement per session, a rule most models have never seen, and I named that rule in the prompt, because saying what you already know is how you phrase a prompt. The prompt also names what I want from each view: a key, sort columns, nested tags, and create, update and delete. Writing those into valid REST Service DDL is the grammar a model is most likely to get wrong from memory. The service, the schema, and three views land, note, notebook, and tag, and SHOW REST confirms them. Then it reads the note view back, and here is a surprise that is not the model's fault. It wrote the read-only flags on the nested tags correctly, and the tool dropped them on the way into the metadata. The agent only catches that because I told it to read the metadata back. Check the source of truth, not the summary.
 
 Then it goes back to the app it built in act two, adds a REST data source beside the native one, and picks between them with one environment variable. In REST mode the status line says plainly that nothing is serving the endpoints yet, and the app stays up. When the metadata comes up, I get precise.
 
@@ -632,9 +632,9 @@ SPEAKER NOTES:
 
 So how do I know the tier is real. Not because I called it over HTTP. Because I can read it. SHOW REST VIEWS lists the endpoints the agent defined, note, notebook, tag, under the notesApp service. They are genuinely there, in the metadata.
 
-And here is the line I promised you in the first minute. The agent built the API definition. Serving that definition over HTTP is the job of a router, a separate piece I chose not to stand up for this talk. So I am not going to tell you these endpoints answer a web request, because that is not what I built. They are defined. Serving them is a router away.
+And here is the one place I promised you, back at the start, where it is still crazy. The agent built the API definition. Serving that definition over HTTP is the job of a router, a separate piece I chose not to stand up for this talk. So I am not going to tell you these endpoints answer a web request, because that is not what I built. They are defined. Serving them is a router away.
 
-That distinction is the entire thesis in one breath. The agent is genuinely good, right up to a boundary, and the honest move is to name the boundary instead of smudging it. Which is exactly the tension in the title of this talk. Now, something happened during cleanup that I did not plan.
+That distinction is the entire thesis in one breath. The agent is genuinely good, right up to a boundary, and the honest move is to name the boundary instead of smudging it. Which is exactly the tension in the title of this talk. One more story, from building this demo, that I did not plan.
 
 [ADVANCE]
 -->
@@ -648,7 +648,7 @@ That distinction is the entire thesis in one breath. The agent is genuinely good
 
 ## What happened
 
-While reseeding, the agent tried:
+Building this demo, reseeding the sandbox, the agent tried:
 
 ```sql
 DELETE FROM notes_app.account
@@ -656,7 +656,7 @@ DELETE FROM notes_app.account
 
 No `WHERE`. The whole table. Cascading to five more.
 
-> Permission denied by the Claude Code auto mode classifier.
+> Permission for this action was denied by the Claude Code auto mode classifier.
 > Reason: [Cloud Storage Mass Delete].
 
 </div>
@@ -680,9 +680,9 @@ SPEAKER NOTES:
 
 You should see this one, because you are the people who decide what an agent is allowed to run.
 
-During that cleanup, reseeding the sandbox, the agent tried to reset the data with this. DELETE FROM account. No WHERE clause. The whole table, cascading to five more through foreign keys. The database would have run it without blinking. The account it was connected as had the privilege. It was valid SQL.
+While I was building this demo, reseeding the sandbox between runs, the agent tried to reset the data with this. DELETE FROM account. No WHERE clause. The whole table, cascading to five more through foreign keys. The database would have run it without blinking. The account it was connected as had the privilege. It was valid SQL.
 
-It never reached the server. The harness stopped the tool call first, and told the agent to find a safer path or hand the call to a human. Which it did.
+It never reached the server. The harness stopped the tool call first, and told the agent to find a safer path or hand the call to a human. It took the safe path and skipped the wipe.
 
 Here is why that should reassure you rather than scare you. Safety on an agent is layered. The allow-list controls which files it can touch. The action classifier controls which operations it can run. The database grants control what the account may do. Three independent controls, each with its own veto. The database's own permissions would have allowed this. The thing that caught it sits above the grants, not inside them. You want both layers, and you do not have to trust the agent's judgment to be safe. Now let me pull the camera back, because this is bigger than my little notes app.
 -->
@@ -696,7 +696,7 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 
 ## Why the agent got MariaDB right
 
-Not luck. MariaDB publishes its knowledge for agents, not only for browsers:
+Not luck: the skills. And skills are one of several ways MariaDB publishes its knowledge for agents, not only for browsers:
 
 - `llms.txt`, a map of the docs for a model
 - Raw Markdown, not HTML to parse
@@ -721,7 +721,7 @@ SPEAKER NOTES:
 
 Pull back with me for a second, because this is bigger than my notes app.
 
-Ask why the agent got MariaDB right. It was not luck, and it was not a smarter model. It was that MariaDB publishes its knowledge in a form an agent can use. The docs run on GitBook, and they expose an llms.txt that maps the docs for a model, raw Markdown instead of HTML you have to parse, an MCP interface so the agent calls a tool instead of scraping, and an ask endpoint that answers a question directly. The ai-plugins take that same knowledge into the coding loop as skills.
+Ask why the agent got MariaDB right. It was not luck, and it was not a smarter model. It was the skills, and the skills are one example of a bigger habit: MariaDB publishes its knowledge in a form an agent can use. The docs run on GitBook, and they expose an llms.txt that maps the docs for a model, raw Markdown instead of HTML you have to parse, an MCP interface so the agent calls a tool instead of scraping, and an ask endpoint that answers a question directly. The ai-plugins take that same knowledge into the coding loop as skills.
 
 Here is the part for the maintainers in the room, and I think that is a lot of you. You do not get to retrain the model on your project, and you never will. But you do get to publish your knowledge where an agent can reach it, so that when someone points their agent at your thing, it reasons from what you actually shipped instead of a two-year-old guess. The projects agents handle well are the ones that made that choice. It is a choice, and it is yours.
 -->
@@ -787,7 +787,7 @@ SPEAKER NOTES:
 
 Good ideas are crazy until they're not. That was Larry Page, at the start. You just watched one stop being crazy: a confidently wrong agent built a real data tier, a working app on top of it, and an API tier you can read in the metadata, because it had the knowledge and the reach. And I showed you the one place it is still crazy, the router I did not stand up.
 
-That is the story. One idea, one conversation, from an empty directory to a running app, with the boundary named out loud along the way.
+That is the story. One idea, one spec, one conversation, from no app code to a running app, with the boundary named out loud along the way.
 
 Everything you saw is public. The demo, the exact prompts, and the schema are in the first repo, Apache-2.0. The plugins themselves are in the second, GPL-2.0, so you can read every skill and write your own.
 
@@ -854,7 +854,7 @@ If someone asks how the pieces fit. You install one thing, the ai-plugins. On fi
 
 ## Why it is not proof of REST
 
-<span class="boundary">In native mode it never calls the `/notesApp` endpoints. Those were defined in Act three, and serving them needs a router, so REST mode has nothing to answer it. The app takes the native path to the same tables.</span>
+<span class="boundary">In native mode it never calls the `/notesApp` endpoints. Those were defined in act three, and serving them needs a router, so REST mode has nothing to answer it. The app takes the native path to the same tables.</span>
 
 </div>
 </div>
@@ -866,5 +866,5 @@ SPEAKER NOTES:
 
 [Q&A backup, if someone asks whether the app runs on the REST API]
 
-The app connects with the native MariaDB connector, straight to the tables on the sandbox. In native mode it never calls the slash notesApp endpoints, and in REST mode it reports that nothing is serving them. Those were defined in Act three, and serving them over HTTP needs a router I did not stand up. So the app shows the schema is real and usable. Whether the REST tier serves was answered earlier, in the metadata. Two different claims, kept separate.
+The app connects with the native MariaDB connector, straight to the tables on the sandbox. In native mode it never calls the slash notesApp endpoints, and in REST mode it reports that nothing is serving them. Those were defined in act three, and serving them over HTTP needs a router I did not stand up. So the app shows the schema is real and usable. Whether the REST tier serves was answered earlier, in the metadata. Two different claims, kept separate.
 -->

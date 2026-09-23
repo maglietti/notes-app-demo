@@ -104,7 +104,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 - **On slide:** The recording fills the frame, then hold on the running three-pane app.
 - **Build:** Cut to act two of the recorded run. **[CAPTURE] app opening.** Land on notebooks, pinned notes, the status line reading `native`.
-- **Says:** From an empty directory to this, in one conversation, on the data act one loaded.
+- **Says:** From no app code to this, in one conversation, on the data act one loaded.
 
 ### Slide 14: A working client, and the line
 
