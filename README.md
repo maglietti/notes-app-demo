@@ -206,12 +206,13 @@ By default a run leaves nothing behind in git, since the output is ignored, whic
 
 ```bash
 git switch -c run/2026-09-18
-git add -f notes_app pyproject.toml uv.lock working/notes_app.sql working/RUN_LOG.md
+git add -f notes_app/*.py pyproject.toml uv.lock working/notes_app.sql working/RUN_LOG.md
+git status --short
 git commit -m "run: <harness or model>, <what stood out>"
 git switch main
 ```
 
-If the run included the optional Prompt 3, add `working/notes_app_rest.sql` to the list too. Keep the snapshot scoped to what you actually want to compare, which is the app source and the SQL the agent wrote, and leave out the `.venv`, the `.env`, and the sandbox data directory as noise. Switching back to `main` removes the snapshotted files from your working tree, so the app no longer runs there. They stay safe on the run branch, and switching to it brings them back. The files you left out, such as `.venv` and `.env`, stay in place. To compare two runs, diff their branches:
+The glob `notes_app/*.py` matters. `-f` overrides every ignore rule under a path you name, so `git add -f notes_app` would also commit the `__pycache__` bytecode that any launch of the app leaves behind. Check the `git status --short` output for stray `__pycache__` or `.env` entries before you commit. If the run included the optional Prompt 3, add `working/notes_app_rest.sql` to the list too. Keep the snapshot scoped to what you actually want to compare, which is the app source and the SQL the agent wrote, and leave out the `.venv`, the `.env`, and the sandbox data directory as noise. Switching back to `main` removes the snapshotted files from your working tree, so the app no longer runs there. They stay safe on the run branch, and switching to it brings them back. The files you left out, such as `.venv` and `.env`, stay in place. To compare two runs, diff their branches:
 
 ```bash
 git diff run/2026-09-17 run/2026-09-18 -- notes_app
