@@ -205,8 +205,9 @@ A three-pane layout, Textual widgets:
 - **Middle:** the note list for the selected notebook and status view, where a star marks a pinned note and `/` opens search.
 - **Right:** the selected note, its Markdown rendered read-only, with `e` to edit.
 - **Bottom:** the status line, showing the data mode, the service root, and the note count.
+- **Footer:** a footer below the status line lists the key bindings, and `?` opens a help screen.
 
-Key bindings are `n` for a new note, `e` to edit, `p` to pin, `a` to archive, `d` to trash, `u` to restore, `/` to search, `tab` to cycle panes, and `q` to quit. Edit mode is a full-screen Markdown text area with `ctrl+s` to save.
+Key bindings are `n` for a new note, `e` to edit, `p` to pin, `a` to archive, `d` to trash, `u` to restore, `/` to search, `?` for help, `tab` to cycle panes, and `q` to quit. Edit mode is a full-screen Markdown text area with `ctrl+s` to save.
 
 ## 8. Non-functional requirements
 
