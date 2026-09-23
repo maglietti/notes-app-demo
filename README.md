@@ -6,23 +6,29 @@ The talk it supports is *Confidently Wrong: Handing a Coding Agent an API Tier A
 
 ## Repository layout
 
-The repository tracks the instructions, and nothing else. This is the committed tree, the part you read and run:
+The repository tracks the instructions, and nothing else. This is the committed tree, the part you read and run. The prompts point the agent at two of these files, marked `(agent input)`, and have it run `bin/notes-app`:
 
 ```text
 .
 ├── README.md                  this runbook
+├── LICENSE                    Apache License 2.0
 ├── bin/
 │   └── notes-app              stable launcher for the generated app
-├── docs/                      inputs the agent reads
-│   ├── notes_app-prd.md       the client design
+├── docs/
+│   ├── notes_app-prd.md       the product doc: schema spec, REST surface, app design (agent input)
 │   ├── demo-prompts.md        the three prompts on their own
 │   ├── stack-layering.md      how the pieces relate
 │   └── decisions.md           the choices behind the demo
-└── research/                  inputs the agent reads
-    ├── notes_app.sql          the canonical schema (frozen from an agent run)
-    ├── synthetic_data.sql     test data for the canonical schema
-    ├── agent-security-note.md the blocked mass-delete talking point
-    └── notes_app-er.*         the schema ER diagram
+├── research/
+│   ├── synthetic_data.sql     the seed fixture Prompt 1 loads (agent input)
+│   ├── notes_app.sql          reference schema, frozen from an earlier agent run; the prompts do not read it
+│   ├── notes_app-er.*         the reference schema's ER diagram
+│   └── agent-security-note.md the blocked mass-delete talking point
+└── talk/                      the talk that uses this demo
+    ├── demo-cue-card.md       the operating sheet, and the source of truth for the prompts
+    ├── run-of-show.md         the timed beats
+    ├── outline.md             the slide-by-slide plan
+    └── slides.md              the deck, in Marp Markdown
 ```
 
 Everything a run generates is gitignored, so `git clean -fdx` removes all of it:
@@ -34,7 +40,7 @@ working/                                      schema, RUN_LOG, sandbox datadir (
 .venv/                                        the app's virtual environment
 ```
 
-The repository is the project, not the output. It holds the instructions for generating the app, while the app itself and every prompt output stay ignored, so a run never dirties the tree and `git clean -fdx` returns it to a clean, re-runnable state. During a run the agent reads from `docs/` and `research/`, builds the `notes_app` package at the repository root, and writes its working files under `working/`.
+A run never dirties the committed tree, so `git clean -fdx` returns it to a clean, re-runnable state. During a run the agent reads the product doc and the seed fixture, builds the `notes_app` package at the repository root, and writes its working files under `working/`.
 
 ## The stack, in three layers
 
@@ -50,7 +56,10 @@ You install only the top layer. Installing `ai-plugins` pulls down `mariadb-shel
 
 - A coding-agent harness. This runbook uses Claude Code.
 - macOS or Linux.
-- Nothing else. The sandbox brings its own MariaDB Server when the machine has none, with no Docker and no root.
+- Python 3.11 or newer for the generated app. `uv` is optional: `bin/notes-app` uses it when present and falls back to `python3`.
+- MariaDB Connector/C with `mariadb_config` on the `PATH`, plus a C compiler. The app's `mariadb` Python package (Connector/Python) builds against them on install, because it ships no Linux or macOS wheels. The package is `libmariadb-dev` on Debian and Ubuntu, `mariadb-connector-c-devel` on Fedora, `mariadb-libs` on Arch, and `mariadb-connector-c` in Homebrew.
+
+You do not need a MariaDB Server. The sandbox brings its own when the machine has none, with no Docker and no root.
 
 ## Step 1: Install the ai-plugins
 
@@ -79,7 +88,7 @@ The server starts out allowed to reach nothing, so point it at this repository r
 mariadb-shell -- mcp setup
 ```
 
-If `mariadb-shell` is not on your `PATH`, use the copy the launcher installed at `~/.local/bin/mariadb-shell`. When the setup walks you through it, add this repository's root directory to the allowed paths. You do not need to configure a database connection, because the sandbox registers its own automatically.
+If `mariadb-shell` is not on your `PATH`, use the copy the plugin installed at `~/.local/bin/mariadb-shell`. When the setup walks you through it, add this repository's root directory to the allowed paths. You do not need to configure a database connection, because the sandbox registers its own automatically.
 
 ## Step 3: Build and seed the data tier
 
@@ -146,6 +155,8 @@ The app lives at the repository root, and `bin/notes-app` is the fixed command t
 
 Configuration comes from a `.env` file at the repository root, which the client build writes with the sandbox password `demo-pw`. If it is missing, copy the `.env.example` the build produced and set the password. Both `.env` and `.env.example` are generated output, so both are gitignored.
 
+To choose the data mode, set `NOTES_APP_MODE` on the command line, as in `NOTES_APP_MODE=rest ./bin/notes-app`. The launcher exports `NOTES_APP_MODE=native` before the app starts whenever the variable is unset, so a `NOTES_APP_MODE` line in `.env` does not take effect if the app lets the environment win over `.env`, as the usual loaders do. REST mode exists only after Step 6.
+
 ## Step 6 (optional): Add the API tier and REST mode
 
 Give the agent Prompt 3 when you want the REST tier the talk is named for. It puts a MariaDB REST Service in front of the schema, then adds a `RestDataSource` beside the `NativeDataSource` that Prompt 2 built, so `NOTES_APP_MODE` selects native or REST mode. The REST DDL has to run through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` hands each statement a fresh session. The prompt says so up front.
@@ -200,7 +211,7 @@ git commit -m "run: <harness or model>, <what stood out>"
 git switch main
 ```
 
-If the run included the optional Prompt 3, add `working/notes_app_rest.sql` to the list too. Keep the snapshot scoped to what you actually want to compare, which is the app source and the SQL the agent wrote, and leave out the `.venv`, the `.env`, and the sandbox data directory as noise. Switching back to `main` clears those generated files from your working tree, though they stay safe on the run branch. To compare two runs, diff their branches:
+If the run included the optional Prompt 3, add `working/notes_app_rest.sql` to the list too. Keep the snapshot scoped to what you actually want to compare, which is the app source and the SQL the agent wrote, and leave out the `.venv`, the `.env`, and the sandbox data directory as noise. Switching back to `main` removes the snapshotted files from your working tree, so the app no longer runs there. They stay safe on the run branch, and switching to it brings them back. The files you left out, such as `.venv` and `.env`, stay in place. To compare two runs, diff their branches:
 
 ```bash
 git diff run/2026-09-17 run/2026-09-18 -- notes_app
@@ -224,7 +235,7 @@ With the sandbox gone, remove the generated files. Snapshot the generation first
 git clean -fdx
 ```
 
-Because the repository tracks only the instructions, `git clean -fdx` clears every generated file (the app, the `working/` artifacts, the sandbox, the `.venv`, and the `.env`) and leaves only the committed `README.md`, `bin/`, `docs/`, and `research/`. Re-run the prompts from Step 3 for a fresh build with no residue.
+Because the repository tracks only the instructions, `git clean -fdx` clears every generated file (the app, the `working/` artifacts, the sandbox, the `.venv`, and the `.env`) and leaves only the committed files: `README.md`, `LICENSE`, `bin/`, `docs/`, `research/`, and `talk/`. Re-run the prompts from Step 3 for a fresh build with no residue.
 
 ## Troubleshooting
 
@@ -243,10 +254,11 @@ Because the repository tracks only the instructions, `git clean -fdx` clears eve
 - [`docs/demo-prompts.md`](docs/demo-prompts.md) collects the three prompts on their own.
 - [`docs/stack-layering.md`](docs/stack-layering.md) explains how the layers relate.
 - [`docs/decisions.md`](docs/decisions.md) records the choices behind the demo and why.
-- [`research/notes_app.sql`](research/notes_app.sql) is the canonical schema.
-- [`research/synthetic_data.sql`](research/synthetic_data.sql) is the test data for it.
+- [`research/notes_app.sql`](research/notes_app.sql) is the reference schema, frozen from an earlier agent run. The prompts do not read it: the agent writes its own from PRD section 4. Use it to load the tier without an agent, or to compare against a run.
+- [`research/synthetic_data.sql`](research/synthetic_data.sql) is the seed fixture that Prompt 1 loads.
 - [`research/agent-security-note.md`](research/agent-security-note.md) is the blocked mass-delete talking point.
-- [`research/notes_app-er.md`](research/notes_app-er.md) is the schema ER diagram.
+- [`research/notes_app-er.md`](research/notes_app-er.md) is the reference schema's ER diagram.
+- [`talk/demo-cue-card.md`](talk/demo-cue-card.md) is the operating sheet for the live run, and the source of truth for the prompts. The rest of `talk/` holds the run of show, the slide outline, and the deck.
 - `working/` holds what the demo generates: the agent's schema, the REST DDL from the optional prompt, and `RUN_LOG.md`.
 
 ## License
