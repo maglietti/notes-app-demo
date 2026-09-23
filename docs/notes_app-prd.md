@@ -149,6 +149,8 @@ Endpoints the client calls in REST mode, served by the REST Daemon under the ser
 
 `@KEY` on the note `id` is what makes the row-level `GET`, `PUT`, and `DELETE` work, `@SORTABLE` on `title`, `created_at`, and `updated_at` drives ordering, and tags arrive embedded in each note through `@UNNEST`, so the list view needs one request rather than three.
 
+**Tags are read-only through `/note`.** The tag names embedded in a note are for display, and a write to `/note` changes only the note's own columns, never `note_tag` or `tag`. This must be explicit, because the server gives nested objects the parent view's write operations unless they are switched off, so a writable `/note` would otherwise make its embedded tags writable too, even with `/tag` read-only.
+
 Two response shapes the client must handle:
 
 - **List responses are paginated.** The REST Service wraps a collection in an `items` array alongside `limit`, `offset`, `count`, `hasMore`, and `links`, so even with a handful of notes the client reads `items` and honours `hasMore` rather than assuming a bare array.
