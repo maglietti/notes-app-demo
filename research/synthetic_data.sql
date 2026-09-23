@@ -73,7 +73,7 @@ FROM (
   UNION ALL SELECT 'DevRel', 'Blog closing the agent loop', 'Draft on how an MCP connection lets the agent run its own SQL and verify the result instead of guessing.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Video sandbox in five minutes', 'Screencast deploying a throwaway MariaDB instance and running DDL over MCP.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Migrator demo notes', 'MySQL to MariaDB migration over MCP. Show the resume-safe restart and the false success trap.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Tutorial vector search in twenty lines', 'VECTOR column, VEC_DISTANCE_COSINE, and one HNSW index. Embeddings come from a local model so the reader needs no API key.', 'active', 1
+  UNION ALL SELECT 'DevRel', 'Tutorial vector search in twenty lines', 'VECTOR column, VEC_DISTANCE_COSINE, and one HNSW index. Embeddings come from a local model so the reader needs no API key.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Docs gap on system versioning', 'The FOR SYSTEM_TIME examples stop at AS OF. Add AS OF now minus an interval, BETWEEN, and the partition-pruning caveat.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Office hours question log', 'Recurring questions worth turning into posts: connector pooling defaults, JSON validation, and picking a collation.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Newsletter draft on 11.8 LTS', 'Lead with vector indexes, then the uca1400 collations and the utf8mb4 default. Keep it to four paragraphs.', 'active', 0
@@ -108,7 +108,7 @@ FROM (
   UNION ALL SELECT 'Inbox', 'Expense report', 'Submit the conference travel expenses before month end.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Renew SSL cert', 'The staging demo certificate expires next month.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Idea skill for window functions', 'A skill covering OVER and the framing clauses would close a common gap.', 'active', 0
-  UNION ALL SELECT 'Inbox', 'Reset sandbox before rehearsal', 'Drop and redeploy so the run starts from the same state every time.', 'active', 0
+  UNION ALL SELECT 'Inbox', 'Reset sandbox before rehearsal', 'Drop and redeploy so the run starts from the same state every time.', 'active', 1
   UNION ALL SELECT 'Inbox', 'Ask docs team about REST examples', 'The REST service pages need a worked example that returns rows, not just the DDL.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Follow up on the benchmark harness', 'Pin the dataset, the client count, and the warmup time, or the numbers mean nothing next quarter.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Draft reply to podcast invite', 'Yes, but ask for the topic list a week out so the examples can be prepared.', 'active', 0
