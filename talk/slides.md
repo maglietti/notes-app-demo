@@ -603,7 +603,8 @@ Then it goes back to the app it built in act two, adds a REST data source beside
 ## The proof
 
 ```
-SHOW REST VIEWS;
+SHOW REST VIEWS
+  FROM SERVICE /notesApp SCHEMA /notes;
 ```
 
 Lists `/note`, `/notebook`, `/tag`
