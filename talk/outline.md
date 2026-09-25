@@ -40,17 +40,17 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ## Beat 2: Guess one, the database (slides 5-6, ~1:00)
 
-### Slide 5: The model guesses your database, fluently
+### Slide 5: The LLM behind your agent guesses your database, fluently
 
 - **On slide:** Perfect time to vibe code. What it hands you, and the trap: code that looks right and behaves wrong.
 - **Build:** Two columns. The accent line defines confidently wrong.
-- **Says:** Name the first guess. The vibe-coding kicker sets up slide 9.
+- **Says:** Name the first guess, and introduce "the LLM behind your agent" once, so later slides can say "the LLM" for what it learned and "the agent" for what it does. The vibe-coding kicker sets up slide 9.
 
-### Slide 6: Before you use MariaDB, you have to break the model's MySQL habits
+### Slide 6: Before you use MariaDB, you have to break the LLM's MySQL habits
 
 - **On slide:** What you correct, round after round (`UUID_TO_BIN`, plain `utf8`, `LAST_INSERT_ID()`), against what you wanted the time for (row history, time-ordered keys, full-text search, one default notebook).
 - **Build:** Two columns, with the accent line beneath: every correction is time you meant for the app.
-- **Says:** The model learned MariaDB as MySQL's fork, from a corpus about 45 times heavier in MySQL, so it writes correct MySQL for the wrong database. The cost is steering time, spent before you reach the features you picked MariaDB for. Sets up slide 7 (what if it already knew?), and slide 13 pays off the features.
+- **Says:** The LLM learned MariaDB as MySQL's fork, from a corpus about 45 times heavier in MySQL, so it writes correct MySQL for the wrong database. The cost is steering time, spent before you reach the features you picked MariaDB for. Sets up slide 7 (what if it already knew?), and slide 13 pays off the features.
 
 ---
 
@@ -150,7 +150,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 - **On slide:** Maintainers write down the knowledge (skills, `llms.txt`, raw Markdown, MCP, `?ask=`). Teams write down the intent (a spec, IDs, acceptance criteria).
 - **Build:** Two columns, one per fix, with the review-it-like-code line beneath.
-- **Says:** Both fixes were the same move. Neither is a smarter model.
+- **Says:** Both fixes were the same move. Neither is a smarter LLM.
 
 ---
 

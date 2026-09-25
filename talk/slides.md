@@ -96,7 +96,7 @@ SPEAKER NOTES:
 
 Good morning. You just sat through two keynotes about how agents are going to change everything. I want to do the opposite for twenty minutes. I want to get specific.
 
-I gave a coding agent one job: build an app against a real MariaDB server, from the data tier up, API tier included. I knew before I started that a model is confidently wrong about a database it never trained on. I handed it the job anyway. And it worked, because of two changes I made to how I work with it.
+I gave a coding agent one job: build an app against a real MariaDB server, from the data tier up, API tier included. I knew before I started that an LLM is confidently wrong about a database it never trained on. I handed it the job anyway. And it worked, because of two changes I made to how I work with it.
 
 But start with why I would even try that.
 -->
@@ -181,16 +181,16 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 ### *Perfect time to vibe code my idea into existence...*
 
-# The model guesses your database, fluently
+# The LLM behind your agent guesses your database, fluently
 
 <div class="columns">
 <div>
 
-## What the model hands you
+## What the LLM hands you
 
 - SQL that is syntactically perfect
 - Grammar borrowed from the wrong database
-- Not one word about what the model guessed
+- Not one word about what the LLM guessed
 
 </div>
 <div>
@@ -207,9 +207,9 @@ The SQL parses, and it usually runs. Then you exercise the app and CRUD breaks: 
 <!--
 SPEAKER NOTES:
 
-Perfect time to vibe code my idea into existence, right? This is the moment the keynotes promised you. And here is what usually happens instead. The villain of the story shows up, and it is not a dumb model. It is a fluent one.
+Perfect time to vibe code my idea into existence, right? This is the moment the keynotes promised you. And here is what usually happens instead. The villain of the story shows up, and it is not a dumb LLM. It is a fluent one.
 
-Ask a model for SQL and you get something that runs, something that looks like a careful engineer wrote it. And for anything it never trained on, it is guessing, and it will not tell you which parts.
+By LLM I mean the language model underneath your agent, whether the agent is Claude Code, Codex, or anything else. Ask an LLM for SQL and you get something that runs, something that looks like a careful engineer wrote it. And for anything it never trained on, it is guessing, and it will not tell you which parts.
 
 That is the trap. The SQL parses, and it usually runs, so nothing waves a flag. Then you exercise the app and the operations break. A create gets rejected. An update touches the wrong rows. A read comes back in a shape the client did not expect. You catch it in testing, not in production, but every pass through that loop is time you meant to spend building, not debugging someone else's confident guess.
 
@@ -218,14 +218,14 @@ That is what I mean by confidently wrong. It is not a syntax error you can see. 
 
 ---
 
-# Before you use MariaDB, you have to break the model's MySQL habits
+# Before you use MariaDB, you have to break the LLM's MySQL habits
 
 <div class="columns">
 <div>
 
 ## What you correct, round after round
 
-The model learned MariaDB as MySQL's fork, so the SQL is correct MySQL for the wrong database:
+The LLM learned MariaDB as MySQL's fork, so the SQL is correct MySQL for the wrong database:
 
 - **Keys:** `BINARY(16) DEFAULT (UUID_TO_BIN(UUID(), 1))`, a MySQL 8 function MariaDB does not have, missing its `UUID` type and `UUID_v7()`
 - **Character set:** plain `utf8`, which MariaDB still reads as 3-byte `utf8mb3`, so the first emoji in a note is rejected
@@ -249,9 +249,9 @@ The model learned MariaDB as MySQL's fork, so the SQL is correct MySQL for the w
 <!--
 SPEAKER NOTES:
 
-Here is where that guessing comes from, and what it costs on this exact app. The model has read far more MySQL than MariaDB. Stack Overflow alone has about forty-five MySQL questions for every MariaDB one. And what it read about MariaDB says it is a fork of MySQL that started as a drop-in replacement. So it assumes MySQL, and you spend your time breaking the habit. Notice none of this is made up. Every one of these is correct MySQL. It is just the wrong database. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the model writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails. You correct it. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. You correct it again. For the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING. Another round.
+Here is where that guessing comes from, and what it costs on this exact app. The LLM has read far more MySQL than MariaDB. Stack Overflow alone has about forty-five MySQL questions for every MariaDB one. And what it read about MariaDB says it is a fork of MySQL that started as a drop-in replacement. So it assumes MySQL, and you spend your time breaking the habit. Notice none of this is made up. Every one of these is correct MySQL. It is just the wrong database. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the LLM writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails. You correct it. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. You correct it again. For the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING. Another round.
 
-And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. You do get there, eventually. But first you spend the afternoon breaking the model's MySQL habits, one correction at a time, before you can think about what MariaDB does for you.
+And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. You do get there, eventually. But first you spend the afternoon breaking the LLM's MySQL habits, one correction at a time, before you can think about what MariaDB does for you.
 
 Breaking those habits by hand is the part we can fix.
 -->
@@ -701,18 +701,18 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 </div>
 </div>
 
-**You cannot retrain the model. You can write down what the model needs, and review those documents like code.**
+**You cannot retrain the LLM. You can write down what the agent needs, and review those documents like code.**
 
 <!--
 SPEAKER NOTES:
 
 Both fixes you saw today were the same move: write it down where an agent can read it.
 
-The first is knowledge, and that is on maintainers. The agent got MariaDB right because of the skills, and skills are one of several ways MariaDB publishes for agents, not only for browsers: an llms.txt that maps the docs, raw Markdown instead of HTML, an MCP interface, and an ask endpoint that answers a question. If you maintain a project, you will never retrain the model on it. You can publish what it needs to know.
+The first is knowledge, and that is on maintainers. The agent got MariaDB right because of the skills, and skills are one of several ways MariaDB publishes for agents, not only for browsers: an llms.txt that maps the docs, raw Markdown instead of HTML, an MCP interface, and an ask endpoint that answers a question. If you maintain a project, you will never retrain the LLM on it. You can publish what it needs to know.
 
 The second is intent, and that is on all of us. The agent built the app I meant because I wrote a spec: what to build, never the syntax, with IDs a prompt can point at and criteria that say when it is done.
 
-Neither one is a smarter model. Both are documents, and you can review them like code.
+Neither one is a smarter LLM. Both are documents, and you can review them like code.
 -->
 
 ---
@@ -722,7 +722,7 @@ Neither one is a smarter model. Both are documents, and you can review them like
 <div class="columns">
 <div>
 
-1. **Skills are the fix, not a cleverer prompt.** When the model guesses past its training, more prompting will not teach the model current MariaDB. A skill hands the model the knowledge, and the plugin installs the skills in the harness you already use.
+1. **Skills are the fix, not a cleverer prompt.** When the LLM guesses past its training, more prompting will not teach the LLM current MariaDB. A skill hands the agent the knowledge, and the plugin installs the skills in the harness you already use.
 2. **Write a spec, and end it in acceptance criteria.** A skill stops the guessing about the database. A spec stops the guessing about your app, and its criteria let the agent check its own work. Unlike a chat prompt, a spec is something you can review.
 3. **Tools give the agent something to run against.** The MCP server opens a live connection and deploys a sandbox server, so the agent runs its SQL and fixes what broke. When a run fails, wrong SQL points to missing knowledge, and a blocked connection points to the tools.
 
@@ -741,11 +741,11 @@ SPEAKER NOTES:
 
 Six things to carry out the door, whatever database you run.
 
-One. Skills are the fix, not a cleverer prompt. When the model guesses past its training, no amount of prompting makes it know current MariaDB. A skill hands it that knowledge, and the plugin installs it in the harness you already use.
+One. Skills are the fix, not a cleverer prompt. When the LLM guesses past its training, no amount of prompting makes it know current MariaDB. A skill hands it that knowledge, and the plugin installs it in the harness you already use.
 
 Two. Write a spec, and end it in acceptance criteria. A skill stops the agent guessing about the database. A spec stops it guessing about your app, and the criteria let it check its own work against your definition of done, not its own. Unlike a chat prompt, a spec is something you and your team can review. That is spec-driven development, and it is how acts one and two happened.
 
-Three. Tools give the agent something real to run against. The MCP server opens a live connection and can deploy a sandbox server, so the agent runs its own SQL and fixes what broke instead of handing you code to paste. And when a run fails, the split tells you where to look. Wrong SQL means the model hit the edge of its training, so you add a skill. A refused connection or a blocked path is a tools problem, a setting to fix.
+Three. Tools give the agent something real to run against. The MCP server opens a live connection and can deploy a sandbox server, so the agent runs its own SQL and fixes what broke instead of handing you code to paste. And when a run fails, the split tells you where to look. Wrong SQL means the LLM hit the edge of its training, so you add a skill. A refused connection or a blocked path is a tools problem, a setting to fix.
 
 Four. Name the artifact you want. Ask for the schema, the DDL file, the running app, not the outcome you are imagining, and number the steps when the sequence matters.
 
