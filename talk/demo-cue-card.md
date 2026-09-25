@@ -79,7 +79,8 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 3. Seed it by loading research/synthetic_data.sql with db.execute_sql_script.
    The fixture is the data contract: if it fails, fix working/notes_app.sql and
    redeploy. Never edit the fixture.
-4. List the tables, show the columns of note, and report each table's row count.
+4. Check the result against AC-D1 to AC-D4 in section 11 of the PRD, and report
+   each one as passed or failed with its evidence.
 ```
 
 **[CAPTURE] the schema landing.** As the DDL scrolls, call out the current-MariaDB idioms and what they mean:
@@ -104,26 +105,15 @@ Paste:
 Build the Textual app that docs/notes_app-prd.md specifies, in native mode only.
 Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
 
-- Layout: a notes_app package with a __main__.py at the repository root, and a
-  pyproject.toml with the dependencies and a notes-app console script. The repo
-  gitignores notes_app/, so make sure the build backend still packages it. Keep
-  working/ for the schema, run log and sandbox only.
-- Stack: Python 3.11+, Textual, and mariadb Connector/Python against
-  127.0.0.1:3310, bound to the columns in working/notes_app.sql.
-- Structure: put the queries behind the section 9 DataSource interface as
-  NativeDataSource.
-- Features: the three-pane layout from section 7, with a status line naming
-  native mode and the sandbox address, and every Must in section 6: notebooks
-  with note counts; list, open, create and edit notes; pin and unpin; archive
-  and restore; trash and restore.
-- Config: host, port and password from the environment or .env. Write .env with
-  password demo-pw, plus .env.example, at the repository root.
+- Scope: every Must in section 6, the three-pane layout in section 7,
+  NativeDataSource behind the section 9 DataSource interface, and the
+  packaging and config in section 10.
+- Bind the queries to the columns in working/notes_app.sql, the schema this
+  session built.
+- Keep working/ for the schema, run log and sandbox only.
 
-Verify both entry points against the sandbox, and record each command and its
-result in working/RUN_LOG.md:
-1. bin/notes-app (the committed launcher, which runs `python -m notes_app` from
-   the root) starts the app and the seeded notes appear in the list.
-2. The notes-app console script starts the app too.
+Check the app against AC-A1 to AC-A5 in section 11, and record each command and
+its result in working/RUN_LOG.md.
 ```
 
 The build writes `.env` with the sandbox password `demo-pw`, which the native run needs to reach the seeded data. If `.env` is missing, copy `.env.example` and set the password before launching.
@@ -148,33 +138,17 @@ Paste:
 Continue against the sandbox on port 3310. Keep database files in working/, and
 append each step's result to working/RUN_LOG.md. Complete the steps in order.
 
-1. Build the REST Service from PRD section 5. Save the REST DDL to
-   working/notes_app_rest.sql, but run it with db.execute_sql one statement at a
-   time: the REST grammar is session state, and db.execute_sql_script gives each
-   statement a fresh session.
-   - Configure the REST metadata, then create service /notesApp and schema
-     /notes mapping notes_app.
-   - /note from notes_app.note: id @KEY; title, created_at and updated_at
-     @SORTABLE; tag names flattened through note_tag with @UNNEST and
-     read-only; @INSERT @UPDATE @DELETE.
-   - /notebook from notes_app.notebook, with @INSERT @UPDATE.
-   - /tag from notes_app.tag, read-only.
-   - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
-2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
-   exists. Run SHOW CREATE REST VIEW /note and report whether the nested tag
-   objects came back read-only. If they did not, log it and move on: do not
-   patch the REST metadata. Publish with ALTER REST SERVICE /notesApp
-   PUBLISHED, and log the SHOW REST output.
-3. Add RestDataSource as the second section 9 DataSource backend beside
-   NativeDataSource: httpx against the /notesApp service root, the section 5
-   endpoints, and the paginated items/hasMore list shape. NOTES_APP_MODE
-   selects the backend and defaults to native. Add the mode and service root
-   URL to .env.example, and name the active mode and its address on the status
-   line.
-4. Run bin/notes-app in native mode to confirm nothing regressed, then with
-   NOTES_APP_MODE=rest. No router is running, so the app must start, show the
-   connection error on the status line, and stay up (PRD section 8). Log both
-   runs.
+1. Build the REST Service in section 5 of the PRD (API-1 to API-6). Save the
+   REST DDL to working/notes_app_rest.sql, but run it with db.execute_sql one
+   statement at a time: the REST grammar is session state, and
+   db.execute_sql_script gives each statement a fresh session.
+2. Check it against AC-R1 to AC-R3 in section 11, and log the SHOW REST output.
+   If the nested tag objects did not come back read-only, log it and move on:
+   do not patch the REST metadata.
+3. Add RestDataSource and NOTES_APP_MODE (PRD build order step 7) beside
+   NativeDataSource, with the REST settings in CF-4.
+4. Check both modes against AC-R4 and AC-R5. No router is running, so REST mode
+   must report the connection error and stay up. Log both runs.
 ```
 
 **[CAPTURE] the REST DDL landing.** The prompt names the one-statement-per-session rule, so the DDL runs one statement at a time. Call out what the agent wrote: `@KEY`, `@SORTABLE`, `@UNNEST` through `note_tag`, and the CRUD flags, the least-trained grammar in the run.

@@ -10,7 +10,7 @@ Run the agent from the repository root, where the layout keeps inputs apart from
 
 Add the repository root to the MCP allowed paths so the agent can read `docs/` and `research/`, write `working/`, and create the app at the root. The sandbox is deployed with its data directory under `working/sandbox`, so everything the demo generates stays inside the repository.
 
-The prompts name the artifact they want, number the steps, and say "in order" wherever the sequence is a hard constraint, because an agent lands the work more reliably that way. Each one points at a section of [`docs/notes_app-prd.md`](notes_app-prd.md) instead of restating it, so the product doc stays the single description of the app.
+The prompts name the artifact they want, number the steps, and say "in order" wherever the sequence is a hard constraint, because an agent lands the work more reliably that way. Each one points at sections and requirement IDs in [`docs/notes_app-prd.md`](notes_app-prd.md) instead of restating them, so the PRD stays the single description of the app and of how to check it. A prompt carries only the slice to build, where to write, the order, and a few hard constraints, and it ends by asking the agent to report against the acceptance criteria in PRD section 11.
 
 ---
 
@@ -28,10 +28,11 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 3. Seed it by loading research/synthetic_data.sql with db.execute_sql_script.
    The fixture is the data contract: if it fails, fix working/notes_app.sql and
    redeploy. Never edit the fixture.
-4. List the tables, show the columns of note, and report each table's row count.
+4. Check the result against AC-D1 to AC-D4 in section 11 of the PRD, and report
+   each one as passed or failed with its evidence.
 ```
 
-What to check. The tables match the six tables and one view in PRD section 4, and the seed reports 61 notes (48 active with 6 pinned, 7 archived, and 6 trashed), 6 notebooks, and 12 tags. If the fixture forces a schema fix, that is a finding, not a failure: the contract working as intended.
+What to check. The agent reports AC-D1 to AC-D4 as passed. The tables match the six tables and one view in PRD section 4, and the seed reports 61 notes (48 active with 6 pinned, 7 archived, and 6 trashed), 6 notebooks, and 12 tags. If the fixture forces a schema fix, that is a finding, not a failure: the contract working as intended.
 
 ---
 
@@ -41,29 +42,18 @@ What to check. The tables match the six tables and one view in PRD section 4, an
 Build the Textual app that docs/notes_app-prd.md specifies, in native mode only.
 Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
 
-- Layout: a notes_app package with a __main__.py at the repository root, and a
-  pyproject.toml with the dependencies and a notes-app console script. The repo
-  gitignores notes_app/, so make sure the build backend still packages it. Keep
-  working/ for the schema, run log and sandbox only.
-- Stack: Python 3.11+, Textual, and mariadb Connector/Python against
-  127.0.0.1:3310, bound to the columns in working/notes_app.sql.
-- Structure: put the queries behind the section 9 DataSource interface as
-  NativeDataSource.
-- Features: the three-pane layout from section 7, with a status line naming
-  native mode and the sandbox address, and every Must in section 6: notebooks
-  with note counts; list, open, create and edit notes; pin and unpin; archive
-  and restore; trash and restore.
-- Config: host, port and password from the environment or .env. Write .env with
-  password demo-pw, plus .env.example, at the repository root.
+- Scope: every Must in section 6, the three-pane layout in section 7,
+  NativeDataSource behind the section 9 DataSource interface, and the
+  packaging and config in section 10.
+- Bind the queries to the columns in working/notes_app.sql, the schema this
+  session built.
+- Keep working/ for the schema, run log and sandbox only.
 
-Verify both entry points against the sandbox, and record each command and its
-result in working/RUN_LOG.md:
-1. bin/notes-app (the committed launcher, which runs `python -m notes_app` from
-   the root) starts the app and the seeded notes appear in the list.
-2. The notes-app console script starts the app too.
+Check the app against AC-A1 to AC-A5 in section 11, and record each command and
+its result in working/RUN_LOG.md.
 ```
 
-What to check. Both entry points start the app. The left pane lists the six notebooks, the middle pane shows the seeded notes with the pinned ones at the top, and the status line reads `native` alongside the sandbox address. The console-script check matters because the repository gitignores `notes_app/`, and a build backend that honours `.gitignore` installs a package with no code in it, which `bin/notes-app` alone cannot detect.
+What to check. The agent reports AC-A1 to AC-A5 as passed. Both entry points start the app. The left pane lists the six notebooks, the middle pane shows the seeded notes with the pinned ones at the top, and the status line reads `native` alongside the sandbox address. The console-script check matters because the repository gitignores `notes_app/`, and a build backend that honours `.gitignore` installs a package with no code in it, which `bin/notes-app` alone cannot detect.
 
 ---
 
@@ -73,36 +63,20 @@ What to check. Both entry points start the app. The left pane lists the six note
 Continue against the sandbox on port 3310. Keep database files in working/, and
 append each step's result to working/RUN_LOG.md. Complete the steps in order.
 
-1. Build the REST Service from PRD section 5. Save the REST DDL to
-   working/notes_app_rest.sql, but run it with db.execute_sql one statement at a
-   time: the REST grammar is session state, and db.execute_sql_script gives each
-   statement a fresh session.
-   - Configure the REST metadata, then create service /notesApp and schema
-     /notes mapping notes_app.
-   - /note from notes_app.note: id @KEY; title, created_at and updated_at
-     @SORTABLE; tag names flattened through note_tag with @UNNEST and
-     read-only; @INSERT @UPDATE @DELETE.
-   - /notebook from notes_app.notebook, with @INSERT @UPDATE.
-   - /tag from notes_app.tag, read-only.
-   - Mark every view AUTHENTICATION NOT REQUIRED. This is a local demo.
-2. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that every endpoint
-   exists. Run SHOW CREATE REST VIEW /note and report whether the nested tag
-   objects came back read-only. If they did not, log it and move on: do not
-   patch the REST metadata. Publish with ALTER REST SERVICE /notesApp
-   PUBLISHED, and log the SHOW REST output.
-3. Add RestDataSource as the second section 9 DataSource backend beside
-   NativeDataSource: httpx against the /notesApp service root, the section 5
-   endpoints, and the paginated items/hasMore list shape. NOTES_APP_MODE
-   selects the backend and defaults to native. Add the mode and service root
-   URL to .env.example, and name the active mode and its address on the status
-   line.
-4. Run bin/notes-app in native mode to confirm nothing regressed, then with
-   NOTES_APP_MODE=rest. No router is running, so the app must start, show the
-   connection error on the status line, and stay up (PRD section 8). Log both
-   runs.
+1. Build the REST Service in section 5 of the PRD (API-1 to API-6). Save the
+   REST DDL to working/notes_app_rest.sql, but run it with db.execute_sql one
+   statement at a time: the REST grammar is session state, and
+   db.execute_sql_script gives each statement a fresh session.
+2. Check it against AC-R1 to AC-R3 in section 11, and log the SHOW REST output.
+   If the nested tag objects did not come back read-only, log it and move on:
+   do not patch the REST metadata.
+3. Add RestDataSource and NOTES_APP_MODE (PRD build order step 7) beside
+   NativeDataSource, with the REST settings in CF-4.
+4. Check both modes against AC-R4 and AC-R5. No router is running, so REST mode
+   must report the connection error and stay up. Log both runs.
 ```
 
-What to check. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. On mariadb-shell 26.9.3, expect the agent to report that `SHOW CREATE REST VIEW /note` shows the nested tag objects as writable: the shell stores them with the parent view's operations whatever the DDL says (PRD section 13). The endpoints are defined before any router serves them, because the metadata is the API definition. In REST mode the status line names `rest` and the service root, shows a connection error, and the app stays up.
+What to check. The agent reports AC-R1 to AC-R5, with AC-R2 expected to show the mismatch below. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. On mariadb-shell 26.9.3, expect the agent to report that `SHOW CREATE REST VIEW /note` shows the nested tag objects as writable: the shell stores them with the parent view's operations whatever the DDL says (PRD section 13). The endpoints are defined before any router serves them, because the metadata is the API definition. In REST mode the status line names `rest` and the service root, shows a connection error, and the app stays up.
 
 ---
 
