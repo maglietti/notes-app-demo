@@ -1,0 +1,21 @@
+2026-09-25 13:15:31 0 [Note] Starting MariaDB 11.8.9-MariaDB source revision bf9193a939f515e95dd8def1a5468088c91cede6 server_uid YaJ5FBbgzmojq5dYVj/G71YW//c= as process 76209
+2026-09-25 13:15:31 0 [Note] InnoDB: Compressed tables use zlib 1.2.12
+2026-09-25 13:15:31 0 [Note] InnoDB: Number of transaction pools: 1
+2026-09-25 13:15:31 0 [Note] InnoDB: Using generic crc32 instructions
+2026-09-25 13:15:31 0 [Note] InnoDB: innodb_buffer_pool_size_max=8388608m, innodb_buffer_pool_size=16m
+2026-09-25 13:15:31 0 [Note] InnoDB: Completed initialization of buffer pool
+2026-09-25 13:15:31 0 [Note] InnoDB: End of log at LSN=45434
+2026-09-25 13:15:31 0 [Note] InnoDB: Opened 3 undo tablespaces
+2026-09-25 13:15:31 0 [Note] InnoDB: 128 rollback segments in 3 undo tablespaces are active.
+2026-09-25 13:15:31 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2026-09-25 13:15:31 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2026-09-25 13:15:31 0 [Note] InnoDB: log sequence number 45434; transaction id 14
+2026-09-25 13:15:31 0 [Note] Plugin 'FEEDBACK' is disabled.
+2026-09-25 13:15:31 0 [Note] InnoDB: Loading buffer pool(s) from /Users/maglietti/Code/magliettiGit/notes-app-demo/working/sandbox/3310/sandboxdata/ib_buffer_pool
+2026-09-25 13:15:31 0 [Note] InnoDB: Cannot open '/Users/maglietti/Code/magliettiGit/notes-app-demo/working/sandbox/3310/sandboxdata/ib_buffer_pool' for reading: No such file or directory
+2026-09-25 13:15:31 0 [Note] Server socket created on IP: '::', port: '3310'.
+2026-09-25 13:15:31 0 [Note] Server socket created on IP: '0.0.0.0', port: '3310'.
+2026-09-25 13:15:31 0 [Note] mariadbd: Event Scheduler: Loaded 0 events
+2026-09-25 13:15:31 0 [Note] /Users/maglietti/.local/share/mariadb-sandbox-server/11.8.9/bin/mariadbd: ready for connections.
+Version: '11.8.9-MariaDB'  socket: '/Users/maglietti/Code/magliettiGit/notes-app-demo/working/sandbox/3310/mysqld.sock'  port: 3310  Development Sandbox
+2026-09-25 13:15:32 3 [Warning] Aborted connection 3 to db: 'unconnected' user: 'unauthenticated' host: 'localhost' (This connection closed normally without authentication)

@@ -1,0 +1,28 @@
+[project]
+name = "notes-app"
+version = "0.1.0"
+description = "Terminal client for the notes_app MariaDB schema (native mode)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    "textual>=0.80",
+    "mariadb>=1.1,<2",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+notes-app = "notes_app.__main__:main"
+
+# setuptools, with an explicit package list and no VCS plugin, packages
+# notes_app/ even though the repository's .gitignore ignores it. Build backends
+# that honour .gitignore (hatchling, setuptools-scm) would ship an empty wheel.
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["notes_app"]
+
+[tool.setuptools.package-data]
+notes_app = ["*.tcss"]
