@@ -4,7 +4,7 @@ Three prompts, run in order in one agent session, each pasted into the coding ag
 
 Run the agent from the repository root, where the layout keeps inputs apart from output:
 
-- The agent reads two inputs: the spec, [`talk/notes-app-spec.md`](../talk/notes-app-spec.md), and the seed fixture, `research/synthetic_data.sql`. `research/` also holds the reference schema and the earlier PRD, and Prompt 1 tells the agent not to read either.
+- The agent reads two inputs: the spec, [`talk/notes-app-spec.md`](../talk/notes-app-spec.md), and the seed fixture, `research/synthetic_data.sql`. `research/` also holds the reference schema, the earlier PRD, and a no-skills run, and Prompt 1 tells the agent to read only the fixture there.
 - The Textual app is generated at the repository root as a `notes_app` package with a `pyproject.toml`, laid out like any normal Python project.
 - `working/` holds the working artifacts: the schema SQL, the REST DDL, the sandbox data directory, and a `working/RUN_LOG.md` that records each step.
 
@@ -22,7 +22,7 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Turn the data model in talk/notes-app-spec.md into MariaDB DDL for the
    notes_app schema, saved as working/notes_app.sql. Work from the spec alone:
-   do not read research/notes_app.sql or research/notes_app-prd.md.
+   in research/, read only synthetic_data.sql.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.

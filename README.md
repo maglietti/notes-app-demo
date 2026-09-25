@@ -102,7 +102,7 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Turn the data model in talk/notes-app-spec.md into MariaDB DDL for the
    notes_app schema, saved as working/notes_app.sql. Work from the spec alone:
-   do not read research/notes_app.sql or research/notes_app-prd.md.
+   in research/, read only synthetic_data.sql.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
