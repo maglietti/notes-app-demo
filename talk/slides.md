@@ -174,7 +174,7 @@ A notebook that lives in the terminal. No browser, no tab to lose, no mouse. Thr
 
 And it does the things you actually want a notebook to do. Search across everything, full text, the moment you type. Pin the notes that matter so they float to the top. Archive the ones you are done with so they get out of your way. Trash, with a way back, because nobody wants a cliff. Tags, so you can slice across notebooks.
 
-That is the app. The kind of thing you would keep open all day. So I opened an agent, pointed it at MariaDB, and asked it to build exactly that.
+That is the app. The kind of thing you would keep open all day. And someday I want to ask my notes a question and get an answer back. Hold that thought, because I come back to it at the end. So I opened an agent, pointed it at MariaDB, and asked it to build exactly that.
 -->
 
 ---
@@ -251,7 +251,7 @@ SPEAKER NOTES:
 
 Here is where that guessing comes from, and what it costs on this exact app. The LLM has read far more MySQL than MariaDB. Stack Overflow alone has about forty-five MySQL questions for every MariaDB one. And what it read about MariaDB says it is a fork of MySQL that started as a drop-in replacement. So it assumes MySQL, and you spend your time breaking the habit. Notice none of this is made up. Every one of these is correct MySQL. It is just the wrong database. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the LLM writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails. You correct it. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. You correct it again. For the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING. Another round.
 
-And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. You do get there, eventually. But first you spend the afternoon breaking the LLM's MySQL habits, one correction at a time, before you can think about what MariaDB does for you.
+And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. And one more reason I will come back to at the end: vector search is built into the server too. You do get there, eventually. But first you spend the afternoon breaking the LLM's MySQL habits, one correction at a time, before you can think about what MariaDB does for you.
 
 Breaking those habits by hand is the part we can fix.
 -->
@@ -267,7 +267,7 @@ Breaking those habits by hand is the part we can fix.
 
 - Markdown files, one per topic
 - The current grammar, the ordering rules, the failure modes
-- Reviewed and versioned, no fine-tuning
+- Skills change the agent's context, the working memory the agent reads, not what the LLM learned
 - Skills work offline, with no database at all
 
 </div>
@@ -510,6 +510,7 @@ CREATE OR REPLACE TABLE notes_app.note (
 - `CREATE OR REPLACE TABLE` with `utf8mb4` and the current `uca1400` collation
 - A `uuid_v7()` primary key and `FULLTEXT` search, both in the `note` table shown
 - Then the fixture loaded, and the report passed AC-D1 to AC-D4: 61 notes, 6 notebooks, 12 tags
+- The LLM's training is the same as before. What changed is the agent's context: the skills and the spec
 
 <span class="accent">My spec says what each column does, never the syntax. The MariaDB grammar is the agent's own work.</span>
 
@@ -678,41 +679,80 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 
 ---
 
-# Agents are only as good as what you write down for them
+# An agent works from two kinds of memory, and you can write to only one of them
 
 <div class="columns">
 <div>
 
-## Maintainers write down the knowledge
+## What the LLM learned in training, fixed when the LLM was built
 
-- Skills, like the ai-plugins, carry the knowledge into the coding loop
-- `llms.txt`, raw Markdown, an MCP interface, and `?ask=` publish the knowledge for agents, not only for browsers
-- MariaDB's docs expose all four
+- More MySQL than MariaDB in what the LLM read
+- The same for everyone who uses that LLM
+- You cannot change it
 
 </div>
 <div>
 
-## Teams write down the intent
+## What the agent reads into its context, its working memory for this session
 
-- A spec says what to build, never the syntax
-- Requirement IDs let a prompt point instead of restate
-- Acceptance criteria say what done looks like, so the agent checks itself
+- Skills from MariaDB, with the current grammar
+- The spec from your team, with what to build and how to check it
+- Memory files with your own corrections, such as `CLAUDE.md` or `AGENTS.md`
+- You write, review, and version all three like code
 
 </div>
 </div>
 
-**You cannot retrain the LLM. You can write down what the agent needs, and review those documents like code.**
+<span class="accent">When the agent does not load the knowledge, the LLM's training fills the gap.</span>
 
 <!--
 SPEAKER NOTES:
 
-Both fixes you saw today were the same move: write it down where an agent can read it.
+Pull back with me, because both fixes you saw today were the same move, and it is worth naming.
 
-The first is knowledge, and that is on maintainers. The agent got MariaDB right because of the skills, and skills are one of several ways MariaDB publishes for agents, not only for browsers: an llms.txt that maps the docs, raw Markdown instead of HTML, an MCP interface, and an ask endpoint that answers a question. If you maintain a project, you will never retrain the LLM on it. You can publish what it needs to know.
+An agent works from two kinds of memory. The first is what the LLM learned in training. It was fixed the day the LLM was built, it read far more MySQL than MariaDB, and it is the same for everyone who uses it. You cannot change it, and neither can I.
 
-The second is intent, and that is on all of us. The agent built the app I meant because I wrote a spec: what to build, never the syntax, with IDs a prompt can point at and criteria that say when it is done.
+The second is the agent's context, its working memory for this session. That is where the skills go, with the current MariaDB grammar. That is where my spec goes, with what to build and how to check it. And that is where my own corrections go. Here is a real one. While I built this talk, I corrected the agent twice on how to write these slides. Both times it wrote the rule into its memory files, so the next session started with the rule already in place. I taught it once, not every session. That is the round-after-round problem from earlier, solved.
 
-Neither one is a smarter LLM. Both are documents, and you can review them like code.
+All three are things you write, review, and version like code. And the flip side is the honest part: when the agent does not load that knowledge, the LLM's training fills the gap, and the MySQL habits come right back.
+-->
+
+---
+
+# The next coding session: ask my notes a question, and an LLM answers from them
+
+<div class="columns">
+<div>
+
+## What the app does today
+
+- Stores notebooks, notes, and tags in MariaDB
+- Finds notes with the `FULLTEXT` index the agent built
+
+</div>
+<div>
+
+## What I will build next, on the same MariaDB server
+
+- Store an embedding beside each note, in a `VECTOR` column built into MariaDB since 11.7
+- Combine the `FULLTEXT` index with vector search to find the right notes
+- Work the same way: a spec first, skills for the grammar, a sandbox to run it
+
+</div>
+</div>
+
+<span class="accent">One MariaDB server holds the app's data and the agent's memory. That is why I build agentic applications on MariaDB.</span>
+
+<!--
+SPEAKER NOTES:
+
+Remember the thought I asked you to hold, back at the idea? I want to ask my notes a question and get an answer back. That is my next coding session, and I have not built it yet, so this is a plan, not a demo.
+
+Today the app stores notebooks, notes, and tags in MariaDB, and finds notes with the full-text index the agent built. Next, I store an embedding beside each note, in a vector column. Vector search is built into MariaDB since 11.7, so there is nothing to install and no second database to run. Then I combine the full-text index I already have with vector search, so a question finds the right notes whether it uses my exact words or not, and an LLM answers from them.
+
+And I will build it the same way you watched today. A spec first, the skills for the grammar, a sandbox to run it.
+
+This is the other reason I picked MariaDB, the one I promised to come back to. The notes become memory for an agentic application, and one MariaDB server holds both the app's data and that memory.
 -->
 
 ---

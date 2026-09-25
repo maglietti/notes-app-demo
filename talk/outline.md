@@ -1,6 +1,6 @@
 # Slide outline: Confidently Wrong
 
-The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md) and to the deck in [`slides.md`](slides.md). Twenty slides plus two Q&A backups, across ten beats. Read the titles alone and they tell the story: two guesses, two fixes, two acts that prove both, and the boundary. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
+The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md) and to the deck in [`slides.md`](slides.md). Twenty-one slides plus two Q&A backups, across ten beats. Read the titles alone and they tell the story: two guesses, two fixes, two acts that prove both, the boundary, and the agent memory that ties the fixes together and points to the next session. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
 
 Recording note: the two acts play from one trimmed recording, cued at the start of each act. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The REST beat is a static slide, with its output captured from an off-stage run of Prompt 3. The deck carries the frame; the recording carries the work.
 
@@ -144,25 +144,31 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ---
 
-## Beat 9: The bigger shift (slide 18, ~1:30)
+## Beat 9: Agent memory, and the next session (slides 18-19, ~2:30)
 
-### Slide 18: Agents are only as good as what you write down for them
+### Slide 18: An agent works from two kinds of memory, and you can write to only one of them
 
-- **On slide:** Maintainers write down the knowledge (skills, `llms.txt`, raw Markdown, MCP, `?ask=`). Teams write down the intent (a spec, IDs, acceptance criteria).
-- **Build:** Two columns, one per fix, with the review-it-like-code line beneath.
-- **Says:** Both fixes were the same move. Neither is a smarter LLM.
+- **On slide:** What the LLM learned in training (fixed, heavier on MySQL, the same for everyone) against what the agent reads into its context (skills, the spec, memory files with your corrections), with the accent line: when the agent does not load the knowledge, the LLM's training fills the gap.
+- **Build:** Two columns with full-sentence headings.
+- **Says:** Both fixes were the same move: change the agent's context, because the LLM cannot be changed. The notes carry the real anecdote of teaching the agent once while building the talk.
+
+### Slide 19: The next coding session: ask my notes a question, and an LLM answers from them
+
+- **On slide:** What the app does today (MariaDB, `FULLTEXT`) against what comes next on the same server (a `VECTOR` column built in since 11.7, full-text plus vector search, the same spec-first way of working), with the accent line: one MariaDB server holds the app's data and the agent's memory.
+- **Build:** Two columns. Label it clearly as a plan, not a demo.
+- **Says:** Pays off the thought planted on slide 4 and the reason planted on slide 6. MariaDB is where I build agentic applications.
 
 ---
 
-## Beat 10: Takeaways and close (slides 19-20, ~2:00)
+## Beat 10: Takeaways and close (slides 20-21, ~2:00)
 
-### Slide 19: What to take home
+### Slide 20: What to take home
 
 - **On slide:** Six takeaways: skills, a spec with acceptance criteria, tools, name the artifact, layered guardrails, start on greenfield.
 - **Build:** Two columns of three.
 - **Says:** The portable lessons, whatever database they run. Skills, spec, and tools come first, because they are the fixes the talk showed.
 
-### Slide 20: Go build something confidently right
+### Slide 21: Go build something confidently right
 
 - **On slide:** The demo repo (Apache-2.0) and the plugins (GPL-2.0). Questions.
 - **Build:** Lead layout. The Quincy Larson line is spoken; keep it off the slide.
@@ -195,5 +201,6 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ## Still open
 
-- **Slide 18 items:** confirm the four publishing patterns to name. Current set: `llms.txt`, raw Markdown, an MCP interface, `?ask=`.
+- **Publishing patterns:** slide 18 no longer names `llms.txt`, raw Markdown, MCP interfaces, or `?ask=`. Decide whether they belong in slide 18's notes or in Q&A.
+- **Heading sweep:** rewrite the remaining terse headings as plain statements in the copy pass.
 - **Auth on the REST slide:** endpoints marked `AUTHENTICATION NOT REQUIRED` read as insecure to a DBA audience. Decide whether to name the auth path as a follow-on if asked, or leave it to Q&A.

@@ -36,7 +36,7 @@ The REST tier left the stage. The app does not consume the endpoints, and the se
 3. The server that would serve REST over HTTP is not ready yet. State that boundary in one sentence. Naming where the agent's competence stops is the talk modeling its own thesis.
 4. Spec-driven development is shown with **evidence from the run**: the drift story, real lines from the spec, and the agent's acceptance-criteria reports. Keep it a practice, not a methodology pitch.
 
-## Timed beats (~19:45)
+## Timed beats (~20:45)
 
 | #   | Beat                                    | Target | Running | What happens |
 | --- | --------------------------------------- | ------ | ------- | ------------ |
@@ -48,9 +48,9 @@ The REST tier left the stage. The app does not consume the endpoints, and the se
 | 6   | Act two: the application (Prompt 2)     | 2:30   | 14:00   | The same context reads the same spec, builds the Textual client, and reports AC-A1 to AC-A5 from both the launcher and the installed command. The three-pane app opens on the data act one loaded. Name the mode plainly: native, straight to the tables, not proof of a REST tier. The finale. Anchor 2. |
 | 7   | The REST boundary                       | 0:45   | 14:45   | The static `SHOW REST VIEWS` slide from the off-stage Prompt 3 run. The API is defined in the metadata, the server that would serve it is not ready yet, and the app does not call it. One sentence, then move on. Anchors 1 and 3. |
 | 8   | Agent security: the blocked mass delete | 1:30   | 16:15   | The real incident. `DELETE FROM notes_app.account`, no `WHERE`, cascading to five tables. The database would have run it, the account had the privilege, and the harness classifier stopped it above the grants. |
-| 9   | The bigger shift                        | 1:30   | 17:45   | Widen to the room: agents are only as good as what you write down for them. Both fixes were the same move. Maintainers write down the knowledge (skills, `llms.txt`, raw Markdown, MCP interfaces, `?ask=`), and teams write down the intent (a spec with acceptance criteria). Both are documents you can review like code. |
-| 10  | Takeaways and the Quincy callback       | 2:00   | 19:45   | Skills, a spec with acceptance criteria, and tools first, then name the artifact, layered guardrails, and greenfield first. Close by naming Quincy Larson's keynote: you will hear this thesis again this afternoon. |
-| Q&A | Q&A buffer                              | ~9:15  | ~29:00  | Fill the balance of the slot and release the room a minute early. |
+| 9   | Agent memory, and the next session      | 2:30   | 18:45   | Both fixes were the same move. An agent works from two kinds of memory: what the LLM learned in training, which you cannot change, and the agent's context, its working memory, where skills, the spec, and memory files go. When the agent does not load the knowledge, the LLM's training fills the gap. Then the foreshadow planted on slides 4 and 6: the next coding session asks the notes a question, with vector search on the same MariaDB server. A plan, not a demo. One MariaDB server holds the app's data and the agent's memory. |
+| 10  | Takeaways and the Quincy callback       | 2:00   | 20:45   | Skills, a spec with acceptance criteria, and tools first, then name the artifact, layered guardrails, and greenfield first. Close by naming Quincy Larson's keynote: you will hear this thesis again this afternoon. |
+| Q&A | Q&A buffer                              | ~8:15  | ~29:00  | Fill the balance of the slot and release the room a minute early. |
 
 ## How the time is weighted
 
