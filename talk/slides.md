@@ -181,7 +181,7 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 
 ### *Perfect time to vibe code my idea into existence...*
 
-# What usually happens: the LLM is wrong, fluently
+# The model guesses your database, fluently
 
 <div class="columns">
 <div>
@@ -218,89 +218,47 @@ That is what I mean by confidently wrong. It is not a syntax error you can see. 
 
 ---
 
-# So prototyping stalls before it starts
+# So you never reach what MariaDB actually does
 
 <div class="columns">
 <div>
 
-## Stale, MySQL-flavored knowledge
+## What the model reaches for
 
-The model reaches for MySQL habits that do not fit this schema.
+MySQL habits that do not fit this schema:
 
 - **Keys:** `BINARY(16) DEFAULT (UUID_TO_BIN(UUID(), 1))`, a MySQL 8 function MariaDB does not have, missing its `UUID` type and `UUID_v7()`
 - **Character set:** plain `utf8`, which MariaDB still reads as 3-byte `utf8mb3`, so the first emoji in a note is rejected
 - **New row back:** `LAST_INSERT_ID()`, useless for UUID keys, not `INSERT ... RETURNING`
 
-*The first things that bite when you move a schema across, not edge cases.*
-
 </div>
 <div>
 
-## Standing up the stack by hand
-
-The time you meant for the app goes to plumbing.
-
-- Which version? Docker? A container runtime?
-- Ports, credentials, teardown
-
-*An hour of setup before line one of the app.*
-
-</div>
-</div>
-
-<!--
-SPEAKER NOTES:
-
-Two things stall you here, and together they kill the momentum that makes prototyping worth doing.
-
-The first is knowledge. The model blends MariaDB and MySQL, because they share a family tree, and it reaches for the MySQL habit that does not fit. Three of them show up building this exact app. Our tables are keyed on UUIDs, and MariaDB has a native UUID type and UUID_v7 for keys that sort by time. MySQL has neither, so the model reaches for MySQL 8's recipe: a BINARY 16 column filled by UUID_TO_BIN. MariaDB has no UUID_TO_BIN, so that CREATE TABLE fails on the spot. Then the character set. The model writes plain utf8, and on MariaDB that still means the old three-byte form. Everything works until someone puts an emoji in a note, and the insert is rejected. And when the app creates a note, it needs the new id back. With a UUID key, MySQL's LAST_INSERT_ID gives you nothing, because that is an auto-increment idea. MariaDB has INSERT RETURNING, and the model does not reach for it. None of these are obscure. They are the first things that bite when you move between the two.
-
-The second is infrastructure. Before you write a single line of the actual app, you are picking a version, fighting Docker, opening ports, wiring credentials, and remembering to tear it down. That is an hour of setup standing between you and the idea.
-
-Both of them, and here is the part that stings. While you fight them, you never get to the reason you chose this database in the first place.
--->
-
----
-
-# And you never reach what MariaDB actually does
-
-<div class="columns">
-<div>
-
-## What this app could lean on
+## What the server already does
 
 - **Row history** on accounts and notebooks, from system versioning
-- **Time-ordered keys** that sort by creation and leak no row counts (`UUID_v7()`)
+- **Time-ordered keys** that leak no row counts (`UUID_v7()`)
 - **Full-text search** over title and body, no second system
 - **One default notebook**, enforced by the schema, not app code
 
 </div>
-<div>
-
-## What you build instead
-
-Left to its own knowledge, the model gives you the plain version, so you rebuild the rest by hand: triggers for history, app logic for the default rule, search bolted on the side.
-
-<span class="accent">More code, to get less than the server already does.</span>
-
 </div>
-</div>
+
+<span class="accent">You rebuild by hand what the server already does, after an hour of standing up the stack to try it on.</span>
 
 <!--
 SPEAKER NOTES:
 
-This is the part I will not lose in a talk about agents, because it is the reason any of this matters.
+Here is what that guessing costs on this exact app. The model blends MariaDB and MySQL, because they share a family tree, and it reaches for the MySQL habit. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the model writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails on the spot. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. And for the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING.
 
-MariaDB is good on its own, and this app leans on it. System versioning keeps row history on accounts and notebooks, so I do not write audit triggers or shadow tables. UUID version 7 gives me keys that sort by creation time and do not leak how many rows I have. FULLTEXT searches title and body, so I do not stand up a separate search system. And a generated column enforces one default notebook per account, so my app code never has to.
+And here is the part I will not lose in a talk about agents. The server already does the interesting work. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. Left to its own knowledge, the model uses none of it, so you rebuild it by hand, and that is after an hour of picking a version, fighting Docker, and wiring credentials just to have a server to try it on.
 
-All of that is in the server today. But left to its own knowledge, the model does not use any of it. It hands me the plain version, and I rebuild the rest by hand: triggers for history, app logic for the default rule, search bolted on the side. More code, to get less than the server already does.
-
-So the capability is there. What is missing is a way for the agent to know it and use it. That is the fixable part, and it is the turn in the story.
+The capability is there. What is missing is a way for the agent to know it and use it. That is the fixable part.
 -->
 
 ---
 
-# What if the agent already knew?
+# Fix the knowledge: skills, and tools to act on it
 
 <div class="columns">
 <div>
@@ -392,7 +350,7 @@ That is the first change. It fixes what the agent knows about MariaDB. It does n
 
 ---
 
-# Vibe coding has a second guess in it
+# Vibe coding also guesses what you meant
 
 <div class="columns">
 <div>
@@ -434,7 +392,7 @@ This is not a demo trick. It is how I work with an agent every day, and it is th
 
 ---
 
-# A spec the agent checks itself against
+# Fix the intent: a spec the agent checks itself against
 
 <div class="columns">
 <div>
@@ -539,7 +497,7 @@ That last step is the difference between a demo and a result. An agent that just
 
 ---
 
-# It wrote current MariaDB, and the data proved it
+# It wrote current MariaDB, and passed its own criteria
 
 ```sql
 CREATE OR REPLACE TABLE notes_app.note (
@@ -571,9 +529,9 @@ So the schema is real, and it is exactly the schema the app will bind to. Now we
 
 <!-- _class: lead -->
 
-# Act two: an idea you can open
+# Act two: from the same spec to an app you can open
 
-### **Spec-driven development: I wrote the PRD, the agent builds to it.**
+### **Same conversation. The prompt only picks the slice.**
 
 ```
 Build the Textual app that docs/notes_app-prd.md specifies,
@@ -595,7 +553,7 @@ Look how short the prompt is. I am not describing the app in a chat prompt. I wr
 
 ---
 
-# From a spec to a running app
+# A running app, straight to the tables
 
 <div class="watch">
 
@@ -720,41 +678,41 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 
 ---
 
-# Your agent is only as current as what you publish
+# Agents are only as good as what you write down for them
 
 <div class="columns">
 <div>
 
-## Why the agent got MariaDB right
+## Maintainers write down the knowledge
 
-Not luck: the skills. And skills are one of several ways MariaDB publishes its knowledge for agents, not only for browsers:
-
-- `llms.txt`, a map of the docs for a model
-- Raw Markdown, not HTML to parse
-- An MCP interface, so the agent calls a tool
-- `?ask=`, docs that answer a question
+- Skills, like the ai-plugins, carry it into the coding loop
+- `llms.txt`, raw Markdown, an MCP interface, and `?ask=` publish it for agents, not only for browsers
+- MariaDB's docs expose all four
 
 </div>
 <div>
 
-## You can do the same for your project
+## Teams write down the intent
 
-- MariaDB's docs run on GitBook and expose all four, and the ai-plugins carry that knowledge into the coding loop as skills
-- You cannot retrain the model. You can publish skills and an interface, so the agent reasons from your current knowledge, not a stale guess
+- A spec says what to build, never the syntax
+- Requirement IDs let a prompt point instead of restate
+- Acceptance criteria say what done looks like, so the agent checks itself
 
 </div>
 </div>
 
-**The projects agents handle well are the ones that made their knowledge reachable. That is a choice, and it is yours.**
+**You cannot retrain the model. You can write down what it needs, and review it like code.**
 
 <!--
 SPEAKER NOTES:
 
-Pull back with me for a second, because this is bigger than my notes app.
+Both fixes you saw today were the same move: write it down where an agent can read it.
 
-Ask why the agent got MariaDB right. It was not luck, and it was not a smarter model. It was the skills, and the skills are one example of a bigger habit: MariaDB publishes its knowledge in a form an agent can use. The docs run on GitBook, and they expose an llms.txt that maps the docs for a model, raw Markdown instead of HTML you have to parse, an MCP interface so the agent calls a tool instead of scraping, and an ask endpoint that answers a question directly. The ai-plugins take that same knowledge into the coding loop as skills.
+The first is knowledge, and that is on maintainers. The agent got MariaDB right because of the skills, and skills are one of several ways MariaDB publishes for agents, not only for browsers: an llms.txt that maps the docs, raw Markdown instead of HTML, an MCP interface, and an ask endpoint that answers a question. If you maintain a project, you will never retrain the model on it. You can publish what it needs to know.
 
-Here is the part for the maintainers in the room, and I think that is a lot of you. You do not get to retrain the model on your project, and you never will. But you do get to publish your knowledge where an agent can reach it, so that when someone points their agent at your thing, it reasons from what you actually shipped instead of a two-year-old guess. The projects agents handle well are the ones that made that choice. It is a choice, and it is yours.
+The second is intent, and that is on all of us. The agent built the app I meant because I wrote a spec: what to build, never the syntax, with IDs a prompt can point at and criteria that say when it is done.
+
+Neither one is a smarter model. Both are documents, and you can review them like code.
 -->
 
 ---
