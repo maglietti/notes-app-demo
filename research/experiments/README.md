@@ -8,6 +8,7 @@ Controlled runs that test what the talk claims. Each entry names the setup, the 
 | 2 | What does the LLM write from the minimal spec with no skills? | Plugin disabled, repository checkout, `talk/notes-app-spec.md` as input | [`no-skills-spec-run.sql`](../no-skills-spec-run.sql) | [`exp2-no-skills-spec.txt`](exp2-no-skills-spec.txt) |
 | 3 | What changes when the skills are loaded? | Plugin enabled, isolated directory holding only the spec, the fixture, and the launcher, with no git history | [`skills-spec-run.sql`](../skills-spec-run.sql) | [`exp3-skills-spec.txt`](exp3-skills-spec.txt) |
 | 4 | Do the DDL files from runs 2 and 3 work through the MCP tools? | Scratch sandbox, MariaDB 11.8.9 on port 3311; each file loaded with `db.execute_sql_script`, then the fixture | Results below | This log |
+| 5 | Does run 2's "safe to run more than once" hold when a fix is rerun? | Scratch sandbox; run 2's DDL and the fixture loaded, then the same DDL rerun with `note.title` widened from `VARCHAR(255)` to `VARCHAR(500)` | Results below | This log |
 
 ## Results
 
@@ -19,8 +20,11 @@ Controlled runs that test what the talk claims. Each entry names the setup, the 
    - The skills file's `SET` block restored every session setting. Rerunning the file on a loaded schema also worked: `FOREIGN_KEY_CHECKS=0` let `CREATE OR REPLACE` replace referenced parent tables, and the rerun emptied the tables, as the agent had warned.
    - Side note: `sandbox.delete` reported success but left a 49 MB `myboilerplate-mariadb-11.8.9-MariaDB` directory in the sandbox directory, which was removed by hand.
 
+5. **Without skills, a fix to the schema silently never lands.** Run 2's agent called its script "safe to run more than once". The rerun with the wider `title` raised no error: each `CREATE TABLE IF NOT EXISTS` returned only `warnings_count: 1` (the table already exists), the column stayed `VARCHAR(255)`, and all 61 notes were untouched. The skills version uses `CREATE OR REPLACE TABLE`, so a rerun applies the change (and empties the tables, as that agent warned).
+
 ## What the talk can claim
 
 - Without skills, a frontier LLM writes correct, portable SQL from a developer's spec. With skills, the agent writes MariaDB: native time-ordered UUID keys, atomic `CREATE OR REPLACE`, and indexes shaped to the queries.
+- Without skills, the agent was confidently wrong in one concrete way: it called its script safe to rerun, and a rerun silently ignores a schema fix, with only a warning count to show for it.
 - The talk no longer claims that the LLM falls back on MySQL habits. No run showed them. Smaller LLMs are untested.
 - The REST prompt's reason for one statement per call ("`db.execute_sql_script` gives each statement a fresh session") is contradicted for plain SQL. Whether the REST grammar fails through a script for another reason is untested.

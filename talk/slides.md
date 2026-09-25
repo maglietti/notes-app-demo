@@ -97,7 +97,7 @@ SPEAKER NOTES:
 
 Good morning. You just sat through two keynotes about how agents are going to change everything. For the next twenty minutes I want to do the opposite, and get specific.
 
-I gave a coding agent one job: build an app against a real MariaDB server, from the data tier up, with an API tier behind it. I assumed the LLM underneath would be confidently wrong about MariaDB, and I built the first version of this talk on that assumption. Then I tested it, and the results changed the talk. Most of the build worked, because of two changes I made to how I work with the agent. I will show you those, the one part that did not work, and the one thing that turned out to be confidently wrong.
+I gave a coding agent one job: build an app against a real MariaDB server, from the data tier up, with an API tier behind it. I expected the LLM underneath to be confidently wrong about MariaDB. It was, just not where I expected. Most of the build worked, because of two changes I made to how I work with the agent. I will show you both, and the one part that still did not work.
 
 But first, why would I even try?
 -->
@@ -177,107 +177,14 @@ And it does what you actually want a notebook to do. Search everything, full tex
 
 That is the kind of tool you keep open all day. And someday I want to ask my notes a question and get an answer back. Hold that thought, because I come back to it at the end.
 
-So I opened an agent, pointed it at MariaDB, and asked it to build exactly that.
+So I wrote down what I wanted, and handed it to an agent.
 -->
 
 ---
 
 ### *Perfect time to vibe code my idea into existence...*
 
-# A one-line prompt drifted, so I wrote a spec, and kept adding to the spec
-
-<div class="columns">
-<div>
-
-## What happened with a one-line prompt
-
-- The SQL was fine, but the names drifted: one run called the owner table `user`, not `account`
-- The app binds to those names, so a run that drifted broke the app
-
-</div>
-<div>
-
-## What happened to the spec
-
-- A spec fixed the drift
-- Then every failed run added a rule to the spec: key types, the collation, row history, index names
-- The spec grew to 288 lines
-
-</div>
-</div>
-
-<span class="accent">I never asked whether the spec was starting to do the agent's job.</span>
-
-<!--
-SPEAKER NOTES:
-
-Perfect time to vibe code my idea into existence, right? That is the moment the keynotes promised you. So that is what I did first.
-
-My first version of this demo was a one-line prompt that left the whole design to the agent. The SQL was fine. But the names drifted. One run called the owner table user instead of account. The app I build next binds to those names, so a run that picked a different name broke the app.
-
-So I did the sensible thing, and wrote a spec. That fixed the drift. And then, every time a run failed, I added a rule to the spec. The key type. The collation. Row history. The index names. You know how this goes. The spec grew to 288 lines, and it got the demo working reliably.
-
-A quick word on terms, because I use two of them all talk. By LLM I mean the language model underneath your agent. By agent I mean that LLM running inside a harness, like Claude Code or Codex, where it can read files and run tools.
-
-Here is the question I never asked while the spec was growing: was the spec starting to do the agent's job?
--->
-
----
-
-# Then I tested my own spec: with the skills turned off, the LLM still wrote current MariaDB
-
-<div class="columns">
-<div>
-
-## What my 288-line spec said
-
-```
-Primary keys: a UUID the server generates,
-in the database's native UUID type, in time
-order.
-
-The schema: utf8mb4 with the server's current
-default Unicode collation.
-
-account keeps its full row history in the
-table itself.
-```
-
-</div>
-<div>
-
-## What the LLM wrote, with no skills loaded
-
-```sql
-id  UUID NOT NULL DEFAULT UUID_v7(),
-
-COLLATE = utf8mb4_uca1400_ai_ci
-
-WITH SYSTEM VERSIONING;
-```
-
-</div>
-</div>
-
-<span class="accent">My spec was the answer key. The skills never got the chance to help.</span>
-
-<!--
-SPEAKER NOTES:
-
-Before this talk, I tested my own claims, and this is the result that changed the talk.
-
-I turned the MariaDB skills off, handed the LLM my 288-line spec, and asked for the DDL. It wrote current MariaDB. Native UUID keys, the current collation, system versioning, all of it.
-
-Now look at the left column. That is my spec. The server's native UUID type, in time order. The server's current default Unicode collation. Row history kept in the table itself. Every failed run had taught me a little more of the answer, and I had written the answer down. The LLM did not need the skills. It needed to read my spec, and my spec was the answer key.
-
-That is the part I want you to take home, whatever tools you use. A spec that grows by chasing failures drifts toward the answer. At some point you are doing the agent's job and calling it a spec. And you only find out if you test it.
-
-So I threw it out, and wrote the spec I would actually write.
--->
-
----
-
-# The spec a developer actually writes: what the app does, never how MariaDB does it
+# Instead, I wrote down what the app does, in a short spec
 
 <div class="columns">
 <div>
@@ -302,9 +209,9 @@ without changes.
 </div>
 <div>
 
-## Three rules for the spec and the prompts
+## Three rules I follow for a spec and its prompts
 
-1. **Describe behaviour, not syntax.** The skills carry the grammar.
+1. **Describe what the app does.** Leave the code to the agent.
 2. **Keep one spec and thin prompts.** A prompt picks a slice and points at the spec. The prompt never restates the spec.
 3. **Write down what done means.** Every prompt ends by checking the "Done when" list.
 
@@ -316,23 +223,23 @@ without changes.
 <!--
 SPEAKER NOTES:
 
-This is the whole spec, forty-eight lines, and here are the lines that matter. The data section says it is just me for now, and that my sample data must load without changes. That sample data is the contract: when it does not fit, the schema changes, never the data. A must-have: list the active notes, pinned first, newest first. And Done when: the schema loads, the sample data loads, and the counts come out at six notebooks, twelve tags, and sixty-one notes.
+Perfect time to vibe code my idea into existence, right? That is the moment the keynotes promised you. But I have learned to write it down first. A one-line prompt leaves every name to the agent, and then the next run picks different names and your app breaks. So I wrote a short spec, the kind you write in fifteen minutes.
 
-Notice what is missing. Not one word about key types, collations, history, or any MariaDB feature.
+Here are the lines that matter. The data section says it is just me for now, and that my sample data must load without changes. That sample data is the contract: when it does not fit, the schema changes, never the data. A must-have: list the active notes, pinned first, newest first. And Done when: the schema loads, the sample data loads, and the counts come out at six notebooks, twelve tags, and sixty-one notes.
 
-Three rules make this work. Describe behaviour, not syntax, so the skills carry the grammar. Keep one spec and thin prompts, so a prompt points at the spec instead of restating it, and nothing drifts between copies. And write down what done means, so the agent checks its own work against my definition of done, not its own.
+Three rules I follow. Describe what the app does, and leave the code to the agent. Keep one spec and thin prompts, so a prompt points at the spec instead of restating it. And write down what done means, so the agent checks its own work against my definition of done, not its own.
 
-Then I ran the test again.
+Then I handed it to an agent.
 -->
 
 ---
 
-# From that spec, the agent without skills writes generic SQL. With the skills, the agent writes MariaDB.
+# A coding agent built the schema: the SQL ran, and the agent was confidently wrong about reruns
 
 <div class="columns">
 <div>
 
-## Without skills: correct, and generic
+## What the coding agent wrote from my spec
 
 ```sql
 CREATE TABLE IF NOT EXISTS note (
@@ -342,40 +249,36 @@ CREATE TABLE IF NOT EXISTS note (
      is_pinned, created_at)
 ```
 
-- Runs on any MySQL-family server
-- A rerun keeps the old tables
+- The SQL ran, and my sample data loaded
 
 </div>
 <div>
 
-## With skills: the same spec, written for MariaDB
+## What the agent said, and what happened
 
-```sql
-CREATE OR REPLACE TABLE notes_app.note (
-  ...
-  KEY ix_note_notebook_list
-    (notebook_id, status,
-     is_pinned DESC, updated_at DESC)
-```
+> "Safe to run more than once."
 
-- An index shaped to "pinned first, newest first"
-- A rerun replaces the schema cleanly
+- I changed a column and reran the script
+- No error, only a warning count
+- The column did not change, and my fix never landed
 
 </div>
 </div>
 
-<span class="accent">Both scripts run, and both load my sample data. The skills made the agent use the database I chose.</span>
+<span class="accent">The SQL looked right, ran, and loaded my data. Nothing told me that my fix was ignored.</span>
 
 <!--
 SPEAKER NOTES:
 
-Same LLM, same forty-eight-line spec, same prompt. The only difference is whether the MariaDB skills were loaded. And then I ran both scripts against a real server.
+A quick word on terms, because I use two of them all talk. By LLM I mean the language model underneath your agent. By agent I mean that LLM running inside a harness, like Claude Code or Codex, where it can read files and run tools.
 
-Without skills, the LLM wrote correct SQL. I want to be fair about that. It loaded, and my sample data loaded into it. But it is generic SQL that would run on any server in the MySQL family. Look at the index for the note list. The spec says pinned first, newest first, and this index is ascending on every column. And the script creates tables only if they do not exist, so running it again after a fix quietly keeps the old tables.
+So I gave my spec to a coding agent, the way most people start, and asked for the schema. And I want to be fair: the SQL was correct. It ran, and my sample data loaded into it.
 
-With the skills, the agent wrote for MariaDB. CREATE OR REPLACE, so a rerun replaces the schema cleanly. An index with pinned and updated descending, shaped to exactly the order the spec asks for. Keys and defaults chosen from current MariaDB, not from the lowest common denominator.
+And the agent told me something with total confidence: this script is safe to run more than once. So I tested that the way you would in real life. I changed a column, the way you do after the first bug report, and ran the script again. No error. Just a warning count. And the column did not change. The script creates each table only if it does not already exist, so every fix I make after the first run is silently ignored.
 
-Both work. That is the honest finding. The skills did not fix broken SQL. They made the agent use the database I chose, instead of any database. That is the first of the two changes: the right knowledge. The second is the spec you just saw.
+That is what confidently wrong looks like. Not a syntax error. SQL that looks right, runs, loads your data, and quietly ignores your fix.
+
+So I went looking for help.
 -->
 
 ---
@@ -409,13 +312,13 @@ Both work. That is the honest finding. The skills did not fix broken SQL. They m
 <!--
 SPEAKER NOTES:
 
-Here is what made the difference on that last slide, and what let me test it at all.
+I went looking for two things: a way for the agent to know current MariaDB, and a way for the agent to check its own work.
 
 The first piece is skills. A skill carries the current MariaDB grammar, the order the statements have to run in, and the failure modes the docs leave out. MariaDB curates them, and a plugin installs them. When a task needs one, the agent loads it into its context, its working memory for the session. No fine-tuning. The LLM underneath does not change at all. And skills work offline, because knowledge does not need a database attached.
 
-The second piece is tools. An MCP server gives the agent a live connection. It can run SQL, read the schema, run EXPLAIN, and when you have no database yet, deploy a sandbox. That is how I ran both scripts against a real server a moment ago, instead of trusting that they looked right.
+The second piece is tools. An MCP server gives the agent a live connection. It can run SQL, read the schema, run EXPLAIN, and when you have no database yet, deploy a sandbox. That is how I found the ignored fix: by running the script against a real server, not by reading it.
 
-You need both. Knowledge without a connection gives you better code that you still copy and run by hand. A connection without the knowledge gives you generic SQL, run faster. With both, the agent writes the statement, runs it, reads the result, and fixes what broke.
+You need both. Knowledge without a connection gives you better code that you still copy and run by hand. A connection without the knowledge runs confident SQL faster, including SQL that ignores your fix. With both, the agent writes the statement, runs it, reads the result, and fixes what broke.
 
 So where do you get both?
 -->
@@ -467,7 +370,7 @@ Two commands to install. Add the marketplace, install the plugin. It runs in Cla
 
 Three things to expect, because I promised you specifics. The skills work the moment you install them, offline, because knowledge needs no database. The MCP server takes one setup step, where you tell it what it is allowed to touch. And when you have nothing, the sandbox deploys a real MariaDB server for you, with no Docker and no root. That is why the demo you are about to watch starts with no database and no app code.
 
-So here are the two changes together: the forty-eight-line spec, and an agent with the skills and the tools. Watch it build the app.
+So here are both changes together: the same forty-eight-line spec, and now an agent with the skills and the tools. Watch it build.
 -->
 
 ---
@@ -531,35 +434,55 @@ That last step is the difference between a demo and a result. An agent that only
 
 ---
 
-# The agent wrote current MariaDB, and passed its own criteria
+# Same spec, now with skills: the agent wrote MariaDB, and a rerun applies the fix
+
+<div class="columns">
+<div>
+
+## Before: the agent without skills
+
+```sql
+CREATE TABLE IF NOT EXISTS note (
+  ...
+  KEY ix_note_notebook_list
+    (notebook_id, status,
+     is_pinned, created_at)
+```
+
+</div>
+<div>
+
+## After: the agent with the skills
 
 ```sql
 CREATE OR REPLACE TABLE notes_app.note (
-  id      uuid  NOT NULL DEFAULT uuid_v7(),
-  status  enum('active','archived','trashed') NOT NULL DEFAULT 'active',
-  FULLTEXT KEY ft_note_title_body (title, body)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  ...
+  KEY ix_note_notebook_list
+    (notebook_id, status,
+     is_pinned DESC, updated_at DESC)
 ```
 
-- `CREATE OR REPLACE TABLE`, `utf8mb4`, and the current `uca1400` collation
-- A `uuid_v7()` primary key and a `FULLTEXT` index in the `note` table
-- The fixture loaded, and the counts matched the spec: 61 notes, 6 notebooks, 12 tags
-- The LLM's training did not change. The agent's context did: the skills and the spec
+</div>
+</div>
 
-<span class="accent">The spec says what the app stores, never the syntax. The MariaDB grammar is the agent's own work.</span>
+- A rerun replaces the schema, so a fix lands
+- The index follows the spec's order: pinned first, newest first
+- The counts matched the spec: 61 notes, 6 notebooks, 12 tags
+
+<span class="accent">Same LLM, same spec. The skills changed the agent's context, and the agent used the database I chose.</span>
 
 <!--
 SPEAKER NOTES:
 
-Now look at what the agent actually wrote, because this is the payoff of act one.
+[UPDATE FROM THE RECORDED RUN: match the right-hand DDL to what the agent wrote on stage. The lines shown come from the same spec with the skills loaded, in research/skills-spec-run.sql.]
 
-[UPDATE FROM THE RECORDED RUN: name the idioms the agent actually wrote, and match the DDL snippet on the slide to it.] CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys that default to uuid_v7. A FULLTEXT index for search.
+Here is the before and after. Same LLM. Same forty-eight-line spec. The difference is that the agent now has the MariaDB skills.
 
-This is the same result as the skills run I showed you earlier, now in the live demo. The spec never mentions key types, collations, or any MariaDB feature. It says one account, notebooks, notes, and tags, and that my sample data must load. Every MariaDB idiom on this slide is the agent's choice.
+On the left, the agent before the skills: create the table only if it does not exist, and an ascending index. Now that I can put the two side by side, I can see something I could not see before. The first version was portable SQL that would run almost anywhere in the MySQL family. On the right, with the skills: CREATE OR REPLACE, so when I fix a column and run it again, the fix lands. It replaces the data too, and the agent told me that up front. And an index with pinned and updated descending, shaped to exactly the order the spec asks for, pinned first, newest first.
 
-Compare it with the run without skills. Not the LLM changed. Its training is exactly the same. What changed is the agent's context: the skills for the grammar, and the spec for the intent. Then the agent proved the result against the spec. The server accepted the DDL, sixty-one notes loaded, and every criterion passed.
+The spec never mentions any of this. Every MariaDB choice on the right is the agent's, made with a skill in its context. The LLM's training did not change. What changed is what the agent had to work with.
 
-So the schema is real, and it is exactly the schema the app will bind to. Now we build on it.
+Then the agent checked itself against the spec. The server accepted the DDL, sixty-one notes loaded, and the counts matched. So the schema is real, and it is exactly the schema the app will bind to. Now we build on it.
 -->
 
 ---
@@ -750,8 +673,6 @@ An agent works from two kinds of memory. The first is what the LLM learned in tr
 The second is the agent's context, its working memory for the session. That is where the skills go, with the current MariaDB grammar. That is where my spec goes, with what to build and how to check it. And that is where my own corrections go. Here is a real one. While I built this talk, I corrected the agent three times on how to write these slides: no dangling pronouns, say LLM or agent instead of model, and plain headings. Each time, the agent wrote the rule into its memory files, so the next session started with the rule in place. I taught it once, not every session.
 
 You write, review, and version all three like code. And here is the honest flip side: when the agent does not load that knowledge, the LLM's training fills the gap, and you are back to generic SQL.
-
-And test what you write down, because written memory can be confidently wrong too. My own repo notes said that the script tool gives every statement a fresh database session. I built rules on that note, and I put those rules in my spec. When I finally ran the scripts, the note was wrong. Of everything in this project, that was the one thing that turned out to be confidently wrong. Not the LLM. My own writing, until I ran it.
 -->
 
 ---
@@ -801,12 +722,12 @@ This is the other reason I picked MariaDB, the one I promised to come back to. M
 
 1. **Skills make the agent write for your database, not for any database.** Without them, a frontier LLM writes correct, generic SQL. The ai-plugins load MariaDB's knowledge into the agent's context, in the harness you already use.
 2. **Write a spec, and end the spec in acceptance criteria.** The spec stops the agent guessing about your app, and the criteria let the agent check its own work. Unlike a chat prompt, your team can review a spec.
-3. **Give the agent tools to run against.** The MCP server opens a live connection and deploys a sandbox, so the agent runs its SQL and fixes what broke. When a run fails, wrong SQL points to missing knowledge, and a blocked connection points to the tools.
+3. **Give the agent tools to run against.** The MCP server opens a live connection and deploys a sandbox, so the agent runs its SQL and fixes what broke. Running it is how you catch a fix that never landed. When a run fails, wrong SQL points to missing knowledge, and a blocked connection points to the tools.
 
 </div>
 <div>
 
-4. **Test your spec with the skills turned off.** If the agent gets it right anyway, your spec has become the answer key. Name the files you want, and number the steps when the order matters.
+4. **Name the artifact, not the outcome.** Ask for the schema, the DDL file, the running app, and number the steps when the order matters.
 5. **Set all three guardrails.** The working-directory allow-list, the harness action classifier, and the database grants each get a veto, so you do not rely on the agent's judgment.
 6. **Start on greenfield.** The loop is fast and no existing code is at risk. Build your confidence where the blast radius is smallest, then take that confidence into harder work.
 
@@ -824,7 +745,7 @@ Two. Write a spec, and end it in acceptance criteria. The spec stops the agent g
 
 Three. Give the agent tools to run against. The MCP server opens a live connection and can deploy a sandbox, so the agent runs its own SQL and fixes what broke, instead of handing you code to paste. And when a run fails, the split tells you where to look. Generic or wrong SQL means the LLM hit the edge of its training, so the agent needs a skill. A refused connection or a blocked path is a tools setting to fix.
 
-Four. Test your spec with the skills turned off. If the agent gets it right anyway, your spec has become the answer key, and you are doing the agent's job. And when you prompt, name the files you want, and number the steps when the order matters.
+Four. Name the artifact you want. Ask for the schema, the DDL file, the running app, not the outcome you imagine, and number the steps when the order matters.
 
 Five. Set all three guardrails. The working-directory allow-list, the harness action classifier, and the database grants each get a veto. Then you do not rely on the agent's judgment to stay safe.
 
@@ -851,13 +772,13 @@ Six. Start on greenfield. The loop is fast and no existing code is at risk. Buil
 <!--
 SPEAKER NOTES:
 
-Good ideas are crazy until they're not. That was Larry Page, at the start. You just watched most of one stop being crazy. An agent built a real data tier and a working app on top of it, because it had the knowledge, the connection, and a spec that said what right looks like. I showed you the part that is still crazy: an API tier that is defined, and not yet served. And I showed you what was actually confidently wrong in this project. Not the LLM. My own writing: a spec that had quietly become the answer key, and a note nobody had tested.
+Good ideas are crazy until they're not. That was Larry Page, at the start. You just watched most of one stop being crazy. An agent built a real data tier and a working app on top of it, because it had the knowledge, the connection, and a spec that said what right looks like. I showed you the part that is still crazy: an API tier that is defined, and not yet served. And I showed you where the agent was confidently wrong: a script it called safe to rerun, that quietly ignored my fix, until I ran it.
 
 One idea, one spec, one conversation, from no app code to a running app that passed its own acceptance criteria, with the boundary named out loud along the way.
 
-Everything you saw is public. The demo, the exact prompts, the spec, the schema, and every experiment behind these slides are in the first repo, Apache-2.0. The plugins are in the second, GPL-2.0, so you can read every skill and write your own.
+Everything you saw is public. The demo, the exact prompts, the spec, the schema, and the experiments behind these slides are in the first repo, Apache-2.0. The plugins are in the second, GPL-2.0, so you can read every skill and write your own.
 
-One last thing before questions. This afternoon Quincy Larson closes the day with a keynote called How to Use Scaffolding to Make Your Coding Agents Less Dumb. That is this same idea, on a much bigger stage than mine, hours from now. You heard it here first, at ten-thirty, with a live database. Go see him. Then go write a spec for your next idea, test it with the skills turned off, and run everything you write down.
+One last thing before questions. This afternoon Quincy Larson closes the day with a keynote called How to Use Scaffolding to Make Your Coding Agents Less Dumb. That is this same idea, on a much bigger stage than mine, hours from now. You heard it here first, at ten-thirty, with a live database. Go see him. Then go write a short spec for your next idea, keep it about behaviour, and run everything the agent writes.
 
 Questions.
 -->
