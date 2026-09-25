@@ -1,8 +1,8 @@
 # Notes App demo
 
-This repository holds the runbook for a live demo. One coding agent, handed the MariaDB skills and a live database over the Model Context Protocol, turns a product doc into a note-taking schema, deploys a throwaway MariaDB server, runs the schema against it, and seeds it. The same agent then builds a Textual client, on the Python terminal-UI framework, that runs on the result, so the work the agent did is something you can open and use rather than just read. An optional third prompt puts a REST API in front of the schema.
+This repository holds the runbook for a live demo. One coding agent, handed the MariaDB skills and a live database over the Model Context Protocol, turns a short spec into a note-taking schema, deploys a throwaway MariaDB server, runs the schema against it, and seeds it. The same agent then builds a Textual client, on the Python terminal-UI framework, that runs on the result, so the work the agent did is something you can open and use rather than just read. An optional third prompt puts a REST API in front of the schema.
 
-The talk it supports is *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*, in the Databases track at All Things Open 2026. The specification the agent builds from, with its acceptance criteria, lives in [`docs/notes_app-prd.md`](docs/notes_app-prd.md), and the three prompts that drive the run are collected in [`docs/demo-prompts.md`](docs/demo-prompts.md), inlined below at the step where each one belongs. The prompts originate in the talk's cue card, [`talk/demo-cue-card.md`](talk/demo-cue-card.md), so change them there first.
+The talk it supports is *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*, in the Databases track at All Things Open 2026. The spec the agent builds from lives in [`talk/notes-app-spec.md`](talk/notes-app-spec.md). It is deliberately minimal, the one a developer writes to take an idea to a working app. The three prompts that drive the run are collected in [`docs/demo-prompts.md`](docs/demo-prompts.md), inlined below at the step where each one belongs. The prompts originate in the talk's cue card, [`talk/demo-cue-card.md`](talk/demo-cue-card.md), so change them there first.
 
 ## Repository layout
 
@@ -15,7 +15,6 @@ The repository tracks the instructions, and nothing else. This is the committed 
 ├── bin/
 │   └── notes-app              stable launcher for the generated app
 ├── docs/
-│   ├── notes_app-prd.md       the spec: schema, REST surface, app, acceptance criteria (agent input)
 │   ├── demo-prompts.md        the three prompts on their own
 │   ├── stack-layering.md      how the pieces relate
 │   └── decisions.md           the choices behind the demo
@@ -23,8 +22,11 @@ The repository tracks the instructions, and nothing else. This is the committed 
 │   ├── synthetic_data.sql     the seed fixture Prompt 1 loads (agent input)
 │   ├── notes_app.sql          reference schema, frozen from an earlier agent run; the prompts do not read it
 │   ├── notes_app-er.*         the reference schema's ER diagram
+│   ├── notes_app-prd.md       the earlier, over-informed PRD, kept for comparison; the prompts do not read it
+│   ├── no-skills-run.sql      DDL from a no-skills run against that PRD, the evidence it was too informed
 │   └── agent-security-note.md the blocked mass-delete talking point
 └── talk/                      the talk that uses this demo
+    ├── notes-app-spec.md      the spec: what the app does and when it is done (agent input)
     ├── demo-cue-card.md       the operating sheet, and the source of truth for the prompts
     ├── run-of-show.md         the timed beats
     ├── outline.md             the slide-by-slide plan
@@ -40,7 +42,7 @@ working/                                      schema, RUN_LOG, sandbox datadir (
 .venv/                                        the app's virtual environment
 ```
 
-A run never dirties the committed tree, so `git clean -fdx` returns it to a clean, re-runnable state. During a run the agent reads the product doc and the seed fixture, builds the `notes_app` package at the repository root, and writes its working files under `working/`.
+A run never dirties the committed tree, so `git clean -fdx` returns it to a clean, re-runnable state. During a run the agent reads the spec and the seed fixture, builds the `notes_app` package at the repository root, and writes its working files under `working/`.
 
 ## The stack, in three layers
 
@@ -82,7 +84,7 @@ The tell is not the primary key type, because the skill picks that by domain: an
 
 ## Step 2: Configure the MCP server
 
-The server starts out allowed to reach nothing, so point it at this repository root, which lets it read `docs/` and `research/`, write `working/`, and reach the sandbox it deploys:
+The server starts out allowed to reach nothing, so point it at this repository root, which lets it read the spec and the fixture, write `working/`, and reach the sandbox it deploys:
 
 ```bash
 mariadb-shell -- mcp setup
@@ -92,48 +94,48 @@ If `mariadb-shell` is not on your `PATH`, use the copy the plugin installed at `
 
 ## Step 3: Build and seed the data tier
 
-Run the agent from the repository root and give it Prompt 1. The agent turns the data model in section 4 of the product doc into DDL in `working/notes_app.sql`. It deploys a sandbox on port 3310, runs the schema, loads the seed fixture, and logs each step to `working/RUN_LOG.md`.
+Run the agent from the repository root and give it Prompt 1. The agent turns the data model in the spec into DDL in `working/notes_app.sql`. It deploys a sandbox on port 3310, runs the schema, loads the seed fixture, and logs each step to `working/RUN_LOG.md`.
 
 ```text
 Work in this repository and complete every step in order. Write your files to
 working/, and append a short record of each step to working/RUN_LOG.md.
 
-1. Turn the data model in section 4 of docs/notes_app-prd.md into MariaDB DDL
-   for the notes_app schema, saved as working/notes_app.sql.
+1. Turn the data model in talk/notes-app-spec.md into MariaDB DDL for the
+   notes_app schema, saved as working/notes_app.sql. Work from the spec alone:
+   do not read research/notes_app.sql or research/notes_app-prd.md.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
 3. Seed it by loading research/synthetic_data.sql with db.execute_sql_script.
    The fixture is the data contract: if it fails, fix working/notes_app.sql and
    redeploy. Never edit the fixture.
-4. Check the result against AC-D1 to AC-D4 in section 11 of the PRD, and report
-   each one as passed or failed with its evidence.
+4. Check the result against the first "Done when" item in the spec, and report
+   each table's row count.
 ```
 
 The first deploy on a machine with no local MariaDB server downloads the 11.8 server package, a few hundred megabytes, and later deploys reuse the cached copy.
 
-**Check.** The agent reports AC-D1 to AC-D4 in PRD section 11 as passed. The tables match the six tables and one view in PRD section 4, and the seed gives you 61 notes, made up of 48 active with 6 pinned, 7 archived, and 6 trashed, alongside 6 notebooks and 12 tags. That is enough to exercise the archive and trash views, pinned sorting, tag filtering, full-text search, and pagination past the 25-per-page default. Look for the current-MariaDB idioms in `working/notes_app.sql`: `CREATE OR REPLACE TABLE`, `utf8mb4` with a `uca1400` collation, system versioning on `account` and `notebook`, `UUID` keys generated by `UUID_v7()`, and a `FULLTEXT` index over the note title and body. A schema fix that the fixture forces is a finding, not a failure: the data contract doing its job.
+**Check.** The five tables in the spec exist, and the seed gives you 61 notes, made up of 48 active with 6 pinned, 7 archived, and 6 trashed, alongside 6 notebooks and 12 tags. That is enough to exercise the archive and trash views, pinned sorting, tag filtering, full-text search, and pagination past the 25-per-page default. The spec names no MariaDB features, so read `working/notes_app.sql` to see what the agent chose. With the skills loaded, expect current idioms such as `CREATE OR REPLACE TABLE`, `utf8mb4` with a `uca1400` collation, `UUID` keys generated by `UUID_v7()`, and a `FULLTEXT` index over the note title and body. The exact set varies from run to run. A schema fix that the fixture forces is a finding, not a failure: the data contract doing its job.
 
 ## Step 4: Build the client
 
-Give the agent Prompt 2. It reads the design from [`docs/notes_app-prd.md`](docs/notes_app-prd.md), builds the Textual app as a package at the repository root in native mode, and runs it on the data Step 3 loaded.
+Give the agent Prompt 2. It reads the spec, builds the Textual app at the repository root so that `bin/notes-app` runs it, and runs it on the data Step 3 loaded.
 
 ```text
-Build the Textual app that docs/notes_app-prd.md specifies, in native mode only.
-Skip RestDataSource and NOTES_APP_MODE (PRD build order step 7).
+Build the app that talk/notes-app-spec.md describes, on the schema in
+working/notes_app.sql. Build every Must have, and leave the Later items.
 
-- Scope: every Must in section 6, the three-pane layout in section 7,
-  NativeDataSource behind the section 9 DataSource interface, and the
-  packaging and config in section 10.
-- Bind the queries to the columns in working/notes_app.sql, the schema this
-  session built.
+- bin/notes-app is the committed launcher. Read it, and make the app work
+  with it.
+- Write .env with the sandbox password demo-pw, plus a .env.example, at the
+  repository root.
 - Keep working/ for the schema, run log and sandbox only.
 
-Check the app against AC-A1 to AC-A5 in section 11, and record each command and
-its result in working/RUN_LOG.md.
+Check the app against the "Done when" items in the spec, and record each
+command and its result in working/RUN_LOG.md.
 ```
 
-**Check.** The agent reports AC-A1 to AC-A5 as passed. Both entry points start the app. The left pane lists the six notebooks, the middle pane shows the notes with the pinned ones sorted to the top, and the status line reads `native` alongside the sandbox address. The console-script check catches a packaging failure that the launcher cannot: the repository gitignores `notes_app/`, and a build backend that honours `.gitignore` installs the project with no code in it.
+**Check.** `bin/notes-app` starts the app. The left pane lists the six notebooks, the middle pane shows the notes with the pinned ones sorted to the top, and the status line shows where the app is connected.
 
 ## Step 5: Run the client
 
@@ -155,20 +157,26 @@ Give the agent Prompt 3 when you want the REST tier the talk's title names. The 
 Continue against the sandbox on port 3310. Keep database files in working/, and
 append each step's result to working/RUN_LOG.md. Complete the steps in order.
 
-1. Build the REST Service in section 5 of the PRD (API-1 to API-6). Save the
-   REST DDL to working/notes_app_rest.sql, but run it with db.execute_sql one
-   statement at a time: the REST grammar is session state, and
-   db.execute_sql_script gives each statement a fresh session.
-2. Check it against AC-R1 to AC-R3 in section 11, and log the SHOW REST output.
-   If the nested tag objects did not come back read-only, log it and move on:
-   do not patch the REST metadata.
-3. Add RestDataSource and NOTES_APP_MODE (PRD build order step 7) beside
-   NativeDataSource, with the REST settings in CF-4.
-4. Check both modes against AC-R4 and AC-R5. No router is running, so REST mode
-   must report the connection error and stay up. Log both runs.
+1. Put a MariaDB REST Service in front of the notes_app schema: service
+   /notesApp, schema /notes, and three views. /note allows read, insert,
+   update and delete, and nests each note's tag names read-only. /notebook
+   allows read, insert and update. /tag is read-only. Mark every view
+   AUTHENTICATION NOT REQUIRED, because this is a local demo. Save the DDL to
+   working/notes_app_rest.sql, but run it with db.execute_sql one statement at
+   a time: the REST grammar is session state, and db.execute_sql_script gives
+   each statement a fresh session.
+2. Publish the service. Confirm with SHOW REST SERVICES, SCHEMAS and VIEWS that
+   every endpoint exists, and log the output. Run SHOW CREATE REST VIEW /note
+   and report whether the nested tag objects came back read-only. If they did
+   not, log it and move on: do not patch the REST metadata.
+3. Add a REST backend to the app beside the native one, selected by
+   NOTES_APP_MODE (default native), and show the active mode on the status line.
+4. Run bin/notes-app in native mode, then with NOTES_APP_MODE=rest. No server is
+   serving the endpoints, so REST mode must show the connection error and stay
+   up. Log both runs.
 ```
 
-**Check.** The agent reports AC-R1 to AC-R5, with AC-R2 expected to show the mismatch below. `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. On mariadb-shell 26.9.3, expect the agent to report that `SHOW CREATE REST VIEW /note` shows the nested tag objects as writable: the shell stores them with the parent view's operations whatever the DDL says (PRD section 13). The endpoints exist in the metadata before any router serves them over HTTP, and reading that metadata is how the talk confirms the tier is real. With `NOTES_APP_MODE=rest ./bin/notes-app`, the status line names `rest` and the service root, shows the connection error, and the app stays up.
+**Check.** `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. On mariadb-shell 26.9.3, expect the agent to report that `SHOW CREATE REST VIEW /note` shows the nested tag objects as writable: the shell stores them with the parent view's operations whatever the DDL says (see `docs/decisions.md`, "REST tier"). The endpoints exist in the metadata before any router serves them over HTTP, and reading that metadata is how the talk confirms the tier is real. With `NOTES_APP_MODE=rest ./bin/notes-app`, the status line names `rest` and the service root, shows the connection error, and the app stays up.
 
 ### REST mode needs a router
 
@@ -225,11 +233,13 @@ Because the repository tracks only the instructions, `git clean -fdx` clears eve
 ## Files
 
 - [`bin/notes-app`](bin/notes-app) is the stable launcher for the client.
-- [`docs/notes_app-prd.md`](docs/notes_app-prd.md) is the specification the agent builds from: the schema, the REST surface, the app, its packaging, and the acceptance criteria each prompt checks against.
+- [`talk/notes-app-spec.md`](talk/notes-app-spec.md) is the spec the agent builds from: what the app does, the tables the sample data expects, and when the app is done.
 - [`docs/demo-prompts.md`](docs/demo-prompts.md) collects the three prompts on their own.
 - [`docs/stack-layering.md`](docs/stack-layering.md) explains how the layers relate.
 - [`docs/decisions.md`](docs/decisions.md) records the choices behind the demo and why.
-- [`research/notes_app.sql`](research/notes_app.sql) is the reference schema, frozen from an earlier agent run. The prompts do not read it: the agent writes its own from PRD section 4. Use it to load the tier without an agent, or to compare against a run.
+- [`research/notes_app.sql`](research/notes_app.sql) is the reference schema, frozen from an earlier agent run. Prompt 1 tells the agent not to read it, so the agent writes its own from the spec. Use it to load the tier without an agent, or to compare against a run.
+- [`research/notes_app-prd.md`](research/notes_app-prd.md) is the earlier PRD, which grew by chasing failed runs until it described the answer. It is kept for comparison, and Prompt 1 tells the agent not to read it.
+- [`research/no-skills-run.sql`](research/no-skills-run.sql) is the DDL an agent wrote from that PRD with the skills turned off. It is current MariaDB, which showed that the PRD, not the skills, was doing the work.
 - [`research/synthetic_data.sql`](research/synthetic_data.sql) is the seed fixture that Prompt 1 loads.
 - [`research/agent-security-note.md`](research/agent-security-note.md) is the blocked mass-delete talking point.
 - [`research/notes_app-er.md`](research/notes_app-er.md) is the reference schema's ER diagram.

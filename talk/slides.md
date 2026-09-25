@@ -378,9 +378,9 @@ That is the first change. It fixes what the agent knows about MariaDB. It does n
 ## What a spec gives the agent instead
 
 - One document, written once, reviewed like code, and read by the agent on every run
-- What each column must do, never the syntax
-- An ID on every requirement, so a prompt can point at it
-- Acceptance criteria that say what done looks like
+- What the app stores and does, never the syntax
+- A numbered must-have list, so a prompt can point at it
+- A "Done when" list that says what done looks like
 
 </div>
 </div>
@@ -394,7 +394,7 @@ Back to that vibe-coding moment, because a second guess hides in it, and a skill
 
 My first version of act one was a one-line prompt that left the whole design to the agent. The SQL was fine. Current MariaDB, the skills did their job. But the names drifted. One run called the owner table user instead of account. The app I build next binds to those names, so a run that picked a different name broke the app. Nothing was wrong with the SQL. The agent guessed what I meant, and it guessed confidently. Same failure, one layer up.
 
-So I stopped describing the app in a chat window, and wrote a spec. One short document, reviewed like code, that the agent reads on every run. It says what each column must do, never the syntax, so the MariaDB grammar is still the agent's job. Every requirement has an ID, so a prompt can point at exactly the part it wants. And it ends in acceptance criteria: a written-down answer to the question an agent otherwise answers for itself. Am I done?
+So I stopped describing the app in a chat window, and wrote a spec. One short document, reviewed like code, that the agent reads on every run. It says what the app stores and what it does, never the syntax, so the MariaDB grammar is still the agent's job. The must-haves are numbered, so a prompt can point at them. And it ends with a short list called Done when: a written-down answer to the question an agent otherwise answers for itself. Am I done?
 
 This is how I work with an agent every day, and it is the second change.
 -->
@@ -409,14 +409,18 @@ This is how I work with an agent every day, and it is the second change.
 ## Real lines from the spec in the repo
 
 ```
-FR-4  (Must) List active notes in the selected
-      notebook, pinned first and newest next.
+## Data
+It is just me for now, one account. The sample
+data in research/synthetic_data.sql must load
+without changes.
 
-AC-D3 The fixture loads with no edits. When it
-      fails, the schema changes, never the fixture.
+## What the app does
+2. List the active notes in a notebook, pinned
+   first, newest first
 
-AC-D4 1 account, 6 notebooks, 12 tags, 61 notes:
-      48 active (6 pinned), 7 archived, 6 trashed.
+## Done when
+- The schema loads, and the sample data loads
+  into it: 6 notebooks, 12 tags, 61 notes
 ```
 
 </div>
@@ -425,8 +429,8 @@ AC-D4 1 account, 6 notebooks, 12 tags, 61 notes:
 ## Three rules for the spec and the prompts
 
 1. **Describe behaviour, not syntax.** The skills carry the grammar.
-2. **Keep one spec and thin prompts.** A prompt picks a slice and points at IDs. The prompt never restates the spec.
-3. **Write down what done means.** Every prompt ends with "report against the acceptance criteria."
+2. **Keep one spec and thin prompts.** A prompt picks a slice and points at the spec. The prompt never restates the spec.
+3. **Write down what done means.** Every prompt ends by checking the "Done when" list.
 
 </div>
 </div>
@@ -438,11 +442,11 @@ SPEAKER NOTES:
 
 Here is what that looks like, straight from the spec in the repo.
 
-A functional requirement, with an ID and a priority: list active notes, pinned first, newest next. And two acceptance criteria from the data tier. The fixture loads with no edits, and when it fails, the schema changes, never the fixture. And the exact counts the agent must see when it is done. Sixty-one notes, forty-eight active, six of them pinned.
+It is short, and I wrote it the way I would write any first spec. The data section says it is just me for now, and that my sample data must load without changes. That sample data is the contract: when it does not fit, the schema changes, never the data. A must-have: list the active notes, pinned first, newest first. And Done when: the schema loads, the sample data loads, and the counts come out at six notebooks, twelve tags, and sixty-one notes. Notice what is missing. Not one word about UUIDs, collations, or MariaDB features.
 
-Three rules make this work. Describe behaviour, not syntax, so the skills still carry the grammar. Keep one spec and thin prompts, so a prompt picks a slice and points at IDs, and nothing drifts between copies. And write down what done means, so every prompt ends by asking the agent to report against the criteria. The agent grades its own work against my definition of done, not its own.
+Three rules make this work. Describe behaviour, not syntax, so the skills still carry the grammar. Keep one spec and thin prompts, so a prompt picks a slice and points at the spec, and nothing drifts between copies. And write down what done means, so every prompt ends by checking the Done when list. The agent grades its own work against my definition of done, not its own.
 
-One more thing, and check me on it, because it is all public. The spec does not link the reference schema I froze from an earlier run. The agent never sees an answer key. It writes its own schema, every time. Let me show you.
+One more thing, and check me on it, because it is all public. The spec does not link the reference schema I froze from an earlier run, and the prompt tells the agent not to read it. The agent never sees an answer key. It writes its own schema, every time. Let me show you.
 -->
 
 ---
@@ -456,13 +460,13 @@ One more thing, and check me on it, because it is all public. The spec does not 
 ```
 Work in this repository and complete every step in order.
 
-1. Turn the data model in section 4 of docs/notes_app-prd.md
-   into MariaDB DDL in working/notes_app.sql.
+1. Turn the data model in talk/notes-app-spec.md into
+   MariaDB DDL in working/notes_app.sql.
 2. Deploy a MariaDB 11.8 sandbox on port 3310 and run the DDL.
 3. Seed it with research/synthetic_data.sql. If the fixture
    fails, fix the schema. Never edit the fixture.
-4. Check the result against the acceptance criteria
-   AC-D1 to AC-D4, and report each one.
+4. Check the result against the spec's "Done when" list,
+   and report each table's row count.
 ```
 
 <!--
@@ -470,7 +474,7 @@ SPEAKER NOTES:
 
 Act one. I want to be straight about what is scripted, because honesty is the whole talk. This is the prompt I ran, trimmed to fit the slide. The full text is in the repo.
 
-Notice what it says. It names the files it wants, it numbers the steps, and it says do them in order. That is how you phrase a prompt so the work lands. It points at the spec instead of restating it. The agent's job is to turn section 4 into DDL, deploy a server, run the DDL, and prove the schema by loading real data. If the data does not fit, the schema changes, never the data. And the last step is the one you just saw: check the result against the acceptance criteria, and report each one.
+Notice what it says. It names the files it wants, it numbers the steps, and it says do them in order. That is how you phrase a prompt so the work lands. It points at the spec instead of restating it. The agent's job is to turn the data model into DDL, deploy a server, run the DDL, and prove the schema by loading real data. If the data does not fit, the schema changes, never the data. And the last step is the one you just saw: check the result against the Done when list.
 
 Watch what the agent does with it.
 -->
@@ -486,7 +490,7 @@ Watch what the agent does with it.
 1. **Reads** the data model in the spec and **writes** the DDL
 2. **Deploys** a MariaDB sandbox on port 3310, with no Docker and no root
 3. **Runs** the DDL over MCP against that live server
-4. **Loads 61 real notes** as the data contract, and **reports** against AC-D1 to AC-D4
+4. **Loads 61 real notes** as the data contract, and **checks** the counts against the spec
 
 </div>
 
@@ -497,7 +501,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT ONE]
 
-Four things happen here. The agent reads the data model out of my spec and writes the DDL. It deploys a MariaDB sandbox on port 3310, and notice there was no Docker step and no container. I cached the server download ahead of time so you are not watching a progress bar, but the server itself did not exist until the agent deployed it. It runs the DDL over the connection against that live server. Then it loads sixty-one real notes, the fixture the app depends on, and checks the counts against the acceptance criteria in my spec.
+Four things happen here. The agent reads the data model out of my spec and writes the DDL. It deploys a MariaDB sandbox on port 3310, and notice there was no Docker step and no container. I cached the server download ahead of time so you are not watching a progress bar, but the server itself did not exist until the agent deployed it. It runs the DDL over the connection against that live server. Then it loads sixty-one real notes, the fixture the app depends on, and checks the counts against the Done when list in my spec.
 
 That last step is the difference between a demo and a result. An agent that only prints code hands you a review task. This one ran its own code against a real database, made real data prove it, and graded the result against my definition of done.
 
@@ -518,19 +522,19 @@ CREATE OR REPLACE TABLE notes_app.note (
 
 - `CREATE OR REPLACE TABLE`, `utf8mb4`, and the current `uca1400` collation
 - A `uuid_v7()` primary key and a `FULLTEXT` index in the `note` table
-- The fixture loaded, and the agent's report passed AC-D1 to AC-D4: 61 notes, 6 notebooks, 12 tags
+- The fixture loaded, and the counts matched the spec: 61 notes, 6 notebooks, 12 tags
 - The LLM's training did not change. The agent's context did: the skills and the spec
 
-<span class="accent">The spec says what each column does, never the syntax. The MariaDB grammar is the agent's own work.</span>
+<span class="accent">The spec says what the app stores, never the syntax. The MariaDB grammar is the agent's own work.</span>
 
 <!--
 SPEAKER NOTES:
 
 Now look at what the agent actually wrote, because this is the payoff of act one.
 
-CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys that default to uuid_v7. System versioning on the owner tables. A generated column that enforces one default notebook per account. A FULLTEXT index for search.
+[UPDATE FROM THE RECORDED RUN: name the idioms the agent actually wrote, and match the DDL snippet on the slide to it.] CREATE OR REPLACE TABLE. utf8mb4 with the current uca1400 collation. UUID keys that default to uuid_v7. A FULLTEXT index for search.
 
-Remember the MySQL habits from a few minutes ago, UUID_TO_BIN and the utf8 that rejects an emoji? None of them are here. And the spec never says uuid_v7, uca1400, or system versioning. It says a time-ordered UUID key, row history kept in the table itself, one default notebook per account. The agent chose the current MariaDB grammar for each of those.
+Remember the MySQL habits from a few minutes ago, UUID_TO_BIN and the utf8 that rejects an emoji? None of them are here. And the spec never mentions UUIDs, collations, or key types at all. It says one account, notebooks, notes, and tags, and that my sample data must load. Every MariaDB idiom on this slide is the agent's choice.
 
 Here is what changed since that earlier slide. Not the LLM. Its training is exactly the same. What changed is the agent's context: the skills for the grammar, and the spec for the intent. Then the agent proved the result against the spec. The server accepted the DDL, sixty-one notes loaded, and every criterion passed.
 
@@ -546,21 +550,21 @@ So the schema is real, and it is exactly the schema the app will bind to. Now we
 ### **Same conversation. The prompt only picks the slice.**
 
 ```
-Build the Textual app that docs/notes_app-prd.md specifies,
-in native mode only: every Must in section 6, the layout in
-section 7, the section 9 DataSource interface, and the
-packaging in section 10.
+Build the app that talk/notes-app-spec.md describes, on
+the schema in working/notes_app.sql. Build every Must
+have, and leave the Later items.
 
-Check the app against AC-A1 to AC-A5, and record each
-command and its result in working/RUN_LOG.md.
+bin/notes-app is the committed launcher. Make the app
+work with it, then check the app against the "Done when"
+list in the spec.
 ```
 
 <!--
 SPEAKER NOTES:
 
-Act two. Same conversation, same spec. The document that gave act one its data model also describes the app: the three-pane layout, the features, the architecture, the packaging, and the criteria that say it works.
+Act two. Same conversation, same spec. The document that gave act one its data model also describes the app: the three panes, the must-haves, the stack, how it runs, and when it is done.
 
-Look how short the prompt is. I am not describing the app in a chat window. I wrote the spec once, and the prompt only picks the slice: native mode, the Musts, and five criteria to report. The same agent that built my tables now reads my spec and writes my front end.
+Look how short the prompt is. I am not describing the app in a chat window. I wrote the spec once, and the prompt only picks the slice: the must-haves, the launcher, and the Done when list. The same agent that built my tables now reads my spec and writes my front end.
 -->
 
 ---
@@ -572,7 +576,7 @@ Look how short the prompt is. I am not describing the app in a chat window. I wr
 **What the agent does on screen**
 
 1. **Reads the spec** and builds a real Python package, not a snippet
-2. **Checks** AC-A1 to AC-A5: the app starts from the launcher and from the installed command
+2. **Checks** the "Done when" list: `bin/notes-app` opens with the notebooks and notes
 3. **Opens** three panes: notebooks, notes with the pinned ones on top, and the note view
 4. **Shows** `native` on the status line, next to the sandbox address
 
@@ -585,7 +589,7 @@ SPEAKER NOTES:
 
 [CUT TO RECORDING, ACT TWO]
 
-The agent reads the spec and builds a real Python package. Not a snippet in a chat window. A project, with an entry point and dependencies. Then it checks the app against the criteria. It starts the app from the launcher and from the command it installed. That second check is AC-A2. The repo ignores the generated app, and a build that honours that ignore file installs a package with no code in it. The launcher alone would never notice.
+The agent reads the spec and builds a real Python package. Not a snippet in a chat window. A project, with an entry point and dependencies. Then it checks the app against the spec: it starts the app with the committed launcher, and confirms the notebooks and notes appear.
 
 And there it is. Three panes. On the left, the notebooks from act one. In the middle, the notes, pinned ones on top, the way the schema's index intended. On the right, a note rendered from Markdown. Along the bottom, a status line that reads native, so the app talks straight to the tables on the sandbox. That is the data act one loaded, on screen. Search and tag filters are Shoulds in the spec, not Musts, so this prompt leaves them for the next one.
 
@@ -627,11 +631,11 @@ SPEAKER NOTES:
 
 The title promised you an API tier, so here is the honest version, in under a minute.
 
-The same spec defines a REST Service over this schema, and an optional third prompt in the repo has the agent build it. I ran it off stage. SHOW REST VIEWS lists the endpoints the agent defined, note, notebook, and tag, under the notesApp service. They exist, in the metadata.
+An optional third prompt in the repo has the agent put a REST Service over this schema. I ran it off stage. SHOW REST VIEWS lists the endpoints the agent defined, note, notebook, and tag, under the notesApp service. They exist, in the metadata.
 
 And here is the part I promised you at the start, the part that is still crazy. The server that would serve those endpoints over HTTP is not ready yet, and the app you just watched does not call them. It talks straight to the tables. So I am not going to tell you these endpoints answer a web request, because they do not. They are defined. Serving them is still ahead.
 
-[IF THERE IS TIME: That run had one more surprise. The acceptance criteria make the agent read the view back, and the read-back showed the tool had dropped the read-only flags the agent wrote. The agent was right, the tool was wrong, and the only reason anyone knew is that done was written down.]
+[IF THERE IS TIME: That run had one more surprise. The prompt makes the agent read the view back, and the read-back showed the tool had dropped the read-only flags the agent wrote. The agent was right, the tool was wrong, and the only reason anyone knew is that checking was written into the prompt.]
 
 The agent is good right up to a boundary, and the honest move is to name the boundary instead of smudging it. One more story from building this demo, one I did not plan.
 

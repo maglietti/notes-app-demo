@@ -74,13 +74,13 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 9: Vibe coding also guesses what you meant
 
-- **On slide:** A one-line prompt: fine SQL, drifting names (`user` for `account`). A spec: reviewed like code, behaviour not syntax, requirement IDs, acceptance criteria.
+- **On slide:** A one-line prompt: fine SQL, drifting names (`user` for `account`). A spec: reviewed like code, what the app stores and does but never the syntax, a numbered must-have list, and a "Done when" list.
 - **Build:** Two columns, with the accent line beneath: skills stop the guessing about MariaDB, a spec stops the guessing about my app.
 - **Says:** The second guess, and the same failure at a different layer.
 
 ### Slide 10: Fix the intent: a spec the agent checks itself against
 
-- **On slide:** An excerpt from the PRD (FR-4, AC-D3, AC-D4), and three rules: behaviour not syntax, one spec with thin prompts, done is written down.
+- **On slide:** Real lines from `talk/notes-app-spec.md` (the data note, must-have 2, and the first "Done when" item), and three rules: behaviour not syntax, one spec with thin prompts, done is written down.
 - **Build:** Code block of real spec lines on the left, the rules on the right.
 - **Says:** The second change. The agent grades its own work against my definition of done, and never sees an answer key.
 
@@ -90,7 +90,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 11: Act one divider, Prompt 1
 
-- **On slide:** Act one: from a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, deploy a sandbox, seed it, check AC-D1 to AC-D4.
+- **On slide:** Act one: from a spec to a schema. The shape of Prompt 1: turn the spec's data model into DDL, deploy a sandbox, seed it, check the counts against "Done when".
 - **Build:** Act-divider layout. Trimmed prompt shape.
 - **Says:** The prompt points at the spec instead of restating it, and ends with the criteria.
 
@@ -102,7 +102,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 13: The agent wrote current MariaDB, and passed its own criteria
 
-- **On slide:** A trimmed `note` DDL, the idioms, and the AC-D report: 61 notes, 6 notebooks, 12 tags.
+- **On slide:** A trimmed `note` DDL from the recorded run, the idioms, and the matching counts: 61 notes, 6 notebooks, 12 tags.
 - **Build:** DDL snippet with callouts.
 - **Says:** Both fixes paid off: the skills chose the current grammar, and the spec's criteria proved the result.
 
@@ -112,13 +112,13 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 14: Act two: from the same spec to an app you can open
 
-- **On slide:** Same conversation. The prompt only picks the slice. The shape of Prompt 2: build the app the PRD specifies, in native mode, and check AC-A1 to AC-A5.
+- **On slide:** Same conversation. The prompt only picks the slice. The shape of Prompt 2: build the app the spec describes, make it work with the committed launcher, and check it against "Done when".
 - **Build:** Act-divider layout. Trimmed prompt shape.
 - **Says:** The spec carries the app, so the prompt stays short.
 
 ### Slide 15: A running app, straight to the tables
 
-- **On slide:** A real Python package, AC-A1 to AC-A5 checked from both entry points, three panes, a `native` status line.
+- **On slide:** A real Python package, the "Done when" check through the launcher, three panes, and a status line showing the connection.
 - **Build:** Cut to act two of the recording. **[CAPTURE] app opening.**
 - **Says:** From no app code to a working app that meets its own acceptance criteria. The title's "straight to the tables" hands off to the REST boundary.
 

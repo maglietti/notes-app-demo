@@ -1,5 +1,7 @@
 # Notes App: Product Requirements Document
 
+> **Superseded on 2026-09-25, kept for comparison.** The agent now builds from [`talk/notes-app-spec.md`](../talk/notes-app-spec.md), the minimal spec a developer writes to take an idea to a working app. This PRD grew by chasing failed runs until it described the answer: native UUID keys in time order, the current collation, row history, index names, and the generated column. A no-skills run against section 4 (`research/no-skills-run.sql`) produced current MariaDB DDL, which showed that this document, not the LLM, was doing the work. The prompts do not read it.
+
 **Version:** 2.0
 **Date:** 2026-09-25
 **Owner:** Michael Aglietti

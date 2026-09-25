@@ -1,16 +1,10 @@
 -- synthetic_data.sql
--- Test data for the canonical notes_app schema (research/notes_app.sql).
--- Self-contained: creates the seeded account, six notebooks, twelve tags,
--- sixty-one notes across all statuses, and the tag links. Set-based and
--- guarded with NOT EXISTS, so it is safe to run more than once and can be loaded
--- against a bare schema. The account is referenced by email, so no UUID is
--- hard-coded and a fresh deploy works unchanged.
+-- Sample data for the notes_app schema: one account, six notebooks, twelve
+-- tags, sixty-one notes across all statuses, and the tag links. Safe to run
+-- more than once. The account is referenced by email, so no id is hard-coded.
 --
--- The note bodies are the kind of work a developer relations team actually
--- tracks: content in flight, demo mechanics, community threads, reading, and
--- personal errands. They stay on MariaDB's own behavior and measurements and
--- name no other database vendor, so the seeded app reads as a working notebook
--- on stage rather than a competitive brief.
+-- The notes are the kind of work a developer relations team tracks: content in
+-- flight, demo mechanics, community threads, reading, and personal errands.
 
 -- 1. The seeded account the client runs as.
 INSERT INTO notes_app.account (email, display_name)
@@ -19,7 +13,7 @@ WHERE NOT EXISTS (
   SELECT 1 FROM notes_app.account WHERE email = 'michael.aglietti@mariadb.com'
 );
 
--- 2. Notebooks. Inbox is the one default (default_flag enforces at most one).
+-- 2. Notebooks. Inbox is the default notebook.
 INSERT INTO notes_app.notebook (account_id, name, is_default)
 SELECT (SELECT id FROM notes_app.account WHERE email = 'michael.aglietti@mariadb.com'), x.name, x.is_default
 FROM (
@@ -69,14 +63,14 @@ FROM (
   SELECT 'DevRel' AS nb, 'Optimizer trace notes' AS title, 'The optimizer_trace output in MariaDB 11.8 explains why the join order changed after the index was added. Capture the before and after JSON for the blog post.' AS body, 'active' AS status, 1 AS pinned
   UNION ALL SELECT 'DevRel', 'Community call agenda', 'Vector search demo, the 11.8 upgrade path, and the open questions carried over from the forum.', 'active', 0
   UNION ALL SELECT 'DevRel', 'ATO demo run-of-show', 'Time the scaffolding run and the app capstone. Target twenty minutes with buffer for questions.', 'active', 1
-  UNION ALL SELECT 'DevRel', 'Skill coverage gaps', 'List the MariaDB features the agent gets wrong without a skill. Vector search and system versioning are the clearest two.', 'active', 0
+  UNION ALL SELECT 'DevRel', 'Skill coverage gaps', 'List the MariaDB features the agent gets wrong without a skill, and rank them by how often they come up.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Blog closing the agent loop', 'Draft on how an MCP connection lets the agent run its own SQL and verify the result instead of guessing.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Video sandbox in five minutes', 'Screencast deploying a throwaway MariaDB instance and running DDL over MCP.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Migrator demo notes', 'MySQL to MariaDB migration over MCP. Show the resume-safe restart and the false success trap.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Tutorial vector search in twenty lines', 'VECTOR column, VEC_DISTANCE_COSINE, and one HNSW index. Embeddings come from a local model so the reader needs no API key.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Docs gap on system versioning', 'The FOR SYSTEM_TIME examples stop at AS OF. Add AS OF now minus an interval, BETWEEN, and the partition-pruning caveat.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Office hours question log', 'Recurring questions worth turning into posts: connector pooling defaults, JSON validation, and picking a collation.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Newsletter draft on 11.8 LTS', 'Lead with vector indexes, then the uca1400 collations and the utf8mb4 default. Keep it to four paragraphs.', 'active', 0
+  UNION ALL SELECT 'DevRel', 'Tutorial vector search in twenty lines', 'A short tutorial on vector search with a local embedding model, so the reader needs no API key.', 'active', 0
+  UNION ALL SELECT 'DevRel', 'Docs gap on backup examples', 'The backup examples stop at a full backup. Add incremental backups, the restore steps, and the common mistakes.', 'active', 0
+  UNION ALL SELECT 'DevRel', 'Office hours question log', 'Recurring questions worth turning into posts: connector pooling defaults, JSON validation, and choosing an index for a slow query.', 'active', 0
+  UNION ALL SELECT 'DevRel', 'Newsletter draft on 11.8 LTS', 'Lead with the headline features, then the upgrade path. Keep it to four paragraphs.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Sample data generator idea', 'A small script that seeds realistic rows for any schema, so tutorials stop shipping foo and bar.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Quarterly content plan', 'Three tutorials, one webinar, two conference talks. Prioritise the REST service walkthrough.', 'archived', 0
   UNION ALL SELECT 'DevRel', 'Webinar on schema management', 'Versioned schema with MSM and a walkthrough of the section model.', 'archived', 0
@@ -104,7 +98,7 @@ FROM (
   UNION ALL SELECT 'Community', 'Old meetup venue notes', 'The venue closed. No longer useful.', 'trashed', 0
 
   -- Inbox: the default notebook, unsorted capture.
-  UNION ALL SELECT 'Inbox', 'Reply to forum thread', 'Answer the question about UUID_v7 index locality and why it beats UUID v4 on insert-heavy tables.', 'active', 0
+  UNION ALL SELECT 'Inbox', 'Reply to forum thread', 'Answer the question about connection pool defaults and when to raise them.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Expense report', 'Submit the conference travel expenses before month end.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Renew SSL cert', 'The staging demo certificate expires next month.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Idea skill for window functions', 'A skill covering OVER and the framing clauses would close a common gap.', 'active', 0
@@ -116,16 +110,16 @@ FROM (
   UNION ALL SELECT 'Inbox', 'Duplicate capture to clean up', 'Same content as the optimizer trace note. Delete after merging the useful line.', 'trashed', 0
 
   -- Reading: papers, docs, and feature deep dives.
-  UNION ALL SELECT 'Reading', 'Paper on time-ordered UUIDs', 'Read the draft on UUIDv7 and index fragmentation, then check the claims against an actual InnoDB page split count.', 'active', 0
-  UNION ALL SELECT 'Reading', 'System-versioned tables deep dive', 'How MariaDB keeps history rows and how to query them with FOR SYSTEM_TIME.', 'active', 0
+  UNION ALL SELECT 'Reading', 'Paper on index fragmentation', 'Read the draft on index fragmentation in insert-heavy tables, then check the claims against a real measurement.', 'active', 0
+  UNION ALL SELECT 'Reading', 'Locking deep dive', 'How InnoDB handles row locks, and why one long transaction slows everyone down.', 'active', 0
   UNION ALL SELECT 'Reading', 'MCP spec overview', 'Skim the protocol and focus on the tool call semantics.', 'active', 0
   UNION ALL SELECT 'Reading', 'Apache-2.0 and GPL-2.0 notes', 'Which license applies where: the server is GPL-2.0, the talk and skills repositories are Apache-2.0.', 'active', 0
   UNION ALL SELECT 'Reading', 'Window function framing clauses', 'ROWS versus RANGE, and why the default frame surprises people writing a running total.', 'active', 0
   UNION ALL SELECT 'Reading', 'JSON functions in 11.8', 'JSON_TABLE for flattening, JSON_VALUE for extraction, and a CHECK constraint with JSON_VALID.', 'active', 0
-  UNION ALL SELECT 'Reading', 'Vector index tuning notes', 'M and ef_search trade recall against latency. Measure both on the demo dataset before quoting a number.', 'active', 1
+  UNION ALL SELECT 'Reading', 'Vector index tuning notes', 'Recall trades against latency. Measure both on the demo dataset before quoting a number.', 'active', 1
   UNION ALL SELECT 'Reading', 'Query optimization checklist', 'Read EXPLAIN first, check the estimated versus actual rows, then look at the index before rewriting the query.', 'active', 0
   UNION ALL SELECT 'Reading', 'Parallel replication notes', 'Optimistic mode, the slave_parallel_threads setting, and what GTID gives you on failover.', 'active', 0
-  UNION ALL SELECT 'Reading', 'InnoDB page compression', 'Notes on PAGE_COMPRESSED versus the older compressed row format.', 'archived', 0
+  UNION ALL SELECT 'Reading', 'Buffer pool sizing', 'Notes on sizing the buffer pool for a demo laptop versus a server.', 'archived', 0
   UNION ALL SELECT 'Reading', 'Old reading list', 'Superseded by the current quarter list.', 'trashed', 0
 
   -- Personal: the errands that make the seeded app look lived in.
@@ -168,8 +162,8 @@ FROM (
   UNION ALL SELECT 'Tutorial vector search in twenty lines', 'vector'
   UNION ALL SELECT 'Tutorial vector search in twenty lines', 'mariadb'
   UNION ALL SELECT 'Tutorial vector search in twenty lines', 'blog'
-  UNION ALL SELECT 'Docs gap on system versioning', 'mariadb'
-  UNION ALL SELECT 'Docs gap on system versioning', 'todo'
+  UNION ALL SELECT 'Docs gap on backup examples', 'mariadb'
+  UNION ALL SELECT 'Docs gap on backup examples', 'todo'
   UNION ALL SELECT 'Office hours question log', 'community'
   UNION ALL SELECT 'Office hours question log', 'idea'
   UNION ALL SELECT 'Newsletter draft on 11.8 LTS', 'blog'
@@ -208,9 +202,9 @@ FROM (
   UNION ALL SELECT 'Follow up on the benchmark harness', 'benchmark'
   UNION ALL SELECT 'Follow up on the benchmark harness', 'todo'
   UNION ALL SELECT 'Draft reply to podcast invite', 'todo'
-  UNION ALL SELECT 'Paper on time-ordered UUIDs', 'mariadb'
-  UNION ALL SELECT 'Paper on time-ordered UUIDs', 'benchmark'
-  UNION ALL SELECT 'System-versioned tables deep dive', 'mariadb'
+  UNION ALL SELECT 'Paper on index fragmentation', 'mariadb'
+  UNION ALL SELECT 'Paper on index fragmentation', 'benchmark'
+  UNION ALL SELECT 'Locking deep dive', 'mariadb'
   UNION ALL SELECT 'Apache-2.0 and GPL-2.0 notes', 'licensing'
   UNION ALL SELECT 'Window function framing clauses', 'mariadb'
   UNION ALL SELECT 'JSON functions in 11.8', 'mariadb'
@@ -222,7 +216,7 @@ FROM (
   UNION ALL SELECT 'Parallel replication notes', 'mariadb'
   UNION ALL SELECT 'Percona Live follow-ups', 'replication'
   UNION ALL SELECT 'Percona Live follow-ups', 'conference'
-  UNION ALL SELECT 'InnoDB page compression', 'mariadb'
+  UNION ALL SELECT 'Buffer pool sizing', 'mariadb'
   UNION ALL SELECT 'Grocery list', 'personal'
   UNION ALL SELECT 'Grocery list', 'todo'
   UNION ALL SELECT 'Book flight home', 'personal'
