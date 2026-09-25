@@ -1,8 +1,12 @@
 # Run snapshot: 2026-09-25
 
-This branch captures a full run of the demo prompts: pi as the harness, Claude Opus 5.5 as the model, Prompts 1 and 2, native mode only. Unlike the scoped snapshot the main README describes, it commits every generated file, including the gitignored ones: the `notes_app/` package, `pyproject.toml`, `uv.lock`, `.env.example`, the `.venv`, the `working/` artifacts, and the MariaDB sandbox with its data. The pi session export, `pi-session-2026-09-25-claude-opus-5-5.html`, records the run itself.
+This branch captures a full run of the demo prompts: pi as the coding agent, Claude Opus 5.5 as the model, Prompts 1 and 2, native mode only. Unlike the scoped snapshot the main README describes, it commits every generated file, including the gitignored ones: the `notes_app/` package, `pyproject.toml`, `uv.lock`, `.env.example`, the `.venv`, the `working/` artifacts, and the MariaDB sandbox with its data.
 
 The sandbox data directory holds the `notes_app` schema already loaded with the seed fixture, so the app runs without re-running any prompt. You only need to start the server again, recreate `.env`, and launch the app.
+
+## The pi session export
+
+This run used `pi` as the coding agent, not Claude Code. pi saved its work from the session to [`pi-session-2026-09-25-claude-opus-5-5.html`](pi-session-2026-09-25-claude-opus-5-5.html), a single HTML file at the repository root. Open it in a browser to follow how the agent produced the files on this branch. It is the primary record of the run, while `working/RUN_LOG.md` is the agent's own summary of each step.
 
 ## What this snapshot depends on
 
