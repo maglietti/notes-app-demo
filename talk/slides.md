@@ -218,14 +218,14 @@ That is what I mean by confidently wrong. It is not a syntax error you can see. 
 
 ---
 
-# Before you use MariaDB, you spend the time teaching it MariaDB
+# Before you use MariaDB, you have to break the model's MySQL habits
 
 <div class="columns">
 <div>
 
 ## What you correct, round after round
 
-The model generalizes from MySQL, so you steer it back:
+It learned MariaDB as MySQL's fork, so it writes MySQL that is correct for the wrong database:
 
 - **Keys:** `BINARY(16) DEFAULT (UUID_TO_BIN(UUID(), 1))`, a MySQL 8 function MariaDB does not have, missing its `UUID` type and `UUID_v7()`
 - **Character set:** plain `utf8`, which MariaDB still reads as 3-byte `utf8mb3`, so the first emoji in a note is rejected
@@ -249,11 +249,11 @@ The model generalizes from MySQL, so you steer it back:
 <!--
 SPEAKER NOTES:
 
-Here is what that guessing costs on this exact app. The model has seen far more MySQL than MariaDB, so it generalizes from MySQL, and you spend your time steering it back. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the model writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails. You correct it. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. You correct it again. For the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING. Another round.
+Here is where that guessing comes from, and what it costs on this exact app. The model has read far more MySQL than MariaDB. Stack Overflow alone has about forty-five MySQL questions for every MariaDB one. And what it read about MariaDB says it is a fork of MySQL that started as a drop-in replacement. So it assumes MySQL, and you spend your time breaking the habit. Notice none of this is made up. Every one of these is correct MySQL. It is just the wrong database. Our tables are keyed on UUIDs. MariaDB has a native UUID type and UUID_v7. MySQL has neither, so the model writes MySQL 8's recipe, UUID_TO_BIN, which MariaDB does not have, and the CREATE TABLE fails. You correct it. It writes plain utf8, which on MariaDB still means the old three-byte form, so the first emoji in a note is rejected. You correct it again. For the new row's id it reaches for LAST_INSERT_ID, an auto-increment idea that gives you nothing with a UUID key, instead of INSERT RETURNING. Another round.
 
-And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. You do get there, eventually. But first you spend the afternoon teaching the model MariaDB, one correction at a time, before you can think about what MariaDB does for you.
+And every one of those rounds is time you meant for something else. The reason I picked MariaDB for this app is on the right. System versioning keeps row history, so no audit triggers. UUID_v7 gives time-ordered keys. FULLTEXT searches without a second system. A generated column enforces one default notebook per account. You do get there, eventually. But first you spend the afternoon breaking the model's MySQL habits, one correction at a time, before you can think about what MariaDB does for you.
 
-That teaching is the part we can fix.
+Breaking those habits by hand is the part we can fix.
 -->
 
 ---

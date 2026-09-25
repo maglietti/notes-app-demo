@@ -46,11 +46,11 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Build:** Two columns. The accent line defines confidently wrong.
 - **Says:** Name the first guess. The vibe-coding kicker sets up slide 9.
 
-### Slide 6: Before you use MariaDB, you spend the time teaching it MariaDB
+### Slide 6: Before you use MariaDB, you have to break the model's MySQL habits
 
 - **On slide:** What you correct, round after round (`UUID_TO_BIN`, plain `utf8`, `LAST_INSERT_ID()`), against what you wanted the time for (row history, time-ordered keys, full-text search, one default notebook).
 - **Build:** Two columns, with the accent line beneath: every correction is time you meant for the app.
-- **Says:** The cost of the guess is steering time, spent before you reach the features you picked MariaDB for. Sets up slide 7 (what if it already knew?), and slide 13 pays off the features.
+- **Says:** The model learned MariaDB as MySQL's fork, from a corpus about 45 times heavier in MySQL, so it writes correct MySQL for the wrong database. The cost is steering time, spent before you reach the features you picked MariaDB for. Sets up slide 7 (what if it already knew?), and slide 13 pays off the features.
 
 ---
 
