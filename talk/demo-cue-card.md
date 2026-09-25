@@ -184,6 +184,6 @@ git clean -fdx
 
 - Capture the moments in order: schema landing, the row-count check, app opening, the app check. From the off-stage Prompt 3 run, keep only the `SHOW REST VIEWS` output, for the static slide.
 - Trim the waits between tool calls, but keep any fixture-driven schema fix intact. A failure the agent fixes is evidence.
-- The two acts are about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, so the whole talk lands near 20 and stays under 25.
+- The two acts are about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, so the whole talk lands near 21 and stays under 25.
 - Record at the projector font size, not your desk size.
 - Keep the file local. Have `working/RUN_LOG.md` with both reports, an app screenshot, and the `SHOW REST` output exported as static slides in case the recording will not play.

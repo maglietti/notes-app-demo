@@ -1,6 +1,6 @@
 # Slide outline: Confidently Wrong
 
-The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md) and to the deck in [`slides.md`](slides.md). Twenty-one slides plus two Q&A backups, across ten beats. Read the titles alone and they tell the story: two guesses, two fixes, two acts that prove both, the boundary, and the agent memory that ties the fixes together and points to the next session. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
+The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md) and to the deck in [`slides.md`](slides.md). Twenty-one slides plus two Q&A backups, across ten beats. Read the titles alone and they tell the story: the spec that became the answer key, the honest spec with and without skills, two acts that build the app from it, the boundary, and the agent memory that ties it together and points to the next session. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
 
 Recording note: the two acts play from one trimmed recording, cued at the start of each act. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The REST beat is a static slide, with its output captured from an off-stage run of Prompt 3. The deck carries the frame; the recording carries the work.
 
@@ -16,13 +16,13 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 - **On slide:** Confidently Wrong: Handing a Coding Agent an API Tier Anyway. Michael Aglietti, Head of Developer Relations, MariaDB. All Things Open 2026, Databases.
 - **Build:** Lead layout, dark background.
-- **Says:** I handed an agent a job it is confidently wrong about, and it worked because of two changes to how I work with it.
+- **Says:** I assumed the LLM would be confidently wrong about MariaDB, built a talk on it, and then tested it. Two changes made the build work, and one thing turned out to be confidently wrong.
 
 ### Slide 2: "Good ideas are always crazy until they're not."
 
 - **On slide:** The Larry Page quote.
 - **Build:** One line, lead layout.
-- **Says:** The "anyway" in the title. By the end you will watch it stop being crazy, and see the one place it still is.
+- **Says:** The "anyway" in the title.
 
 ### Slide 3: I had an idea
 
@@ -30,59 +30,59 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Build:** Lead layout.
 - **Says:** The itch every developer knows.
 
-### Slide 4: The idea
+### Slide 4: The idea: a notebook that lives in my terminal
 
-- **On slide:** A notebook that lives in the terminal. Three panes. Search, pin, archive, trash, tags.
-- **Build:** Two columns: the feel, and what it does.
-- **Says:** Picture a real app, because in my head it already is one.
-
----
-
-## Beat 2: Guess one, the database (slides 5-6, ~1:00)
-
-### Slide 5: The LLM behind your agent guesses your database, fluently
-
-- **On slide:** Perfect time to vibe code. What it hands you, and the trap: code that looks right and behaves wrong.
-- **Build:** Two columns. The accent line defines confidently wrong.
-- **Says:** Name the first guess, and introduce "the LLM behind your agent" once, so later slides can say "the LLM" for what it learned and "the agent" for what it does. The vibe-coding kicker sets up slide 9.
-
-### Slide 6: Before you use MariaDB, you have to break the LLM's MySQL habits
-
-- **On slide:** What you correct, round after round (`UUID_TO_BIN`, plain `utf8`, `LAST_INSERT_ID()`), against what you wanted the time for (row history, time-ordered keys, full-text search, one default notebook).
-- **Build:** Two columns, with the accent line beneath: every correction is time you meant for the app.
-- **Says:** The LLM learned MariaDB as MySQL's fork, from a corpus about 45 times heavier in MySQL, so it writes correct MySQL for the wrong database. The cost is steering time, spent before you reach the features you picked MariaDB for. Sets up slide 7 (what if it already knew?), and slide 13 pays off the features.
+- **On slide:** Three panes. Search, pin, archive, trash, tags.
+- **Build:** Two columns: what the notebook looks like, and what it does.
+- **Says:** Picture a real app. The notes plant "ask my notes a question" for slide 19.
 
 ---
 
-## Beat 3: Fix one, skills and tools (slides 7-8, ~2:30)
+## Beat 2: The spec that became the answer key (slides 5-6, ~2:00)
 
-### Slide 7: Fix the knowledge: skills teach MariaDB, tools run the SQL
+### Slide 5: A one-line prompt drifted, so I wrote a spec, and kept adding to the spec
 
-- **On slide:** Skills carry the knowledge. Tools carry the reach. Together they close the loop.
+- **On slide:** The one-line prompt drifted on names (`user` for `account`). A spec fixed it, then every failed run added a rule, until the spec reached 288 lines.
+- **Build:** Two columns, with the accent line: I never asked whether the spec was starting to do the agent's job.
+- **Says:** The vibe-coding kicker, the real history of the spec, and the two terms (LLM and agent) defined once in the notes.
+
+### Slide 6: Then I tested my own spec: with the skills turned off, the LLM still wrote current MariaDB
+
+- **On slide:** Three lines of the 288-line spec beside the SQL the LLM wrote from them with no skills loaded.
+- **Build:** Spec wording on the left, generated SQL on the right, with the accent line: my spec was the answer key.
+- **Says:** The aha. A spec that grows by chasing failures drifts toward the answer, and only a test shows it. Evidence: experiment 1.
+
+---
+
+## Beat 3: The honest spec, with and without skills (slides 7-8, ~2:00)
+
+### Slide 7: The spec a developer actually writes: what the app does, never how MariaDB does it
+
+- **On slide:** Real lines from the 48-line `talk/notes-app-spec.md`, and three rules: behaviour not syntax, one spec with thin prompts, done is written down.
+- **Build:** Spec excerpt on the left, rules on the right.
+- **Says:** The spec names no MariaDB feature. The second change.
+
+### Slide 8: From that spec, the agent without skills writes generic SQL. With the skills, the agent writes MariaDB.
+
+- **On slide:** The same table from both runs: `CREATE TABLE IF NOT EXISTS` with an ascending index, against `CREATE OR REPLACE` with an index shaped to "pinned first, newest first". Both ran, and both loaded the sample data.
+- **Build:** Two code blocks side by side, with the accent line: the skills made the agent use the database I chose.
+- **Says:** The honest finding, with no UUID debate. Evidence: experiments 2 to 4.
+
+---
+
+## Beat 4: Skills, tools, and the ai-plugins (slides 9-10, ~2:00)
+
+### Slide 9: Skills teach the agent MariaDB, and tools let the agent run what it writes
+
+- **On slide:** Skills give the agent current MariaDB knowledge, loaded into its context. Tools let the agent run SQL on a live database or a sandbox.
 - **Build:** Two columns.
-- **Says:** The distinction the talk hangs on.
+- **Says:** What made the difference on slide 8, and what let both scripts be tested.
 
-### Slide 8: ai-plugins installs the skills and the tools in your agent
+### Slide 10: ai-plugins installs the skills and the tools in your agent
 
-- **On slide:** The skills and the `mariadb-shell` MCP server. Install in two lines. Four harnesses. What to expect.
+- **On slide:** What the ai-plugins install, two install commands, four harnesses, what to expect.
 - **Build:** Install lines large, the DevHub URL in accent.
-- **Says:** The first change: it fixes what the agent knows about MariaDB, not what it knows about my app.
-
----
-
-## Beat 4: Guess two and fix two, the spec (slides 9-10, ~2:00)
-
-### Slide 9: Vibe coding also guesses what you meant
-
-- **On slide:** A one-line prompt: fine SQL, drifting names (`user` for `account`). A spec: reviewed like code, what the app stores and does but never the syntax, a numbered must-have list, and a "Done when" list.
-- **Build:** Two columns, with the accent line beneath: skills stop the guessing about MariaDB, a spec stops the guessing about my app.
-- **Says:** The second guess, and the same failure at a different layer.
-
-### Slide 10: Fix the intent: a spec the agent checks itself against
-
-- **On slide:** Real lines from `talk/notes-app-spec.md` (the data note, must-have 2, and the first "Done when" item), and three rules: behaviour not syntax, one spec with thin prompts, done is written down.
-- **Build:** Code block of real spec lines on the left, the rules on the right.
-- **Says:** The second change. The agent grades its own work against my definition of done, and never sees an answer key.
+- **Says:** Both changes together: the 48-line spec, and an agent with the skills and the tools.
 
 ---
 
@@ -164,7 +164,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ### Slide 20: What to take home
 
-- **On slide:** Six takeaways: skills, a spec with acceptance criteria, tools, name the artifact, layered guardrails, start on greenfield.
+- **On slide:** Six takeaways: skills make the agent write for your database, a spec that ends in acceptance criteria, tools, test your spec with the skills turned off, every guardrail, start on greenfield.
 - **Build:** Two columns of three.
 - **Says:** The portable lessons, whatever database they run. Skills, spec, and tools come first, because they are the fixes the talk showed.
 
@@ -196,8 +196,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Prompt slides:** trimmed shape on the wall, full text on the cue card.
 - **Recording:** one trimmed cut for acts one and two, cued per act. No REST cut; the REST slide uses captured output.
 - **Three layers:** in the Q&A backups, so beat 3 stays a glance.
-- **Title spine:** parallel titles for the guesses (slides 5 and 9) and the fixes (slides 7 and 10), so the two changes the opening promises are visible in the titles alone.
-- **One problem slide:** the MySQL habits and what MariaDB already does share slide 6, so the first recording starts at 7:30.
+- **The opening tells the true story (2026-09-25).** The MySQL-habits premise and the UUID focus came from before the experiments and did not survive them. The opening now follows the spec's history: drift, growth into the answer key, the test, and the honest spec with and without skills. The first recording starts at 8:00.
 
 ## Still open
 
