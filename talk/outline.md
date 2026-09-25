@@ -62,7 +62,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Build:** Two columns.
 - **Says:** The distinction the talk hangs on.
 
-### Slide 8: ai-plugins
+### Slide 8: ai-plugins installs the skills and the tools in your agent
 
 - **On slide:** The skills and the `mariadb-shell` MCP server. Install in two lines. Four harnesses. What to expect.
 - **Build:** Install lines large, the DevHub URL in accent.
