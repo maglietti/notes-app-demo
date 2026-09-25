@@ -56,7 +56,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ## Beat 3: Fix one, skills and tools (slides 7-8, ~2:30)
 
-### Slide 7: Fix the knowledge: skills, and tools to act on it
+### Slide 7: Fix the knowledge: skills teach MariaDB, tools run the SQL
 
 - **On slide:** Skills carry the knowledge. Tools carry the reach. Together they close the loop.
 - **Build:** Two columns.
@@ -94,13 +94,13 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 - **Build:** Act-divider layout. Trimmed prompt shape.
 - **Says:** The prompt points at the spec instead of restating it, and ends with the criteria.
 
-### Slide 12: Watch it write, deploy, run, and prove itself
+### Slide 12: Watch the agent write, deploy, run, and prove the schema
 
 - **On slide:** Reads the spec and writes the DDL, deploys the sandbox, runs the DDL, loads 61 notes and reports against the criteria.
 - **Build:** Cut to act one of the recording. **[CAPTURE] schema landing.**
 - **Says:** No SQL by hand, and the agent grades its own result.
 
-### Slide 13: It wrote current MariaDB, and passed its own criteria
+### Slide 13: The agent wrote current MariaDB, and passed its own criteria
 
 - **On slide:** A trimmed `note` DDL, the idioms, and the AC-D report: 61 notes, 6 notebooks, 12 tags.
 - **Build:** DDL snippet with callouts.
@@ -136,7 +136,7 @@ Legend: **On slide** is what the audience reads. **Build** is the visual or reve
 
 ## Beat 8: Agent security (slide 17, ~1:30)
 
-### Slide 17: The database would have run it. The harness would not.
+### Slide 17: The database would have run the mass delete. The harness would not.
 
 - **On slide:** `DELETE FROM notes_app.account`, and the classifier's refusal. Three controls, each with a veto.
 - **Build:** The statement and refusal on the left, the three layers on the right.

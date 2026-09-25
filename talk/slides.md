@@ -154,7 +154,7 @@ A fast, keyboard-first notebook you never have to leave the terminal for. Three 
 </div>
 <div>
 
-## What it does
+## What the notebook does
 
 - **Search** every note, full text, instantly
 - **Pin** what matters to the top
@@ -186,18 +186,18 @@ That is the app. The kind of thing you would keep open all day. So I opened an a
 <div class="columns">
 <div>
 
-## What it hands you
+## What the model hands you
 
 - SQL that is syntactically perfect
 - Grammar borrowed from the wrong database
-- Not one word about what it guessed
+- Not one word about what the model guessed
 
 </div>
 <div>
 
 ## The trap
 
-The SQL parses, and it usually runs. Then you exercise the app and CRUD breaks: a create rejected, an update touching the wrong rows, a read in the wrong shape. You catch it in testing, and every pass is time you wanted for the app.
+The SQL parses, and it usually runs. Then you exercise the app and CRUD breaks: a create rejected, an update touching the wrong rows, a read in the wrong shape. You catch the bug in testing, and every pass is time you wanted for the app.
 
 <span class="accent">Confidently wrong is not a syntax error. It is code that looks right and behaves wrong when you use it.</span>
 
@@ -225,7 +225,7 @@ That is what I mean by confidently wrong. It is not a syntax error you can see. 
 
 ## What you correct, round after round
 
-It learned MariaDB as MySQL's fork, so it writes MySQL that is correct for the wrong database:
+The model learned MariaDB as MySQL's fork, so the SQL is correct MySQL for the wrong database:
 
 - **Keys:** `BINARY(16) DEFAULT (UUID_TO_BIN(UUID(), 1))`, a MySQL 8 function MariaDB does not have, missing its `UUID` type and `UUID_v7()`
 - **Character set:** plain `utf8`, which MariaDB still reads as 3-byte `utf8mb3`, so the first emoji in a note is rejected
@@ -258,7 +258,7 @@ Breaking those habits by hand is the part we can fix.
 
 ---
 
-# Fix the knowledge: skills, and tools to act on it
+# Fix the knowledge: skills teach MariaDB, tools run the SQL
 
 <div class="columns">
 <div>
@@ -268,7 +268,7 @@ Breaking those habits by hand is the part we can fix.
 - Markdown files, one per topic
 - The current grammar, the ordering rules, the failure modes
 - Reviewed and versioned, no fine-tuning
-- They work offline, with no database at all
+- Skills work offline, with no database at all
 
 </div>
 <div>
@@ -305,7 +305,7 @@ You need both, and here is why. Knowledge without reach just gives you better co
 <div class="columns">
 <div>
 
-## What it is
+## What ai-plugins ships
 
 - MariaDB **skills**, curated and current
 - The **`mariadb-shell` MCP server**, wired up
@@ -376,7 +376,7 @@ That is the first change. It fixes what the agent knows about MariaDB. It does n
 </div>
 </div>
 
-<span class="accent">Skills stop the agent guessing about MariaDB. A spec stops it guessing about my app.</span>
+<span class="accent">Skills stop the agent guessing about MariaDB. A spec stops the agent guessing about my app.</span>
 
 <!--
 SPEAKER NOTES:
@@ -416,7 +416,7 @@ AC-D4 1 account, 6 notebooks, 12 tags, 61 notes:
 ## Three rules I follow
 
 1. **Behaviour, not syntax.** The grammar stays with the skills.
-2. **One spec, thin prompts.** A prompt picks a slice and points at IDs. It never restates the spec.
+2. **One spec, thin prompts.** A prompt picks a slice and points at IDs. The prompt never restates the spec.
 3. **Done is written down.** Every prompt ends with "report against the acceptance criteria."
 
 </div>
@@ -468,16 +468,16 @@ Watch what it does with it.
 
 ---
 
-# Watch it write, deploy, run, and prove itself
+# Watch the agent write, deploy, run, and prove the schema
 
 <div class="watch">
 
-**What is happening on screen**
+**What the agent does on screen**
 
-1. It **reads** the data model in the spec and **writes** the DDL
-2. It **deploys** a MariaDB sandbox on port 3310, with no Docker and no root
-3. It **runs** the DDL over MCP against that live server
-4. It **loads 61 real notes** as the data contract, and **reports** against AC-D1 to AC-D4
+1. **Reads** the data model in the spec and **writes** the DDL
+2. **Deploys** a MariaDB sandbox on port 3310, with no Docker and no root
+3. **Runs** the DDL over MCP against that live server
+4. **Loads 61 real notes** as the data contract, and **reports** against AC-D1 to AC-D4
 
 </div>
 
@@ -497,7 +497,7 @@ That last step is the difference between a demo and a result. An agent that just
 
 ---
 
-# It wrote current MariaDB, and passed its own criteria
+# The agent wrote current MariaDB, and passed its own criteria
 
 ```sql
 CREATE OR REPLACE TABLE notes_app.note (
@@ -557,10 +557,10 @@ Look how short the prompt is. I am not describing the app in a chat prompt. I wr
 
 <div class="watch">
 
-**What is happening on screen**
+**What the agent does on screen**
 
-1. It **reads the spec** and builds a real Python package, not a snippet
-2. It **checks** AC-A1 to AC-A5: the app starts from the launcher and the installed command
+1. **Reads the spec** and builds a real Python package, not a snippet
+2. **Checks** AC-A1 to AC-A5: the app starts from the launcher and the installed command
 3. Three panes: **notebooks**, **notes** with pinned ones on top, the **note view**
 4. The status line reads `native`, next to the sandbox address
 
@@ -603,14 +603,14 @@ Lists `/note`, `/notebook`, `/tag` under the `/notesApp` service, from an option
 
 ## The line
 
-<span class="boundary">The API is defined in the metadata. The server that would serve it is not ready yet, and this app does not call it.</span>
+<span class="boundary">The API is defined in the metadata. The server that would serve the API is not ready yet, and this app does not call the endpoints.</span>
 
 So I am not going to tell you these endpoints answer a web request.
 
 </div>
 </div>
 
-**Knowing where the agent's work stops is the whole point.** So I am saying it out loud.
+**Knowing where the agent's work stops is the whole point.** So I am saying the boundary out loud.
 
 <!--
 SPEAKER NOTES:
@@ -630,7 +630,7 @@ The agent is good right up to a boundary, and the honest move is to name the bou
 
 ---
 
-# The database would have run it. The harness would not.
+# The database would have run the mass delete. The harness would not.
 
 <div class="columns">
 <div>
@@ -651,12 +651,12 @@ No `WHERE`. The whole table. Cascading to five more.
 </div>
 <div>
 
-## Why it should reassure you
+## Why the refusal should reassure you
 
 Three independent controls, each with a veto:
 
-1. **Allow-list**: which files it can touch
-2. **Action classifier**: which operations it can run
+1. **Allow-list**: which files the agent can touch
+2. **Action classifier**: which operations the agent can run
 3. **Database grants**: what the account may do
 
 *The account had the privilege. The guardrail sits above the grants, not inside them.*
@@ -685,8 +685,8 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 
 ## Maintainers write down the knowledge
 
-- Skills, like the ai-plugins, carry it into the coding loop
-- `llms.txt`, raw Markdown, an MCP interface, and `?ask=` publish it for agents, not only for browsers
+- Skills, like the ai-plugins, carry the knowledge into the coding loop
+- `llms.txt`, raw Markdown, an MCP interface, and `?ask=` publish the knowledge for agents, not only for browsers
 - MariaDB's docs expose all four
 
 </div>
@@ -701,7 +701,7 @@ Here is why that should reassure you rather than scare you. Safety on an agent i
 </div>
 </div>
 
-**You cannot retrain the model. You can write down what it needs, and review it like code.**
+**You cannot retrain the model. You can write down what the model needs, and review those documents like code.**
 
 <!--
 SPEAKER NOTES:
@@ -722,16 +722,16 @@ Neither one is a smarter model. Both are documents, and you can review them like
 <div class="columns">
 <div>
 
-1. **Skills are the fix, not a cleverer prompt.** When the model guesses past its training, more prompting will not make it know current MariaDB. A skill hands it the knowledge, and the plugin installs it in the harness you already use.
-2. **Write a spec, and end it in acceptance criteria.** A skill stops the guessing about the database. A spec stops the guessing about your app, and its criteria let the agent check its own work. Unlike a chat prompt, you can review it.
+1. **Skills are the fix, not a cleverer prompt.** When the model guesses past its training, more prompting will not teach the model current MariaDB. A skill hands the model the knowledge, and the plugin installs the skills in the harness you already use.
+2. **Write a spec, and end it in acceptance criteria.** A skill stops the guessing about the database. A spec stops the guessing about your app, and its criteria let the agent check its own work. Unlike a chat prompt, a spec is something you can review.
 3. **Tools give the agent something to run against.** The MCP server opens a live connection and deploys a sandbox server, so the agent runs its SQL and fixes what broke. When a run fails, wrong SQL points to missing knowledge, and a blocked connection points to the tools.
 
 </div>
 <div>
 
 4. **Name the artifact, not the outcome.** Ask for the schema, the DDL file, the running app, and number the steps when the order matters.
-5. **Guardrails are layered, so set all three.** The working-directory allow-list, the harness action classifier, and the database grants each get a veto. You do not have to trust the agent's judgment to keep it safe.
-6. **Start on greenfield.** The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, then take it into harder work.
+5. **Guardrails are layered, so set all three.** The working-directory allow-list, the harness action classifier, and the database grants each get a veto. You do not have to trust the agent's judgment to keep the agent safe.
+6. **Start on greenfield.** The loop is fast and there is no existing code to put at risk. Build your confidence where the blast radius is smallest, then take that confidence into harder work.
 
 </div>
 </div>
@@ -761,7 +761,7 @@ Six. Start on greenfield. The loop is fast and there is no existing code to put 
 
 # Go build something confidently right
 
-*Crazy until it's not. You watched it flip, and I showed you where it hasn't.*
+*Crazy until it's not. You watched the idea flip, and saw the one place the idea still hasn't.*
 
 **Demo, prompts, and schema:** *github.com/maglietti/notes-app-demo* (Apache-2.0)
 
@@ -805,7 +805,7 @@ Questions.
 </div>
 <div>
 
-## How it fits
+## How the layers fit
 
 - Install `ai-plugins`; it downloads the shell on first run
 - The shell hosts the MCP server as a plugin
@@ -835,15 +835,15 @@ If someone asks how the pieces fit. You install one thing, the ai-plugins. On fi
 ## How the app connects
 
 - The native MariaDB connector, to the sandbox on 3310
-- No router, no daemon, it starts offline
+- No router, no daemon, and the app starts offline
 - A real client on the schema the agent designed
 
 </div>
 <div>
 
-## Why it is not proof of REST
+## Why the app is not proof of REST
 
-<span class="boundary">In native mode it never calls the `/notesApp` endpoints. An optional third prompt defines them, and the server that would serve them is not ready yet, so REST mode has nothing to answer it. The app takes the native path to the same tables.</span>
+<span class="boundary">In native mode the app never calls the `/notesApp` endpoints. An optional third prompt defines them, and the server that would serve them is not ready yet, so REST mode has nothing to answer the app. The app takes the native path to the same tables.</span>
 
 </div>
 </div>
