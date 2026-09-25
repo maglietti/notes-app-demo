@@ -4,11 +4,11 @@ The operating sheet for the live run and for recording it. One agent context run
 
 ## What the audience watches
 
-Two prompts, two acts, one conversation: the data tier, then the app. Both acts start from the same product doc, `docs/notes_app-prd.md`, so the schema the agent designs is the schema the app is built on. Act one seeds the database, so the app has real data to show. An optional third act puts a REST Service in front of the schema and adds a REST backend beside the native one, so the app runs in native or REST mode.
+Two prompts, two acts, one conversation: the data tier, then the app. Both acts start from the same spec, `docs/notes_app-prd.md`, so the schema the agent designs is the schema the app is built on, and each act ends with the agent reporting against the spec's acceptance criteria. Act one seeds the database, so the app has real data to show. Prompt 3, which puts a REST Service in front of the schema, runs off stage only, to capture the `SHOW REST VIEWS` output for the REST slide.
 
 ## Running this card as an agent walkthrough
 
-To rehearse, open a fresh Claude Code session at the repository root and say: "Walk through talk/demo-cue-card.md as a rehearsal." Add "including act three" to run the optional act. The rest of the card is written for the presenter, and an agent follows these five rules instead:
+To rehearse, open a fresh Claude Code session at the repository root and say: "Walk through talk/demo-cue-card.md as a rehearsal." Add "including Prompt 3" to run the off-stage REST prompt. The rest of the card is written for the presenter, and an agent follows these five rules instead:
 
 1. **Check the pre-flight, change nothing.**
    - Confirm the MariaDB MCP tools (`sandbox.*`, `db.*`) and the MariaDB skills are available, then run the skills smoke test from One-time setup yourself and check the output for the tells it lists. If the tools or skills are missing, stop and report it, because installing the plugin and running `mariadb-shell -- mcp setup` are interactive steps only the presenter can do.
@@ -16,8 +16,8 @@ To rehearse, open a fresh Claude Code session at the repository root and say: "W
    - If generated files exist (`notes_app/`, `pyproject.toml`, `uv.lock`, `.env`, `.env.example`, `.venv/`, or `working/`), list them and ask the presenter to run `git clean -fdx`, then wait. Do not run git yourself.
    - Skip the presenter-only items: the terminal font, the recording, and the pre-cache step. Act one's pinned deploy downloads MariaDB 11.8 if it is not cached yet.
 2. **Run the acts in order, in this one session.** Treat each **Paste** block as the presenter's next message and follow it exactly. Log each act's start and end time (from `date`) in `working/RUN_LOG.md`, so the rehearsal can be compared with the act's target.
-3. **Check each act before starting the next.** Check only what the act's **Check** paragraph and **[CAPTURE]** notes name, from output the act already produced: the idioms in the DDL, the 61 seeded notes from the step 4 counts, the three panes and `native` status line from the launch the act two prompt verifies, and, in act three, the `SHOW REST` output, the `/note` read-back report, and the two mode runs. Record whether each item held. Do not drive the app's features or write to the seeded data, because testing beyond the prompt's own verification inflates the act's time and changes the fixture. Skip the **Line to say** and the manual `./bin/notes-app` launch.
-4. **Run act three only when asked.** Otherwise stop after act two.
+3. **Check each act before starting the next.** Check only what the act's **Check** paragraph and **[CAPTURE]** notes name, from output the act already produced: the idioms in the DDL, the agent's AC-D1 to AC-D4 report, its AC-A1 to AC-A5 report, and, for Prompt 3, its AC-R1 to AC-R5 report with the `SHOW REST` output. Record whether each item held. Do not drive the app's features or write to the seeded data, because testing beyond the prompt's own verification inflates the act's time and changes the fixture. Skip the **Line to say** and the manual `./bin/notes-app` launch.
+4. **Run Prompt 3 only when asked.** Otherwise stop after act two.
 5. **Report and stop.** Finish with a table of the acts: elapsed time against target, checks that passed or failed, and anything you had to fix along the way. Leave the sandbox and the generated files in place for inspection. Run the Cleanup section only when asked, and leave its `git clean -fdx` to the presenter.
 
 ## Pre-flight checklist (before doors, then again before you record)
@@ -63,7 +63,7 @@ Both this deploy and act one's Prompt 1 step 2 pin MariaDB 11.8, the LTS series 
 
 ## Act one: the data tier (Prompt 1)
 
-**Target 4:00.** The spec beat. The agent reads the product doc, turns its data model into current MariaDB DDL, deploys it to a fresh sandbox, and seeds it.
+**Target 4:00.** The spec pays off. The agent reads the spec, turns its data model into current MariaDB DDL, deploys it to a fresh sandbox, seeds it, and reports against the data criteria.
 
 Paste:
 
@@ -91,13 +91,15 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 - `FULLTEXT (title, body)` on `note`. Search without a second system.
 - `default_flag` generated column. One default notebook per account, enforced by the schema.
 
-**Check.** The tables list matches the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure.
+**[CAPTURE] the AC-D report.** The agent's step 4 lists AC-D1 to AC-D4, each passed with its evidence. Hold on it: this is the spec beat's promise, kept.
 
-**Line to say:** "No SQL by hand. My spec says what each column does, never the syntax. The agent turned it into current MariaDB grammar, with a skill in the room, then proved the schema by loading real data into it."
+**Check.** The report passes AC-D1 to AC-D4. The tables match the six tables and one view in PRD section 4, and the seed reports 61 notes: 48 active with 6 pinned, 7 archived, 6 trashed, plus 6 notebooks and 12 tags. Enough to show archive and trash views, pinned sorting, tag filters, search, and pagination past 25 per page. If the fixture fails first time, let the agent fix the schema and reload. A schema that bends to the contract is a finding, not a failure.
+
+**Line to say:** "No SQL by hand. My spec says what each column does, never the syntax. The agent turned it into current MariaDB grammar, with a skill in the room, proved the schema by loading real data into it, and graded itself against my definition of done."
 
 ## Act two: the application (Prompt 2)
 
-**Target 2:30.** The finale of the core run. The same context reads the same product doc, builds the client in native mode, and runs it on the data it just seeded.
+**Target 2:30.** The finale. The same context reads the same spec, builds the client in native mode, runs it on the data it just seeded, and reports against the app criteria.
 
 Paste:
 
@@ -126,11 +128,13 @@ If the build finishes but you want a clean launch on stage, run it yourself:
 
 **[CAPTURE] the app opening.** Left pane lists the six notebooks. Middle pane shows the notes with the pinned ones on top. Status line reads `native` next to the sandbox address. Open a note so the Markdown renders in the right pane.
 
-**Line to say:** "Same conversation, same product doc, from no app code to this. The app talks straight to the tables the agent designed, and the data on screen is the data act one loaded."
+**[CAPTURE] the AC-A report.** The agent lists AC-A1 to AC-A5, including the console-script check (AC-A2) that catches a package installed with no code.
 
-## Optional act three: the API tier and REST mode (Prompt 3)
+**Line to say:** "Same conversation, same spec, from no app code to this. The app talks straight to the tables the agent designed, and the data on screen is the data act one loaded."
 
-**Target 4:00.** Run it only when the clock allows, or cut to the recording. The agent puts a MariaDB REST Service in front of the schema, reads the `/note` view back, then adds a REST backend beside the native one, so the working app runs in native or REST mode. If you skip the act, still show the recorded `SHOW REST VIEWS` output and say the boundary line below, about 30 seconds, because the title promises an API tier.
+## Off stage: the API tier and REST mode (Prompt 3)
+
+**Not in the talk.** Run it once, off stage, in the same session after act two, to capture the `SHOW REST VIEWS` output for the REST slide (slide 17). The agent puts a MariaDB REST Service in front of the schema, reads the `/note` view back, and adds a REST backend beside the native one. On stage, the REST beat is that static slide and one boundary sentence, about 45 seconds.
 
 Paste:
 
@@ -151,21 +155,11 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
    must report the connection error and stay up. Log both runs.
 ```
 
-**[CAPTURE] the REST DDL landing.** The prompt names the one-statement-per-session rule, so the DDL runs one statement at a time. Call out what the agent wrote: `@KEY`, `@SORTABLE`, `@UNNEST` through `note_tag`, and the CRUD flags, the least-trained grammar in the run.
+**[CAPTURE] for the REST slide.** Save the `SHOW REST VIEWS` output, which lists `/note`, `/notebook`, and `/tag` under `/notesApp`. That output is the whole on-stage REST beat.
 
-**Line to say:** "This is the grammar the model is most confidently wrong about, and it is the grammar the skill knows best."
+**Expect the read-back mismatch.** On mariadb-shell 26.9.3, `SHOW CREATE REST VIEW /note` shows the nested `noteTag` and `tag` objects with `@INSERT @UPDATE @DELETE`, even though the DDL says `@NOINSERT @NOUPDATE @NODELETE`. The grammar accepts the flags, but the shell stores each nested object with the parent view's operations (`plugins/mrs_plugin/lib/db_objects.py:762`), so no DDL can make them read-only. AC-R2 asks for a report, not a fix. Re-check on any newer shell. The slide's speaker notes hold an optional one-line mention of it.
 
-**[CAPTURE] the read-back.** On mariadb-shell 26.9.3, `SHOW CREATE REST VIEW /note` shows the nested `noteTag` and `tag` objects with `@INSERT @UPDATE @DELETE`, even though the DDL says `@NOINSERT @NOUPDATE @NODELETE`. The grammar accepts the flags, but the shell stores each nested object with the parent view's operations (`plugins/mrs_plugin/lib/db_objects.py:762`), so no DDL can make them read-only. The prompt asks for a report, not a fix, so the act stays inside its target. Expect this until a fixed shell ships, and re-rehearse the beat on any newer shell.
-
-**Line to say:** "The agent wrote the flags right, and the tool dropped them on the way into the metadata. The agent only caught it because the prompt made it read the metadata back. Check the source of truth, not the summary."
-
-**[CAPTURE] the metadata.** `SHOW REST VIEWS` lists `/note`, `/notebook`, and `/tag` under `/notesApp`. State the boundary in one sentence and move on:
-
-**Line to say:** "The endpoints are defined right here in the metadata. Serving them over HTTP is a router, and that router is a separate job I did not stand up today. Knowing where the agent's work stops is the whole idea."
-
-**[CAPTURE] the two modes.** The status line flips from `native` with the sandbox address to `rest` with `/notesApp` and a clean connection error, and the app stays up.
-
-**Line to say:** "Same app, one environment variable. Native mode is a working client on the tables. REST mode is wired to the tier the agent defined, and it tells you plainly that nothing is serving it yet."
+**Expect REST mode to report the missing server.** The status line flips from `native` with the sandbox address to `rest` with `/notesApp` and a connection error, and the app stays up (AC-R5). The server that would serve the endpoints is not ready yet.
 
 ## Cleanup (after the run, off the clock)
 
@@ -183,8 +177,8 @@ git clean -fdx
 
 ## Recording notes
 
-- Capture the core moments in order: schema landing, app opening. For the optional act, add the REST DDL landing, the `SHOW CREATE REST VIEW /note` read-back, `SHOW REST`, and the two modes.
+- Capture the moments in order: schema landing, the AC-D report, app opening, the AC-A report. From the off-stage Prompt 3 run, keep only the `SHOW REST VIEWS` output, for the static slide.
 - Trim the waits between tool calls, but keep any fixture-driven schema fix intact. A failure the agent fixes is evidence.
-- The core run is about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, and a separate optional-act cut inside 4:00, so the whole talk lands near 20 and stays under 25 with or without it.
+- The two acts are about six and a half minutes. Target a trimmed cut of acts one and two inside 6:30, so the whole talk lands near 21 and stays under 25.
 - Record at the projector font size, not your desk size.
-- Keep the file local. Have `working/RUN_LOG.md`, an app screenshot, and, for the optional act, the `SHOW REST` output exported as static slides in case the recording will not play.
+- Keep the file local. Have `working/RUN_LOG.md` with both reports, an app screenshot, and the `SHOW REST` output exported as static slides in case the recording will not play.

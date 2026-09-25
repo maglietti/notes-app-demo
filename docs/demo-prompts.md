@@ -1,6 +1,6 @@
 # Notes App demo prompts
 
-Three prompts, run in order in one agent session, each pasted into the coding agent. Prompt 1 builds and seeds the data tier, and Prompt 2 builds the Textual client that runs on it. Prompt 3 is optional: it puts a REST Service in front of the schema and adds a REST backend beside the native one, so the client runs in native or REST mode. The cue card, [`talk/demo-cue-card.md`](../talk/demo-cue-card.md), is the source of truth for these prompts, and this file and the README carry copies of them.
+Three prompts, run in order in one agent session, each pasted into the coding agent. Prompt 1 builds and seeds the data tier, and Prompt 2 builds the Textual client that runs on it. Prompt 3 is optional: it puts a REST Service in front of the schema and adds a REST backend beside the native one, so the client runs in native or REST mode. The talk runs Prompts 1 and 2 on stage, and runs Prompt 3 off stage only, to capture the `SHOW REST VIEWS` output for its REST slide. The cue card, [`talk/demo-cue-card.md`](../talk/demo-cue-card.md), is the source of truth for these prompts, and this file and the README carry copies of them.
 
 Run the agent from the repository root, where the layout keeps inputs apart from output:
 
@@ -83,5 +83,5 @@ What to check. The agent reports AC-R1 to AC-R5, with AC-R2 expected to show the
 ## After the prompts
 
 - **Where things land.** The app is a `notes_app` package at the repository root. The schema, the REST DDL, the sandbox data, and `RUN_LOG.md` sit under `working/`, and the inputs the agent read stay in `docs/` and `research/`.
-- **REST mode needs a router.** Serving `/notesApp` over HTTP is a MySQL-Router-family binary bootstrapped against the metadata, and it is neither a shell command nor an MCP tool, so standing one up is out of band. Native mode is the reliable demo path, so switch to `NOTES_APP_MODE=rest` against live endpoints only once a router is running and verified.
+- **REST mode needs a router.** Serving `/notesApp` over HTTP is a MySQL-Router-family binary bootstrapped against the metadata, and it is neither a shell command nor an MCP tool, so standing one up is out of band. The REST server expected in `mariadb-shell` is not ready yet. Native mode is the reliable demo path, so switch to `NOTES_APP_MODE=rest` against live endpoints only once a router is running and verified.
 - **The sandbox outlives the conversation.** Stop and delete it when done with `sandbox.stop(port=3310, password="demo-pw", sandbox_dir="working/sandbox")` and then `sandbox.delete(port=3310, sandbox_dir="working/sandbox")`.

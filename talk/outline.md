@@ -1,195 +1,203 @@
 # Slide outline: Confidently Wrong
 
-The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md). Twenty-one slides plus one appendix, across nine beats. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
+The slide-by-slide plan, mapped to the beats in [`run-of-show.md`](run-of-show.md) and to the deck in [`slides.md`](slides.md). Twenty-one slides plus two Q&A backups, across ten beats. On-slide text stays sparse, in the MariaDB deck style: a title, a few words, and one artifact. The detail lives in the script and the speaker notes, not on the wall.
 
-Recording note: the acts play from the recorded run. Acts one and two share one trimmed cut, cued at the start of each act, and the optional act three has its own cut. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The deck carries the frame; the recording carries the work.
+Recording note: the two acts play from one trimmed recording, cued at the start of each act. Each act is an act-divider slide holding the prompt's shape, then a cut to that act's recording, then a payoff slide that names what just happened. The REST beat is a static slide, with its output captured from an off-stage run of Prompt 3. The deck carries the frame; the recording carries the work.
 
-Prompt slides show the trimmed shape of the prompt, not the full text. The full prompt lives in the speaker notes and on the cue card.
+Prompt slides show the trimmed shape of the prompt, not the full text. The full prompt lives on the cue card.
 
 Legend: **On slide** is what the audience reads. **Build** is the visual or reveal. **Says** is the one job the slide does.
 
 ---
 
-## Beat 1: Opening hook (slides 1-3, ~2:00)
+## Beat 1: Opening hook (slides 1-4, ~2:00)
 
 ### Slide 1: Title
 
 - **On slide:** Confidently Wrong: Handing a Coding Agent an API Tier Anyway. Michael Aglietti, Head of Developer Relations, MariaDB. All Things Open 2026, Databases.
-- **Build:** Title layout, Deep Ocean background, Electric Eel accent rule.
-- **Says:** This is the concrete, verified session, and it starts on time.
+- **Build:** Lead layout, dark background.
+- **Says:** I handed an agent a job it is confidently wrong about, and it worked because of two changes to how I work with it.
 
-### Slide 2: The hook
+### Slide 2: "Good ideas are always crazy until they're not."
 
-- **On slide:** "A model writes fluent, wrong SQL for grammar it never saw. And it cannot tell you which parts it guessed."
-- **Build:** One line, large. Optional: a short block of plausible-looking SQL with one MariaDB construct quietly wrong.
-- **Says:** Name the problem the whole talk answers. This is what confidently wrong means.
+- **On slide:** The Larry Page quote.
+- **Build:** One line, lead layout.
+- **Says:** The "anyway" in the title. By the end you will watch it stop being crazy, and see the one place it still is.
 
-### Slide 3: The promise
+### Slide 3: I had an idea
 
-- **On slide:** Prototype a real app on current MariaDB, from a handful of prompts. See exactly where the agent stops.
-- **Build:** Two lines. The second line in the accent color, because the boundary is the differentiator.
-- **Says:** Set the contract with the room, counter to the keynote hype next door.
+- **On slide:** I had an idea. And I wanted to build the app, not stand up a tech stack.
+- **Build:** Lead layout.
+- **Says:** The itch every developer knows.
+
+### Slide 4: The idea
+
+- **On slide:** A notebook that lives in the terminal. Three panes. Search, pin, archive, trash, tags.
+- **Build:** Two columns: the feel, and what it does.
+- **Says:** Picture a real app, because in my head it already is one.
 
 ---
 
-## Beat 2: The two frictions (slides 4-6, ~2:00)
+## Beat 2: The frictions (slides 5-7, ~2:00)
 
-### Slide 4: Friction one, the guessing
+### Slide 5: The LLM is wrong, fluently
 
-- **On slide:** The model conflates MariaDB with MySQL. It gets version-specific grammar wrong, confidently.
-- **Build:** Side-by-side: what the model writes vs what current MariaDB wants. One or two lines each.
-- **Says:** The knowledge gap is real and it is specific, not hand-waving about hallucination.
+- **On slide:** Perfect time to vibe code. What it hands you, and the trap: code that looks right and behaves wrong.
+- **Build:** Two columns. The accent line defines confidently wrong.
+- **Says:** Name the problem the whole talk answers. The vibe-coding line sets up the spec beat.
 
-### Slide 5: Friction two, standing up the stack by hand
+### Slide 6: Prototyping stalls before it starts
 
-- **On slide:** The time meant for the app goes to plumbing. Which version. Docker. Provisioning.
-- **Build:** A short list of the plumbing, struck through, to signal what the tooling removes.
-- **Says:** The second cost is time and focus, and the audience feels this one.
+- **On slide:** Stale, MySQL-flavored knowledge (`UUID_TO_BIN`, plain `utf8`, `LAST_INSERT_ID()`), and standing up the stack by hand.
+- **Build:** Two columns.
+- **Says:** The knowledge gap is specific, and the plumbing eats the time.
 
-### Slide 6: What current MariaDB actually gives you
+### Slide 7: What MariaDB actually does
 
-- **On slide:** System versioning. `UUID_v7()`. `FULLTEXT`. Generated columns.
-- **Build:** Four capability chips. This is the MariaDB value slide, so give it room.
+- **On slide:** Row history, time-ordered keys, full-text search, one default notebook enforced by the schema.
+- **Build:** Two columns: what the app could lean on, and what you build instead.
 - **Says:** The database is worth reaching for. The tooling is how you reach it, not a replacement for it.
 
 ---
 
-## Beat 3: The frame and the plugins (slides 7-8, ~2:30)
+## Beat 3: The frame, skills and tools (slides 8-9, ~2:30)
 
-### Slide 7: Skills and tools
+### Slide 8: What if the agent already knew?
 
-- **On slide:** Skills carry the grammar the model never saw. Tools carry the connection and the instance. You need both to close the loop.
-- **Build:** Two columns. Skills: Markdown, versioned, no fine-tuning. Tools: MCP server, sandbox, execute.
-- **Says:** The one distinction the whole talk hangs on.
+- **On slide:** Skills carry the knowledge. Tools carry the reach. Together they close the loop.
+- **Build:** Two columns.
+- **Says:** The distinction the talk hangs on.
 
-### Slide 8: The ai-plugins, and how to get them
+### Slide 9: ai-plugins
 
-- **On slide:** `ai-plugins`: MariaDB's skills and MCP server, for the harness you already use. Install one line. Skills work offline; the MCP server takes one setup. GPL-2.0.
-- **Build:** The install line big (`/plugin marketplace add mariadb/ai-plugins`, `/plugin install dev@mariadb`), four harness logos beneath it (Claude Code, Codex, OpenCode, Pi), and a note: sandbox needs no Docker and no root. DevHub link.
-- **Says:** The star of the show, named and reachable. This is a real thing you install today, not a research demo.
-
----
-
-## Beat 4: Act one, the data tier (slides 9-11, ~4:00)
-
-### Slide 9: Act one divider, Prompt 1
-
-- **On slide:** Act 1: From a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, deploy a sandbox, seed it, report the counts.
-- **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** I wrote the data model once, in a spec. The agent writes the DDL and proves it.
-
-### Slide 10: The recording (schema landing)
-
-- **On slide:** Minimal chrome, the recording fills the frame. Caption: writing the DDL, deploying the sandbox, running it, loading the fixture.
-- **Build:** Cut to act one of the recorded run. **[CAPTURE] schema landing.**
-- **Says:** No SQL by hand. Watch the loop close against a live database, with real data as the contract.
-
-### Slide 11: What just landed
-
-- **On slide:** `CREATE OR REPLACE TABLE`. `utf8mb4` with `uca1400`. `WITH SYSTEM VERSIONING`. `uuid_v7()`. `FULLTEXT`. Generated `default_flag`. Then 61 notes, 6 notebooks, 12 tags loaded.
-- **Build:** The idioms as callouts over a trimmed DDL snippet, with the fixture counts beneath.
-- **Says:** The spec describes behaviour, not syntax. The agent chose the current grammar, and the server and the fixture proved it.
+- **On slide:** The skills and the `mariadb-shell` MCP server. Install in two lines. Four harnesses. What to expect.
+- **Build:** Install lines large, the DevHub URL in accent.
+- **Says:** The first change: it fixes what the agent knows about MariaDB, not what it knows about my app.
 
 ---
 
-## Beat 5: Act two, the application (slides 12-14, ~2:30)
+## Beat 4: The spec (slides 10-11, ~2:00)
 
-### Slide 12: Act two divider, Prompt 2
+### Slide 10: Vibe coding has a second guess in it
 
-- **On slide:** Act 2: An idea you can open. The shape of Prompt 2: build the Textual app the PRD specifies, in native mode with its queries behind the DataSource interface, and verify both entry points.
-- **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** Spec-driven development. The same product doc that gave act one its data model drives the client.
+- **On slide:** A one-line prompt: fine SQL, drifting names (`user` for `account`). A spec: reviewed like code, behaviour not syntax, requirement IDs, acceptance criteria.
+- **Build:** Two columns, with the accent line beneath: skills stop the guessing about MariaDB, a spec stops the guessing about my app.
+- **Says:** The second change. Same failure, different layer, and this is how I work with an agent every day.
 
-### Slide 13: The recording (the app opens)
+### Slide 11: A spec the agent checks itself against
 
-- **On slide:** The recording fills the frame, then hold on the running three-pane app.
-- **Build:** Cut to act two of the recorded run. **[CAPTURE] app opening.** Land on notebooks, pinned notes, the status line reading `native`.
-- **Says:** From no app code to this, in one conversation, on the data act one loaded.
-
-### Slide 14: A working client, and the line
-
-- **On slide:** Native mode, straight to the tables. A working client on the schema the agent built. Not proof of a REST tier.
-- **Build:** App screenshot with the status line circled. The boundary in the accent color.
-- **Says:** Draw the line at the emotional peak. This is the honesty the title promises.
+- **On slide:** An excerpt from the PRD (FR-4, AC-D3, AC-D4), and three rules: behaviour not syntax, one spec with thin prompts, done is written down.
+- **Build:** Code block of real spec lines on the left, the rules on the right.
+- **Says:** The agent grades its own work against my definition of done, and never sees an answer key.
 
 ---
 
-## Beat 6 (optional): Act three, the API tier (slides 15-17, ~4:00, or ~0:30 on the skip path)
+## Beat 5: Act one, the data tier (slides 12-14, ~4:00)
 
-Run this act, or cut to its recording, only when the clock allows. The skip path jumps from slide 14 straight to slide 17 and shows the recorded `SHOW REST VIEWS` output with the boundary line, about 30 seconds, because the title promises an API tier.
+### Slide 12: Act one divider, Prompt 1
 
-### Slide 15: Act three divider, Prompt 3
+- **On slide:** Act one: from a spec to a schema. The shape of Prompt 1: turn PRD section 4 into DDL, deploy a sandbox, seed it, check AC-D1 to AC-D4.
+- **Build:** Act-divider layout. Trimmed prompt shape.
+- **Says:** The prompt points at the spec instead of restating it, and ends with the criteria.
 
-- **On slide:** Act 3: From the schema to a REST API. The shape of Prompt 3: build the REST Service from PRD section 5 one statement per session, verify with `SHOW REST`, read `/note` back, publish, then add REST mode to the app.
-- **Build:** Act-divider layout. Trimmed prompt shape, full text in notes.
-- **Says:** The same context now puts a REST Service in front of the schema, and teaches the app to use it.
+### Slide 13: Watch it write, deploy, run, and prove itself
 
-### Slide 16: The recording (the API tier and the two modes)
+- **On slide:** Reads the spec and writes the DDL, deploys the sandbox, runs the DDL, loads 61 notes and reports against the criteria.
+- **Build:** Cut to act one of the recording. **[CAPTURE] schema landing.**
+- **Says:** No SQL by hand, and the agent grades its own result.
 
-- **On slide:** The recording fills the frame. Caption: the REST grammar is session state, then the app flips between native and REST mode.
-- **Build:** Cut to the act three recording. **[CAPTURE] the REST DDL landing, the `SHOW CREATE REST VIEW /note` read-back, `SHOW REST`, and the two modes.** On mariadb-shell 26.9.3 the read-back shows the nested tag objects writable despite the DDL's read-only flags, a tool bug the agent reports and does not patch.
-- **Says:** The grammar the model is most confidently wrong about is the grammar the skill knows best.
+### Slide 14: It wrote current MariaDB, and the data proved it
 
-### Slide 17: Defined, not served
-
-- **On slide:** `SHOW REST VIEWS` lists `/note`, `/notebook`, `/tag`. Serving them over HTTP is a router, and that router is a separate job.
-- **Build:** The metadata output, with the boundary line beneath it in the accent color. The skip path lands here.
-- **Says:** The endpoints are real in the metadata. Knowing where the agent's work stops is the point.
+- **On slide:** A trimmed `note` DDL, the idioms, and the AC-D report: 61 notes, 6 notebooks, 12 tags.
+- **Build:** DDL snippet with callouts.
+- **Says:** The spec describes behaviour, not syntax. The agent chose the current grammar, and the fixture and the criteria proved it.
 
 ---
 
-## Beat 7: Agent security (slide 18, ~1:30)
+## Beat 6: Act two, the application (slides 15-16, ~2:30)
 
-### Slide 18: The blocked mass delete
+### Slide 15: Act two divider, Prompt 2
 
-- **On slide:** `DELETE FROM notes_app.account`. The refusal: "denied by the Claude Code auto mode classifier. Reason: [Cloud Storage Mass Delete]."
-- **Build:** The statement, then the refusal revealed beneath it. A three-layer strip: working-directory allow-list, action classifier, database grants.
+- **On slide:** Act two: an idea you can open. The shape of Prompt 2: build the app the PRD specifies, in native mode, and check AC-A1 to AC-A5.
+- **Build:** Act-divider layout. Trimmed prompt shape.
+- **Says:** Look how short the prompt is. The spec carries the app; the prompt picks the slice.
+
+### Slide 16: From a spec to a running app
+
+- **On slide:** A real Python package, AC-A1 to AC-A5 checked from both entry points, three panes, a `native` status line.
+- **Build:** Cut to act two of the recording. **[CAPTURE] app opening.**
+- **Says:** From no app code to a working app that meets its own acceptance criteria, in one conversation.
+
+---
+
+## Beat 7: The REST boundary (slide 17, ~0:45)
+
+### Slide 17: The API tier, defined, not served
+
+- **On slide:** `SHOW REST VIEWS` lists `/note`, `/notebook`, `/tag`, from an optional prompt run off stage. The server that would serve them is not ready yet, and the app does not call them.
+- **Build:** The captured metadata output, with the boundary line in the boundary color.
+- **Says:** The title's promise, kept honestly in under a minute. Knowing where the agent's work stops is the point.
+
+---
+
+## Beat 8: Agent security (slide 18, ~1:30)
+
+### Slide 18: The database would have run it
+
+- **On slide:** `DELETE FROM notes_app.account`, and the classifier's refusal. Three controls, each with a veto.
+- **Build:** The statement and refusal on the left, the three layers on the right.
 - **Says:** The database would have run it. Safety on an agent is layered, and it sits above the grants.
 
 ---
 
-## Beat 8: The bigger shift (slide 19, ~1:30)
+## Beat 9: The bigger shift (slide 19, ~1:30)
 
-### Slide 19: Knowledge agents can reach
+### Slide 19: Your agent is only as current as what you publish
 
-- **On slide:** The projects agents work well against publish for agents, not just for browsers. `llms.txt`. MCP interfaces. `?ask=` doc endpoints. Markdown source over HTML. Packaged skills.
-- **Build:** Five chips for the industry patterns, with `ai-plugins` marked as MariaDB's move: skills plus an MCP server. One line: your project can join this, whatever it is.
-- **Says:** This is a shift in developer experience, not a MariaDB trick. Skills are how a maintainer reaches coding tools they do not control.
+- **On slide:** `llms.txt`, raw Markdown, an MCP interface, `?ask=`. You can do the same for your project.
+- **Build:** Two columns.
+- **Says:** This is a shift in developer experience, not a MariaDB trick.
 
 ---
 
-## Beat 9: Takeaways and close (slides 20-21, ~2:00)
+## Beat 10: Takeaways and close (slides 20-21, ~2:00)
 
 ### Slide 20: What to take home
 
-- **On slide:** Skills carry current grammar. Tools carry capability. Name the artifact in your prompt. Guardrails are layered. Greenfield scaffolding pays off first.
-- **Build:** Five numbered takeaways, vertical, light background, in the exec-summary style from the North Star deck.
-- **Says:** The portable lessons, whatever database they run.
+- **On slide:** Six takeaways: skills, a spec with acceptance criteria, tools, name the artifact, layered guardrails, start on greenfield.
+- **Build:** Two columns of three.
+- **Says:** The portable lessons, whatever database they run. Skills, spec, and tools come first, because they are the three fixes the talk showed.
 
-### Slide 21: Close and resources
+### Slide 21: Go build something confidently right
 
-- **On slide:** The demo repo, the ai-plugins repo and DevHub, GPL-2.0. "You will hear this thesis again this afternoon, from Quincy Larson." Thank you.
-- **Build:** Resources block, QR to the repo. The Quincy line is spoken; keep it off the slide.
+- **On slide:** The demo repo (Apache-2.0) and the plugins (GPL-2.0). Questions.
+- **Build:** Lead layout. The Quincy Larson line is spoken; keep it off the slide.
 - **Says:** Send them to the code, and plant the thesis before the closing keynote restates it.
 
 ---
 
-## Appendix (Q&A only, not in the main flow)
+## Q&A backups (not in the main flow)
 
 ### Slide A1: One plugin, three layers
 
-- **On slide:** `ai-plugins` (skills and wiring). `mariadb-shell` (the runtime, the MCP server, the secret store). `mariadb-shell-plugins` (the tools and the REST grammar). Install the top; the rest arrives on first run.
-- **Build:** Three stacked layers, "you install the top" marked.
-- **Says:** Held for the architecture question. Kept out of the main flow because it is the most detail and the least demo.
+- **On slide:** `ai-plugins`, `mariadb-shell`, `mariadb-shell-plugins`. Install the top; the rest arrives on first run.
+- **Says:** Held for the architecture question.
+
+### Slide A2: Native mode versus the REST tier
+
+- **On slide:** How the app connects, and why it is not proof of REST.
+- **Says:** Held for "does the app run on the API?" It does not, and the metadata answers the REST question.
 
 ---
 
 ## Decisions folded in
 
-- **Prompt slides:** trimmed shape on the wall, full text in notes and on the cue card.
-- **Recording:** one trimmed cut for acts one and two, cued per act, and a separate cut for the optional act three, so control holds when AV is cold, the act can be dropped cleanly, and the single-conversation story still narrates across them.
-- **Three layers:** moved to the appendix (slide A1) so beat 3 stays a glance. Promote it into the main flow only if the architecture question is expected to lead.
+- **The spec replaces act three.** Spec-driven development gets its own beat before act one, and the REST act leaves the stage for a static slide. The app does not consume the endpoints, and the server that would serve them is not ready yet, so the act spent its time on caveats. See `docs/decisions.md`, "Talk framing".
+- **Prompt slides:** trimmed shape on the wall, full text on the cue card.
+- **Recording:** one trimmed cut for acts one and two, cued per act. No REST cut; the REST slide uses captured output.
+- **Three layers:** in the Q&A backups, so beat 3 stays a glance.
 
 ## Still open
 
-- **Slide 19 chips:** confirm the five patterns to name. Current set: `llms.txt`, MCP interfaces, `?ask=` doc endpoints, Markdown source over HTML, packaged skills. Swap or trim to what you want to stand behind on stage.
+- **Slide 19 items:** confirm the four patterns to name. Current set: `llms.txt`, raw Markdown, an MCP interface, `?ask=`.
+- **Auth on the REST slide:** endpoints marked `AUTHENTICATION NOT REQUIRED` read as insecure to a DBA audience. Decide whether to name the auth path as a follow-on if asked, or leave it to Q&A.

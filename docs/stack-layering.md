@@ -64,7 +64,7 @@ Solid arrows are the live request path. Dashed arrows are dependencies or reads.
 ## Two pieces outside the chain
 
 - **The MariaDB server.** A sandbox instance deployed by `sandbox.*`, or a database you configured, it holds the schema and, once REST is set up, the `mysql_rest_service_metadata` schema too.
-- **The REST router.** Serving `/notesApp` over HTTP is a MySQL-Router-family binary that reads the endpoint definitions from the metadata and serves them. It is external to the shell, it is not an MCP tool, and you bootstrap it yourself, since the plugin only registers and lists routers rather than starting one.
+- **The REST router.** Serving `/notesApp` over HTTP is a MySQL-Router-family binary that reads the endpoint definitions from the metadata and serves them. It is external to the shell, it is not an MCP tool, and you bootstrap it yourself, since the plugin only registers and lists routers rather than starting one. A REST server for `mariadb-shell` is expected but not ready yet.
 
 ## Say it in one line
 

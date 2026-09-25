@@ -2,7 +2,7 @@
 
 This repository holds the runbook for a live demo. One coding agent, handed the MariaDB skills and a live database over the Model Context Protocol, turns a product doc into a note-taking schema, deploys a throwaway MariaDB server, runs the schema against it, and seeds it. The same agent then builds a Textual client, on the Python terminal-UI framework, that runs on the result, so the work the agent did is something you can open and use rather than just read. An optional third prompt puts a REST API in front of the schema.
 
-The talk it supports is *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*, in the Databases track at All Things Open 2026. The application design lives in [`docs/notes_app-prd.md`](docs/notes_app-prd.md), and the three prompts that drive the run are collected in [`docs/demo-prompts.md`](docs/demo-prompts.md), inlined below at the step where each one belongs. The prompts originate in the talk's cue card, [`talk/demo-cue-card.md`](talk/demo-cue-card.md), so change them there first.
+The talk it supports is *Confidently Wrong: Handing a Coding Agent an API Tier Anyway*, in the Databases track at All Things Open 2026. The specification the agent builds from, with its acceptance criteria, lives in [`docs/notes_app-prd.md`](docs/notes_app-prd.md), and the three prompts that drive the run are collected in [`docs/demo-prompts.md`](docs/demo-prompts.md), inlined below at the step where each one belongs. The prompts originate in the talk's cue card, [`talk/demo-cue-card.md`](talk/demo-cue-card.md), so change them there first.
 
 ## Repository layout
 
@@ -149,7 +149,7 @@ To choose the data mode, set `NOTES_APP_MODE` on the command line, as in `NOTES_
 
 ## Step 6 (optional): Add the API tier and REST mode
 
-Give the agent Prompt 3 when you want the REST tier the talk is named for. It puts a MariaDB REST Service in front of the schema, then adds a `RestDataSource` beside the `NativeDataSource` that Prompt 2 built, so `NOTES_APP_MODE` selects native or REST mode. The REST DDL has to run through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` hands each statement a fresh session. The prompt says so up front.
+Give the agent Prompt 3 when you want the REST tier the talk's title names. The talk does not run it on stage, and shows only its `SHOW REST VIEWS` output on a static slide. It puts a MariaDB REST Service in front of the schema, then adds a `RestDataSource` beside the `NativeDataSource` that Prompt 2 built, so `NOTES_APP_MODE` selects native or REST mode. The REST DDL has to run through `db.execute_sql` one statement at a time, because the grammar is session state and `db.execute_sql_script` hands each statement a fresh session. The prompt says so up front.
 
 ```text
 Continue against the sandbox on port 3310. Keep database files in working/, and
@@ -172,7 +172,7 @@ append each step's result to working/RUN_LOG.md. Complete the steps in order.
 
 ### REST mode needs a router
 
-Serving `/notesApp` over HTTP is the job of a MySQL-Router-family binary, bootstrapped against the REST metadata. It is neither a shell command nor an MCP tool, and standing one up is out of band, which is why REST mode stays optional. Point the client at live endpoints only once a router is running and verified. For the live demo, stay in native mode.
+Serving `/notesApp` over HTTP is the job of a MySQL-Router-family binary, bootstrapped against the REST metadata. It is neither a shell command nor an MCP tool, and standing one up is out of band. The REST server expected in `mariadb-shell` is not ready yet, which is why REST mode stays optional. Point the client at live endpoints only once a router is running and verified. For the live demo, stay in native mode.
 
 ## Capturing a run for comparison
 
