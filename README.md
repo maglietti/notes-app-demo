@@ -24,6 +24,8 @@ The repository tracks the instructions, and nothing else. This is the committed 
 │   ├── notes_app-er.*         the reference schema's ER diagram
 │   ├── notes_app-prd.md       the earlier, over-informed PRD, kept for comparison; the prompts do not read it
 │   ├── no-skills-run.sql      DDL from a no-skills run against that PRD, the evidence it was too informed
+│   ├── *-spec-run.sql         DDL from the minimal spec, with and without skills
+│   ├── experiments/           the experiment log and session transcripts behind the talk's claims
 │   └── agent-security-note.md the blocked mass-delete talking point
 └── talk/                      the talk that uses this demo
     ├── notes-app-spec.md      the spec: what the app does and when it is done (agent input)
@@ -226,7 +228,7 @@ Because the repository tracks only the instructions, `git clean -fdx` clears eve
 | ------------------------------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | A tool call hangs and never returns        | The repository root is not on the allowed-paths list.                         | Add it with `mariadb-shell -- mcp setup`.                           |
 | Sandbox deploys but the connection refuses | The root password was blank.                                                  | Redeploy with a non-blank password (`demo-pw`).                     |
-| REST DDL fails partway down                | It ran through `db.execute_sql_script`, which gives each statement a session. | Rerun through `db.execute_sql`, one statement at a time.            |
+| REST DDL fails partway down                | It ran through `db.execute_sql_script`. The cause is unconfirmed: plain SQL shares one session per script. | Rerun through `db.execute_sql`, one statement at a time.            |
 | Endpoints do not answer over HTTP          | No router is serving the service.                                             | Expected. Use native mode, or bootstrap a router for REST mode.     |
 | "Not a configured connection"              | The URI is not on the allow-list or asks for more than was configured.        | Rerun `mcp setup`, or drop the extra schema or option from the URI. |
 
