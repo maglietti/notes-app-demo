@@ -712,7 +712,7 @@ Pull back with me, because both fixes you saw today were the same move, and it i
 
 An agent works from two kinds of memory. The first is what the LLM learned in training. It was fixed the day the LLM was built, it read far more MySQL than MariaDB, and it is the same for everyone who uses it. You cannot change it, and neither can I.
 
-The second is the agent's context, its working memory for this session. That is where the skills go, with the current MariaDB grammar. That is where my spec goes, with what to build and how to check it. And that is where my own corrections go. Here is a real one. While I built this talk, I corrected the agent twice on how to write these slides. Both times it wrote the rule into its memory files, so the next session started with the rule already in place. I taught it once, not every session. That is the round-after-round problem from earlier, solved.
+The second is the agent's context, its working memory for this session. That is where the skills go, with the current MariaDB grammar. That is where my spec goes, with what to build and how to check it. And that is where my own corrections go. Here is a real one. While I built this talk, I corrected the agent three times on how to write these slides: no dangling pronouns, say LLM or agent instead of model, and plain headings. Each time it wrote the rule into its memory files, so the next session started with the rule already in place. I taught it once, not every session. That is the round-after-round problem from earlier, solved.
 
 All three are things you write, review, and version like code. And the flip side is the honest part: when the agent does not load that knowledge, the LLM's training fills the gap, and the MySQL habits come right back.
 -->
