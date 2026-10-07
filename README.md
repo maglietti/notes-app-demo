@@ -14,13 +14,8 @@ The repository tracks the instructions and nothing else. The agent reads the two
 ├── LICENSE                      Apache License 2.0
 ├── bin/
 │   └── notes-app                stable launcher for the generated app
-├── docs/
-│   └── decisions.md             the choices behind the demo
-├── research/
-│   ├── synthetic_data.sql       the seed fixture (agent input)
-│   ├── *-spec-run.sql           DDL from the spec, with and without skills
-│   ├── experiments/             the experiment log and session transcripts
-│   └── agent-security-note.md   the blocked mass delete
+├── data/
+│   └── synthetic_data.sql       the seed fixture (agent input)
 └── talk/
     └── notes-app-spec.md        the spec: what the app does and when it is done (agent input)
 ```
@@ -73,12 +68,11 @@ Work in this repository and complete every step in order. Write your files to
 working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Turn the data model in talk/notes-app-spec.md into MariaDB DDL for the
-   notes_app schema, saved as working/notes_app.sql. Work from the spec alone:
-   in research/, read only synthetic_data.sql.
+   notes_app schema, saved as working/notes_app.sql.
 2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
-3. Seed it by loading research/synthetic_data.sql with db.execute_sql_script.
+3. Seed it by loading data/synthetic_data.sql with db.execute_sql_script.
    The fixture is the data contract: if it fails, fix working/notes_app.sql and
    redeploy. Never edit the fixture.
 4. Check the result against the first "Done when" item in the spec, and report

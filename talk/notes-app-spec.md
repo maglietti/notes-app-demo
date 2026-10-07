@@ -11,7 +11,7 @@ the notes in the one I pick, and the note I am reading, rendered from Markdown.
 
 ## Data
 
-It is just me for now, one account. The sample data in research/synthetic_data.sql
+It is just me for now, one account. The sample data in data/synthetic_data.sql
 must load without changes, and it expects these tables:
 
 - account: email and display name
