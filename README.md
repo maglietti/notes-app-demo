@@ -97,7 +97,7 @@ Import my notes, then check the app against the "Done when" items in the spec,
 and record each command and its result in working/RUN_LOG.md.
 ```
 
-**Check.** The import reports all 56 files in `notes/`: 53 daily notes and 3 quarterly summaries. This search lists `2026-04-14.md` in its top three:
+**Check.** The import reports all 220 files in `notes/`: 217 daily notes and 3 quarterly summaries. This search lists `2026-04-14.md` in its top three:
 
 ```bash
 uv run notes-app search "testing a migration without a copy of production"
