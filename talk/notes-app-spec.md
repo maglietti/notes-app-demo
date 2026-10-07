@@ -35,6 +35,7 @@ Must have:
 7. Archive a note, and bring it back
 8. Trash a note, restore it, and empty the trash
 9. Show a status line with where the app is connected
+
 Later: full-text search, and filtering by tag.
 
 ## How it runs

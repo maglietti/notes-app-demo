@@ -11,7 +11,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [ ! -d "$repo_root/notes_app" ] && [ ! -f "$repo_root/pyproject.toml" ]; then
-  echo "notes-app: no app at the repo root yet — run the demo prompts to build it first." >&2
+  echo "notes-app: no app at the repo root yet. Run the demo prompts to build it first." >&2
   exit 1
 fi
 

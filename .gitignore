@@ -9,7 +9,7 @@
 /.env
 /.env.example
 
-# Prompt 1 and 3 output: schema, REST DDL, run log, and the sandbox data directory
+# Prompt 1 output: schema, run log, and the sandbox data directory
 working/
 
 # Python build and bytecode
