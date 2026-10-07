@@ -1,7 +1,7 @@
 -- synthetic_data.sql
 -- Sample data for the notes_app schema: one account, six notebooks, twelve
--- tags, sixty-one notes across all statuses, and the tag links. Safe to run
--- more than once. The account is referenced by email, so no id is hard-coded.
+-- tags, sixty-one notes across all statuses, and the tag links. The account is
+-- referenced by email, so no id is hard-coded.
 --
 -- The notes are the kind of work a developer relations team tracks: content in
 -- flight, demo mechanics, community threads, reading, and personal errands.

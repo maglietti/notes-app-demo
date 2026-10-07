@@ -89,7 +89,7 @@ Give the agent Prompt 2:
 
 ```text
 Build the app that talk/notes-app-spec.md describes, on the schema in
-working/notes_app.sql. Build every Must have, and leave the Later items.
+working/notes_app.sql. Build every Must have.
 
 - bin/notes-app is the committed launcher. Read it, and make the app work
   with it.
@@ -101,7 +101,7 @@ Check the app against the "Done when" items in the spec, and record each
 command and its result in working/RUN_LOG.md.
 ```
 
-**Check.** `bin/notes-app` starts the app. The left pane lists the six notebooks, the middle pane shows the notes with the pinned ones on top, and the status line shows where the app is connected.
+**Check.** `bin/notes-app` starts the app. The left pane lists the six notebooks, and the middle pane shows the notes with the pinned ones on top.
 
 ## Step 5: Run the client
 

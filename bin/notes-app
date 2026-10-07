@@ -17,9 +17,6 @@ fi
 
 cd "$repo_root"
 
-# Native mode is the demo default; override with NOTES_APP_MODE=rest before the call.
-export NOTES_APP_MODE="${NOTES_APP_MODE:-native}"
-
 # Prefer uv when the app ships a pyproject; fall back to the interpreter directly.
 if command -v uv >/dev/null 2>&1 && [ -f pyproject.toml ]; then
   exec uv run python -m notes_app "$@"

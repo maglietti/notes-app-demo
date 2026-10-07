@@ -7,7 +7,7 @@ the notes in the one I pick, and the note I am reading, rendered from Markdown.
 
 - MariaDB 11.8
 - Python 3.11 or newer, with Textual for the terminal UI
-- The app talks to MariaDB directly with MariaDB Connector/Python
+- The app talks to MariaDB with MariaDB Connector/Python
 
 ## Data
 
@@ -34,9 +34,6 @@ Must have:
 6. Pin and unpin a note
 7. Archive a note, and bring it back
 8. Trash a note, restore it, and empty the trash
-9. Show a status line with where the app is connected
-
-Later: full-text search, and filtering by tag.
 
 ## How it runs
 
