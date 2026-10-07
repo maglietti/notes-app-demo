@@ -3,7 +3,7 @@
 -- tags, sixty-one notes across all statuses, and the tag links. The account is
 -- referenced by email, so no id is hard-coded.
 --
--- The notes are the kind of work a developer relations team tracks: content in
+-- The notes are the kind of work a developer advocate tracks: content in
 -- flight, demo mechanics, community threads, reading, and personal errands.
 
 -- 1. The seeded account the client runs as.
@@ -72,7 +72,7 @@ FROM (
   UNION ALL SELECT 'DevRel', 'Office hours question log', 'Recurring questions worth turning into posts: connector pooling defaults, JSON validation, and choosing an index for a slow query.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Newsletter draft on 11.8 LTS', 'Lead with the headline features, then the upgrade path. Keep it to four paragraphs.', 'active', 0
   UNION ALL SELECT 'DevRel', 'Sample data generator idea', 'A small script that seeds realistic rows for any schema, so tutorials stop shipping foo and bar.', 'active', 0
-  UNION ALL SELECT 'DevRel', 'Quarterly content plan', 'Three tutorials, one webinar, two conference talks. Prioritise the REST service walkthrough.', 'archived', 0
+  UNION ALL SELECT 'DevRel', 'Quarterly content plan', 'Three tutorials, one webinar, two conference talks. Prioritise the backup walkthrough.', 'archived', 0
   UNION ALL SELECT 'DevRel', 'Webinar on schema management', 'Versioned schema with MSM and a walkthrough of the section model.', 'archived', 0
 
   -- Conferences: logistics and submissions.
@@ -90,7 +90,7 @@ FROM (
   UNION ALL SELECT 'Community', 'Triage first-time contributor PRs', 'Four open pull requests are waiting on a first review. Anything older than a week gets a reply today.', 'active', 1
   UNION ALL SELECT 'Community', 'Good first issues list', 'Curate ten issues with enough context that a newcomer can start without asking. Docs examples are the easiest win.', 'active', 0
   UNION ALL SELECT 'Community', 'Where support questions should live', 'Forum threads stay searchable, chat does not. Write down the routing rule and link it from the README.', 'active', 0
-  UNION ALL SELECT 'Community', 'Meetup speakers wanted', 'Two slots open for the spring series. Ask the connector maintainers and the ColumnStore team.', 'active', 0
+  UNION ALL SELECT 'Community', 'Meetup speakers wanted', 'Two slots open for the spring series. Candidates: a connector maintainer and a ColumnStore contributor.', 'active', 0
   UNION ALL SELECT 'Community', 'Contributor guide refresh', 'The build steps are two releases behind and the sign-off section is missing. Rewrite both and test on a clean machine.', 'active', 0
   UNION ALL SELECT 'Community', 'Mentoring plan for docs contributions', 'Pair a new contributor with a maintainer for their first three pages. Set a two-week check-in.', 'active', 0
   UNION ALL SELECT 'Community', 'Forum thread on connector timeouts', 'Reproduced the pool exhaustion with connectionLimit at the default. Reply with the acquireTimeout explanation.', 'active', 0
@@ -103,10 +103,10 @@ FROM (
   UNION ALL SELECT 'Inbox', 'Renew SSL cert', 'The staging demo certificate expires next month.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Idea skill for window functions', 'A skill covering OVER and the framing clauses would close a common gap.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Reset sandbox before rehearsal', 'Drop and redeploy so the run starts from the same state every time.', 'active', 1
-  UNION ALL SELECT 'Inbox', 'Ask docs team about REST examples', 'The REST service pages need a worked example that returns rows, not just the DDL.', 'active', 0
+  UNION ALL SELECT 'Inbox', 'Worked examples for JSON functions', 'The JSON function pages need a worked example that returns rows, not just the syntax.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Follow up on the benchmark harness', 'Pin the dataset, the client count, and the warmup time, or the numbers mean nothing next quarter.', 'active', 0
   UNION ALL SELECT 'Inbox', 'Draft reply to podcast invite', 'Yes, but ask for the topic list a week out so the examples can be prepared.', 'active', 0
-  UNION ALL SELECT 'Inbox', 'Check CI flake', 'Intermittent failure in the REST grammar test.', 'trashed', 0
+  UNION ALL SELECT 'Inbox', 'Check CI flake', 'Intermittent failure in the connector test suite.', 'trashed', 0
   UNION ALL SELECT 'Inbox', 'Duplicate capture to clean up', 'Same content as the optimizer trace note. Delete after merging the useful line.', 'trashed', 0
 
   -- Reading: papers, docs, and feature deep dives.
@@ -198,7 +198,7 @@ FROM (
   UNION ALL SELECT 'Idea skill for window functions', 'mariadb'
   UNION ALL SELECT 'Reset sandbox before rehearsal', 'todo'
   UNION ALL SELECT 'Reset sandbox before rehearsal', 'talk'
-  UNION ALL SELECT 'Ask docs team about REST examples', 'todo'
+  UNION ALL SELECT 'Worked examples for JSON functions', 'todo'
   UNION ALL SELECT 'Follow up on the benchmark harness', 'benchmark'
   UNION ALL SELECT 'Follow up on the benchmark harness', 'todo'
   UNION ALL SELECT 'Draft reply to podcast invite', 'todo'
