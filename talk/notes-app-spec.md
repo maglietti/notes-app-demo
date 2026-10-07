@@ -37,10 +37,10 @@ Must have:
 
 ## How it runs
 
-- `./bin/notes-app` from the repository root starts the app
+- `uv run notes-app` from the repository root starts the app
 - Connection settings come from a .env file
 
 ## Done when
 
 - The schema loads, and the sample data loads into it: 6 notebooks, 12 tags, 61 notes
-- bin/notes-app opens and shows my notebooks and their notes, pinned ones on top
+- `uv run notes-app` opens and shows my notebooks and their notes, pinned ones on top

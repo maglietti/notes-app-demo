@@ -12,8 +12,6 @@ The repository tracks the instructions and nothing else. The agent reads the two
 .
 ├── README.md                    this runbook
 ├── LICENSE                      Apache License 2.0
-├── bin/
-│   └── notes-app                stable launcher for the generated app
 ├── data/
 │   └── synthetic_data.sql       the seed fixture (agent input)
 └── talk/
@@ -33,7 +31,7 @@ working/                                      the schema, RUN_LOG.md, and the sa
 
 - A coding-agent harness. This runbook uses Claude Code.
 - macOS or Linux.
-- Python 3.11 or newer. `uv` is optional: `bin/notes-app` uses it when present and falls back to `python3`.
+- Python 3.11 or newer, and `uv`, the Python project manager the app is built with.
 - MariaDB Connector/C with `mariadb_config` on the `PATH`, plus a C compiler. The app's `mariadb` Python package builds against them on install. The package is `libmariadb-dev` on Debian and Ubuntu, `mariadb-connector-c-devel` on Fedora, `mariadb-libs` on Arch, and `mariadb-connector-c` in Homebrew.
 
 You do not need a MariaDB server. The sandbox brings its own, with no Docker and no root.
@@ -91,8 +89,6 @@ Give the agent Prompt 2:
 Build the app that talk/notes-app-spec.md describes, on the schema in
 working/notes_app.sql. Build every Must have.
 
-- bin/notes-app is the committed launcher. Read it, and make the app work
-  with it.
 - Write .env with the sandbox password demo-pw, plus a .env.example, at the
   repository root.
 - Keep working/ for the schema, run log and sandbox only.
@@ -101,12 +97,12 @@ Check the app against the "Done when" items in the spec, and record each
 command and its result in working/RUN_LOG.md.
 ```
 
-**Check.** `bin/notes-app` starts the app. The left pane lists the six notebooks, and the middle pane shows the notes with the pinned ones on top.
+**Check.** `uv run notes-app` starts the app. The left pane lists the six notebooks, and the middle pane shows the notes with the pinned ones on top.
 
 ## Step 5: Run the client
 
 ```bash
-./bin/notes-app
+uv run notes-app
 ```
 
 The app reads its connection settings from `.env` at the repository root. If `.env` is missing, copy `.env.example` and set the password to `demo-pw`.
