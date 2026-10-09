@@ -71,13 +71,13 @@ working/, and append a short record of each step to working/RUN_LOG.md.
 
 1. Design the MariaDB schema for the app that talk/notes-app-spec.md
    describes, and save the DDL as working/notes_app.sql.
-2. If no MariaDB 11.8 sandbox is running on port 3310, deploy one there with
+2. If no MariaDB 12.3 sandbox is running on port 3310, deploy one there with
    root password demo-pw and data directory working/sandbox. Run
    working/notes_app.sql on it via the MCP server.
 3. Report each table you created and what it holds.
 ```
 
-The first deploy on a machine with no local MariaDB server downloads the 11.8 server package, a few hundred megabytes. Later deploys reuse the cached copy.
+The first deploy downloads the MariaDB 12.3 server package, a few hundred megabytes, unless a 12.3 server is already on your `PATH`. Later deploys reuse the cached copy.
 
 **Check.** The schema runs on the sandbox with no errors. The spec names no MariaDB features, so read `working/notes_app.sql` to see what the agent chose.
 

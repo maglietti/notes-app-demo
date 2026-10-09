@@ -12,7 +12,7 @@ A terminal app that finds my notes semantically. I type what a note was about, a
 
 ## Stack
 
-- MariaDB 11.8
+- MariaDB 12.3
 - Python 3.11 or newer, managed with uv, with Textual for the terminal UI
 - Embeddings come from Ollama on my laptop, using `qwen3-embedding:0.6b`
 - Everything runs on my laptop with no API keys. I don't want my notes to leave my laptop.
