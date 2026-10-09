@@ -91,7 +91,8 @@ slides:
       and roughly what it was about. And one rule I won't bend: everything
       runs on my laptop. I don't want my notes to leave my laptop. So the
       embeddings come from Ollama, locally, and the database is MariaDB 12.3,
-      the current long-term support release.
+      the current long-term support release. That's spec-driven development
+      at its smallest: one page, and a check at the end.
 
   - layout: title-body-dark
     title: The spec lists what to build now and what can wait
@@ -212,7 +213,7 @@ slides:
       12.3, and the app and my agent search the same index.)
 
   - layout: title-body-dark
-    title: Install in two commands, then choose what it can reach
+    title: Installs with two commands, and configures itself
     textboxes:
       - text: "/plugin marketplace add mariadb/ai-plugins\n/plugin install dev@mariadb"
         left_in: 0.8
@@ -399,7 +400,7 @@ slides:
       told it to look.
 
   - layout: title-body-dark
-    title: My check passes, and I can rerun it myself
+    title: My check passes
     pictures:
       - image: talk/captures/pass.png
         left_in: 0.5
@@ -424,7 +425,7 @@ slides:
 
   # Beat 8: Now I just ask (1:45)
   - layout: title-body-dark
-    title: Now I type what I remember, and the note comes up
+    title: Now I can search for what I remember
     pictures:
       - image: talk/captures/tui-search.png
         left_in: 0.75
@@ -438,7 +439,7 @@ slides:
       lazygit, and q quits. That's the note I couldn't find at the start.
 
   - layout: title-body-dark
-    title: One line in CLAUDE.md, and my agent asks the index
+    title: Add one line in CLAUDE.md to use my new tool
     pictures:
       - image: talk/captures/claude-md.png
         left_in: 0.9
@@ -470,7 +471,7 @@ slides:
 
   # Beat 9: The guardrails held (1:15)
   - layout: title-body-dark
-    title: The harness stopped a delete the database allowed
+    title: The harness stopped a delete on its own
     textboxes:
       - text: "DELETE FROM notes_app.account"
         left_in: 0.8
@@ -526,37 +527,33 @@ slides:
 
   # Beat 10: What I'd tell you (2:15)
   - layout: title-body
-    title: Five habits made the agent's work easy to trust
+    title: Five things make codeveloping with an agent easier
     body:
-      - Write down what the app does, and the check it must pass
-      - "Name the files, number the steps, and say \"in order\""
-      - Load how your database does it, and look for the Skill line
+      - Adopt spec driven development (SDD)
+      - text: Write down what the app does, and the check it must pass
+        level: 1
+      - "Name the files, number the steps, and tell the harness to do things \"in order\""
+      - Load skills and plugins for your stack
+      - text: Look for the Skill line to make sure the harness is paying attention!
+        level: 1
       - Give the agent a sandbox to try its work on
-      - Run the check yourself
+      - text: Always work in isolation when rapid-prototyping
+        level: 1
+      - text: Create snapshot clones for experimentation
+        level: 1
+      - Run the check yourself and provide feedback to the agent
     notes: >-
-      [1:00] So here's what I'd tell you. Write down what the app does, and
-      the check it has to pass. That one line is how the agent knew it was
-      done, and how I know it works.
-      Name the files, number the steps, say in order. Load how your database
-      does it, and look for the Skill line, because a small agent may not
-      load it for you. Give the agent a sandbox, so it tries its work on a
-      real server. And run the check yourself.
-
-  - layout: title-body
-    title: What stays after the session, and where to start
-    body:
-      - "The sandbox: still running on port 3310, with its data in working/sandbox"
-      - "The allow-list: the folders and servers you added with mcp setup"
-      - "The CLAUDE.md line: my agent uses the index from now on"
-      - "Start on something new, where nothing existing is at risk"
-    notes: >-
-      [0:45] Know what the agent leaves behind. When the conversation ends,
-      the sandbox keeps running, on its port, with its data on your disk.
-      Stop it when you're done, or keep it, like I did, because it's my index
-      now. The allow-list stays as you set it. And the line in CLAUDE.md
-      means every future session knows about the index. Where to start?
-      Something new. A tool you've wanted, where there's no existing code to
-      break.
+      [1:30] So here's what I'd tell you. Adopt spec-driven development: write
+      down what the app does, and the check it has to pass. That one line is
+      how the agent knew it was done, and how I know it works. Name the files,
+      number the steps, and say in order. Load the skills and plugins for your
+      stack, and look for the Skill line, because a small agent may not load
+      them for you. Give the agent a sandbox, and keep your experiments
+      isolated. I ran every build in a fresh clone, so nothing I cared about
+      was ever at risk. Start with something new, where there's no existing
+      code to break. And know what stays behind: the sandbox keeps running on
+      its port, with its data on your disk, until you stop it. Finally, run
+      the check yourself, and tell the agent what you find.
 
   - layout: thank-you
     title: Go build the tool you've been missing, on open source you own
