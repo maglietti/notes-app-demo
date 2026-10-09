@@ -293,8 +293,9 @@ slides:
       first, using MariaDB's own vector distance, in the form the vector
       index expects. The two schema errors are gone too. And the rerun
       answer is honest now: a second run wipes the database. A few things
-      were still off, like the size of the embeddings my model returns, and
-      we'll see what catches those in a minute.
+      were still off, like the size of the embeddings my model returns. A
+      live server catches those the moment the schema runs, which is why the
+      sandbox matters.
 
   - layout: title-body-dark
     title: Check that the agent actually loaded the skill
@@ -534,7 +535,8 @@ slides:
       - Run the check yourself
     notes: >-
       [1:00] So here's what I'd tell you. Write down what the app does, and
-      the check it has to pass. That one line caught the fifth-place search.
+      the check it has to pass. That one line is how the agent knew it was
+      done, and how I know it works.
       Name the files, number the steps, say in order. Load how your database
       does it, and look for the Skill line, because a small agent may not
       load it for you. Give the agent a sandbox, so it tries its work on a
@@ -570,10 +572,11 @@ slides:
   - layout: section-granite
     title: "Demo: from the spec to a working search"
     notes: >-
-      [3:00 to 5:00] Play the recorded cut of README Prompts 1 and 2 (to be
-      recorded). Then live: uv run notes-app, type "rehearsing a database move
-      with fake data", Enter on the April 14 note to open nvim. If anything
-      fails, slides 20 and 21 already show the result.
+      [3:00 to 5:00] Play the recorded cut of run rec-2026-10c, README
+      Prompts 1 and 2. Then live: uv run notes-app, press slash, type
+      "rehearsing a database move with fake data", and press Enter on the
+      April 14 note to open nvim. Quit nvim, then q. If anything fails,
+      slides 20 and 21 already show the result.
 
   - layout: end
     url: |
