@@ -6,7 +6,7 @@ A year of daily Markdown notes is hard to search by meaning: `rg` finds words, a
 
 ## Repository layout
 
-The repository tracks the instructions and nothing else. The agent reads the two inputs marked `(agent input)`.
+The repository tracks the instructions, the notes, and the talk's slides. The agent reads the two inputs marked `(agent input)`.
 
 ```text
 .
@@ -14,10 +14,11 @@ The repository tracks the instructions and nothing else. The agent reads the two
 ├── LICENSE                      Apache License 2.0
 ├── notes/                       a year of daily notes and quarterly archives (agent input)
 └── talk/
-    └── notes-app-spec.md        the spec: what the app does and when it is done (agent input)
+    ├── notes-app-spec.md        the spec: what the app does and when it is done (agent input)
+    └── slides.pdf               the talk's slides
 ```
 
-Everything a run generates is gitignored, so `git clean -fdx` removes all of it:
+You build the app in a clone of this repository, never in the repository itself. Each run gets its own clone, so the source stays untouched and you can keep runs side by side. A run generates these files in its clone, and all of them are gitignored:
 
 ```text
 notes_app/                                    the app package
@@ -53,17 +54,32 @@ The plugin installs the MariaDB skills and the `mariadb-shell` MCP server. On fi
 
 ## Step 2: Configure the MCP server
 
-The server starts out allowed to reach nothing. Add this repository's root to its allowed paths, so it can read the spec, write `working/`, and reach the sandbox it deploys:
+The server starts out allowed to reach nothing. Allow the folder that will hold your clones, so the server can read the spec, write `working/`, and reach the sandbox it deploys in every clone:
 
 ```bash
-mariadb-shell -- mcp setup
+mkdir -p ~/notes-app-runs
+mariadb-shell -- mcp setup --addPaths=$HOME/notes-app-runs
 ```
 
-If `mariadb-shell` is not on your `PATH`, use `~/.local/bin/mariadb-shell`.
+Run `mariadb-shell -- mcp setup` with no options to do the same interactively. If `mariadb-shell` is not on your `PATH`, use `~/.local/bin/mariadb-shell`.
 
-## Step 3: Build the data tier
+## Step 3: Make a clean clone
 
-Start the agent at the repository root and give it Prompt 1:
+The agent must see only the spec and the notes. Clone the repository, then remove anything from the talk that is not the spec. The slides show how earlier runs went, and an agent that reads them can skip the work.
+
+```bash
+cd ~/notes-app-runs
+git clone https://github.com/maglietti/notes-app-demo.git run-1
+cd run-1
+rm -f talk/slides.pdf
+ls talk
+```
+
+**Check.** `ls talk` prints only `notes-app-spec.md`. Use a new folder name, such as `run-2`, for each run.
+
+## Step 4: Build the data tier
+
+Start the agent at the clone's root. Type a short line of your own, such as `Please run these steps.`, then paste Prompt 1 into the same message. A message that is only a pasted block can make the agent stop and ask for confirmation first.
 
 ```text
 Work in this repository and complete every step in order. Write your files to
@@ -81,9 +97,9 @@ The first deploy downloads the MariaDB 12.3 server package, a few hundred megaby
 
 **Check.** The schema runs on the sandbox with no errors. The spec names no MariaDB features, so read `working/notes_app.sql` to see what the agent chose.
 
-## Step 4: Build the app
+## Step 5: Build the app
 
-Give the agent Prompt 2:
+Give the agent Prompt 2 the same way:
 
 ```text
 Build the app that talk/notes-app-spec.md describes, on the schema in
@@ -104,46 +120,44 @@ and record each command and its result in working/RUN_LOG.md.
 uv run notes-app search "testing a migration without a copy of production"
 ```
 
-## Step 5: Run the app
+## Step 6: Run the app
 
 ```bash
 uv run notes-app
 ```
 
-Type what a note was about, and press Enter on a result to open it in `nvim`. The app reads its connection settings from `.env` at the repository root. If `.env` is missing, copy `.env.example` and set the password to `demo-pw`.
+The bottom bar lists the keys. Search for what a note was about, and press Enter on a result to open it in `nvim`. The app reads its connection settings from `.env` at the clone's root. If `.env` is missing, copy `.env.example` and set the password to `demo-pw`.
 
 ## Clean up
 
-The sandbox is a real server process that outlives the conversation. Stop and delete it first:
+The sandbox is a real server process that outlives the conversation. When you are done with a run, stop and delete it:
 
 ```text
 Stop and delete the sandbox on port 3310.
 ```
 
-Then remove the generated files:
+To keep a run for comparison, keep its clone folder. To discard it, delete the folder:
 
 ```bash
-git clean -fdx
+rm -rf ~/notes-app-runs/run-1
 ```
 
-To keep a generation for comparison, commit it to a branch first. The files are ignored, so `git add` needs `-f`, and the `notes_app/*.py` glob keeps the `__pycache__` bytecode out:
-
-```bash
-git switch -c run/2026-10-07
-git add -f notes_app/*.py pyproject.toml uv.lock working/notes_app.sql working/RUN_LOG.md
-git commit -m "run: <harness or model>, <what stood out>"
-git switch main
-```
+The source repository never changes, so there is nothing to reset.
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | ------- | ----- | --- |
-| A tool call hangs and never returns | The repository root is not on the allowed-paths list. | Add it with `mariadb-shell -- mcp setup`. |
+| A tool call hangs and never returns | The clone is not inside an allowed path. | Add the folder that holds your clones with `mariadb-shell -- mcp setup --addPaths`. |
 | The sandbox deploys but the connection is refused | The root password was blank. | Redeploy with a non-blank password (`demo-pw`). |
+| Port 3310 is already in use | An earlier run's sandbox is still running. | Stop and delete it before the next run, or deploy on another port. |
 | "Not a configured connection" | The URI is not on the allow-list, or asks for more than was configured. | Rerun `mcp setup`, or drop the extra schema or option from the URI. |
 | The import fails to reach Ollama | Ollama is not running, or the model is not pulled. | Start Ollama and run `ollama pull qwen3-embedding:0.6b`. |
 
+## Slides
+
+[`talk/slides.pdf`](talk/slides.pdf) holds the talk's slides.
+
 ## License
 
-Apache License 2.0, in [`LICENSE`](LICENSE). It covers the runbook, the prompts, the spec, and the notes.
+Apache License 2.0, in [`LICENSE`](LICENSE). It covers the runbook, the prompts, the spec, and the notes. It does not cover `talk/slides.pdf`, which uses MariaDB's presentation template. The MariaDB name and logo are trademarks and are not licensed here.

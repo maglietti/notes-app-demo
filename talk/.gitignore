@@ -1,4 +1,4 @@
-# Generated Marp exports
+# The deck source and its builds live in working/deck/ (gitignored).
+# Only the slides PDF is tracked: talk/slides.pdf, without speaker notes.
 slides.html
-slides.pdf
 slides.pptx

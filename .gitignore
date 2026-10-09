@@ -1,6 +1,6 @@
 # This repository holds the INSTRUCTIONS for generating the app, not the app.
-# Everything the prompts, the agent, or a build produce is ignored, so the repo
-# stays clean and `git clean -fdx` returns it to a pristine, re-runnable state.
+# Runs happen in a clone (see README, Step 3). Everything the prompts, the agent,
+# or a build produce is ignored, so a clone's git status stays clean.
 
 # Prompt 2 output: the generated Textual app at the repository root
 /notes_app/
@@ -30,3 +30,6 @@ env/
 
 # macOS
 .DS_Store
+
+# Office lock files
+~$*
