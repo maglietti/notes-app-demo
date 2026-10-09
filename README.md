@@ -87,7 +87,8 @@ Give the agent Prompt 2:
 
 ```text
 Build the app that talk/notes-app-spec.md describes, on the schema in
-working/notes_app.sql. Build every Must have.
+working/notes_app.sql. Build every Must have, and skip the Nice to have
+items.
 
 - Write .env with the sandbox password demo-pw, plus a .env.example, at the
   repository root.
