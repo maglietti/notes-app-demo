@@ -31,6 +31,7 @@ A terminal app that finds my notes semantically. I type what a note was about, a
 5. Open a note and render its Markdown
 6. Open the note in `nvim` if I hit enter
 7. Search from the command line
+8. Keybindings like `lazygit`, and the bottom bar is always visible
 
 ## Nice to have
 
