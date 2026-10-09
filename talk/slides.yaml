@@ -213,7 +213,7 @@ slides:
       12.3, and the app and my agent search the same index.)
 
   - layout: title-body-dark
-    title: Installs with two commands, and configures itself
+    title: Two commands to install, one to give it access
     textboxes:
       - text: "/plugin marketplace add mariadb/ai-plugins\n/plugin install dev@mariadb"
         left_in: 0.8
