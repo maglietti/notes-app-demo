@@ -1,0 +1,1 @@
+Stop and delete the sandbox on port 3310.

@@ -1,0 +1,12 @@
+Please run these steps.
+
+Build the app that talk/notes-app-spec.md describes, on the schema in
+working/notes_app.sql. Build every Must have, and skip the Nice to have
+items.
+
+- Write .env with the sandbox password demo-pw, plus a .env.example, at the
+  repository root.
+- Keep working/ for the schema, run log and sandbox only.
+
+Import my notes, then check the app against the "Done when" items in the spec,
+and record each command and its result in working/RUN_LOG.md.

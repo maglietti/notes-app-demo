@@ -13,6 +13,7 @@ The repository tracks the instructions, the notes, and the talk's slides. The ag
 ├── README.md                    this runbook
 ├── LICENSE                      Apache License 2.0
 ├── notes/                       a year of daily notes and quarterly archives (agent input)
+├── prompts/                     the prompts for steps 4, 5, and the clean-up, ready to paste
 └── talk/
     ├── notes-app-spec.md        the spec: what the app does and when it is done (agent input)
     └── slides.pdf               the talk's slides
@@ -79,7 +80,7 @@ ls talk
 
 ## Step 4: Build the data tier
 
-Start the agent at the clone's root. Type a short line of your own, such as `Please run these steps.`, then paste Prompt 1 into the same message. A message that is only a pasted block can make the agent stop and ask for confirmation first.
+Start the agent at the clone's root. Type a short line of your own, such as `Please run these steps.`, then paste Prompt 1 into the same message. A message that is only a pasted block can make the agent stop and ask for confirmation first. [`prompts/1-data-tier.txt`](prompts/1-data-tier.txt) holds the short line and Prompt 1 together, so you can paste the whole file.
 
 ```text
 Work in this repository and complete every step in order. Write your files to
@@ -99,7 +100,7 @@ The first deploy downloads the MariaDB 12.3 server package, a few hundred megaby
 
 ## Step 5: Build the app
 
-Give the agent Prompt 2 the same way:
+Give the agent Prompt 2 the same way. It is in [`prompts/2-app.txt`](prompts/2-app.txt):
 
 ```text
 Build the app that talk/notes-app-spec.md describes, on the schema in
@@ -130,7 +131,7 @@ The bottom bar lists the keys. Search for what a note was about, and press Enter
 
 ## Clean up
 
-The sandbox is a real server process that outlives the conversation. When you are done with a run, stop and delete it:
+The sandbox is a real server process that outlives the conversation. When you are done with a run, stop and delete it with [`prompts/3-clean-up.txt`](prompts/3-clean-up.txt):
 
 ```text
 Stop and delete the sandbox on port 3310.
